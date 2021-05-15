@@ -1,5 +1,4 @@
-//SpreadsheetApp.getUi().alert('hello world');
-const dateRangeLabels = ['BLANK', 'Evergreen', 'Summer', 'Winter'];
+//const eventRangeLabels = ['BLANK', 'Evergreen', 'Summer', 'Winter'];
 const cyclesSheetName = 'Cycles', cyclesColumns = [4];
 const valuesSheetName = '(dropdowns)', valuesCalendarIdCell = 'K2';
 
@@ -31,27 +30,31 @@ function repopulateCalendar(calendar, cyclesSheet) {
   const startRow = 2, maxRows = 500;
   const startCol = 4, maxCols = 7;
   const values = cyclesSheet.getRange(startRow, startCol, maxRows, maxCols).getValues();
-  var lastDoneDates = getLastDoneDates(values);
+  const status = values[0][maxCols-1];
+  
+  var events = getEvents(values);
   var season = getSeason(values);
-  alertDates(lastDoneDates, season);
-  calendar.createAllDayEvent('TEST', new Date('May 15, 2021'));
+  alertEvents(events, season);
+  calendar.createAllDayEvent('TEST2', new Date('May 15, 2021'));
 }
 
-function getLastDoneDates(values) {
-  var dates = [];
+function getEvents(values) {
+  var events = [];
   var currentRange = 0;
-  dates[currentRange] = [];
+  events[currentRange] = [];
 
   for(var i = 0; i < values.length; i++) {
     if(values[i][0] === 'Last done') {
       currentRange++;
-      dates[currentRange] = [];
+      events[currentRange] = [];
     } else if(values[i][0] instanceof Date){
-      dates[currentRange].push(values[i][0]);
+      events[currentRange].push({
+        date: values[i][0]
+      });
     }
   }
 
-  return dates;
+  return events;
 }
 
 function getSeason(values) {
@@ -59,19 +62,19 @@ function getSeason(values) {
   return statusStr.substring(statusStr.length - 6);
 }
 
-function alertDates(dates, season) {
+function alertEvents(events, season) {
   var str = '';
 
   str += 'Evergreen\n';
   var i = 1;
-  for(var j = 0; j < dates[i].length; j++) {
-    str += dates[i][j] + '\n';
+  for(var j = 0; j < events[i].length; j++) {
+    str += events[i][j].date + '\n';
   }
 
   str += season + '\n';
   i = season === 'Summer' ? 2 : 3;
-  for(var j = 0; j < dates[i].length; j++) {
-    str += dates[i][j] + '\n';
+  for(var j = 0; j < events[i].length; j++) {
+    str += events[i][j].date + '\n';
   }
   SpreadsheetApp.getUi().alert(str);
 }
