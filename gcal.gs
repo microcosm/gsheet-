@@ -1,5 +1,5 @@
 //const eventRangeLabels = ['BLANK', 'Evergreen', 'Summer', 'Winter'];
-const cyclesSheetName = 'Cycles', cyclesColumns = [4];
+const cyclesSheetName = 'Cycles', cyclesColumns = [4], cyclesNounColId = 0, cyclesVerbColId = 1, cyclesDateColId = 2, cyclesDateLabel = 'Last done';
 const valuesSheetName = '(dropdowns)', valuesCalendarIdCell = 'K2';
 
 function onEditInstalledTrigger(e) {
@@ -28,14 +28,12 @@ function clearCalendar(calendar) {
 
 function repopulateCalendar(calendar, cyclesSheet) {
   const startRow = 2, maxRows = 500;
-  const startCol = 4, maxCols = 7;
+  const startCol = 2, maxCols = 9;
   const values = cyclesSheet.getRange(startRow, startCol, maxRows, maxCols).getValues();
-  const status = values[0][maxCols-1];
-  
   var events = getEvents(values);
   var season = getSeason(values);
   alertEvents(events, season);
-  calendar.createAllDayEvent('TEST2', new Date('May 15, 2021'));
+  calendar.createAllDayEvent('TEST', new Date('May 11, 2021'));
 }
 
 function getEvents(values) {
@@ -44,12 +42,13 @@ function getEvents(values) {
   events[currentRange] = [];
 
   for(var i = 0; i < values.length; i++) {
-    if(values[i][0] === 'Last done') {
+    if(values[i][cyclesDateColId] === cyclesDateLabel) {
       currentRange++;
       events[currentRange] = [];
-    } else if(values[i][0] instanceof Date){
+    } else if(values[i][cyclesDateColId] instanceof Date){
       events[currentRange].push({
-        date: values[i][0]
+        title: values[i][cyclesNounColId] + ': ' + values[i][cyclesVerbColId],
+        date: values[i][cyclesDateColId]
       });
     }
   }
@@ -68,13 +67,13 @@ function alertEvents(events, season) {
   str += 'Evergreen\n';
   var i = 1;
   for(var j = 0; j < events[i].length; j++) {
-    str += events[i][j].date + '\n';
+    str += events[i][j].title + ' ' + events[i][j].date + '\n';
   }
 
   str += season + '\n';
   i = season === 'Summer' ? 2 : 3;
   for(var j = 0; j < events[i].length; j++) {
-    str += events[i][j].date + '\n';
+    str += events[i][j].title + ' ' + events[i][j].date + '\n';
   }
   SpreadsheetApp.getUi().alert(str);
 }
