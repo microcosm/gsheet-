@@ -1,11 +1,12 @@
 //const eventRangeLabels = ['BLANK', 'Evergreen', 'Summer', 'Winter'];
-const cyclesSheetName = 'Cycles', cyclesColumns = [4], cyclesNounColId = 0, cyclesVerbColId = 1, cyclesDateColId = 2, cyclesDateLabel = 'Last done';
+const cyclesSheetName = 'Cycles', cyclesWatchColumns = [2, 3, 4, 6];
+const cyclesNounColId = 0, cyclesVerbColId = 1, cyclesDateColId = 2, cyclesNameColId = 4, cyclesDateLabel = 'Last done';
 const valuesSheetName = '(dropdowns)', valuesCalendarIdCell = 'K2';
 
 function onEditInstalledTrigger(e) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const triggeringSheet = spreadsheet.getActiveSheet();
-  if (triggeringSheet.getName() !== cyclesSheetName || cyclesColumns.indexOf(e.range.columnStart) == -1) return;
+  if (triggeringSheet.getName() !== cyclesSheetName || cyclesWatchColumns.indexOf(e.range.columnStart) == -1) return;
   const valuesSheet = spreadsheet.getSheetByName(valuesSheetName);
   updateCalendar(triggeringSheet, valuesSheet);
 }
@@ -48,6 +49,7 @@ function getEvents(values) {
     } else if(values[i][cyclesDateColId] instanceof Date){
       events[currentRange].push({
         title: values[i][cyclesNounColId] + ': ' + values[i][cyclesVerbColId],
+        name: values[i][cyclesNameColId],
         date: values[i][cyclesDateColId]
       });
     }
@@ -67,13 +69,13 @@ function alertEvents(events, season) {
   str += 'Evergreen\n';
   var i = 1;
   for(var j = 0; j < events[i].length; j++) {
-    str += events[i][j].title + ' ' + events[i][j].date + '\n';
+    str += '[' + events[i][j].name + '] ' + events[i][j].title + ' ' + events[i][j].date + '\n';
   }
 
   str += season + '\n';
   i = season === 'Summer' ? 2 : 3;
   for(var j = 0; j < events[i].length; j++) {
-    str += events[i][j].title + ' ' + events[i][j].date + '\n';
+    str += '[' + events[i][j].name + '] ' + events[i][j].title + ' ' + events[i][j].date + '\n';
   }
   SpreadsheetApp.getUi().alert(str);
 }
