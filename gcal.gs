@@ -1,6 +1,6 @@
 //const eventRangeLabels = ['BLANK', 'Evergreen', 'Summer', 'Winter'];
 const rangeRowOffset = 2, rangeColOffset = 2, rangeMaxRows = 500, rangeMaxCols = 9;
-const cyclesSheetName = 'Cycles', cyclesDateLabel = 'Last done', valuesSheetName = '(dropdowns)', valuesCalendarIdCell = 'K2';
+const cyclesSheetName = 'Cycles', cyclesDateLabel = 'Last done', valuesSheetName = '(dropdowns)', valuesCalendarIdCol = 'K';
 var cyclesNounColIndex, cyclesVerbColIndex, cyclesDateColIndex, cyclesNameColIndex;
 const cyclesNounCol = 2, cyclesVerbCol = 3, cyclesDateCol = 4, cyclesNameCol = 6;
 const cyclesWatchColumns = [cyclesNounCol, cyclesVerbCol, cyclesDateCol, cyclesNameCol];
@@ -14,10 +14,25 @@ function onEditInstalledTrigger(e) {
 }
 
 function updateCalendar(cyclesSheet, valuesSheet) {
-  const calendarId = valuesSheet.getRange(valuesCalendarIdCell).getValue();
-  const calendar = CalendarApp.getCalendarById(calendarId);
-  clearCalendar(calendar);
-  populateCalendar(calendar, cyclesSheet);
+  const people = getPeople(valuesSheet);
+  people.forEach(function(person) {
+    clearCalendar(person.calendar);
+    populateCalendar(person.calendar, cyclesSheet);
+  });
+}
+
+function getPeople(valuesSheet) {
+  const values = valuesSheet.getRange(valuesCalendarIdCol + '2:' + valuesCalendarIdCol + '5').getValues();
+  var people = [];
+  for(var i = 0; i < values.length; i+=2) {
+    if(values[i][0] && values[i + 1][0]){
+      people.push({
+        name: values[i][0],
+        calendar: CalendarApp.getCalendarById(values[i + 1][0])
+      });
+    }
+  }
+  return people;
 }
 
 function clearCalendar(calendar) {
@@ -35,7 +50,7 @@ function populateCalendar(calendar, cyclesSheet) {
   var events = getEvents(values);
   var season = getSeason(values);
   alertEvents(events, season);
-  calendar.createAllDayEvent('TEST', new Date('May 11, 2021'));
+  //calendar.createAllDayEvent('TEST', new Date('May 11, 2021'));
 }
 
 function calculateColumnDataIndices() {
