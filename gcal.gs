@@ -7,9 +7,10 @@ var data = {
     maxRows: 500,
     maxCols: 9
   },
-  values: {
+  peopleCalendars: {
     sheetName: '(dropdowns)',
-    gcalColumnId: 'K'
+    start: 'K2',
+    end: 'K5'
   },
   cycles: {
     sheetName: 'Cycles',
@@ -27,20 +28,20 @@ function onEditInstalledTrigger(e) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const triggeringSheet = spreadsheet.getActiveSheet();
   if (triggeringSheet.getName() !== data.cycles.sheetName || Object.values(data.cycles.sheetColumns).indexOf(e.range.columnStart) == -1) return;
-  const valuesSheet = spreadsheet.getSheetByName(data.values.sheetName);
-  updateCalendar(triggeringSheet, valuesSheet);
+  const peopleCalendarsSheet = spreadsheet.getSheetByName(data.peopleCalendars.sheetName);
+  updateCalendar(triggeringSheet, peopleCalendarsSheet);
 }
 
-function updateCalendar(cyclesSheet, valuesSheet) {
-  const people = getPeople(valuesSheet);
-  people.forEach(function(person) {
-    clearCalendar(person.calendar);
-    populateCalendar(person.calendar, cyclesSheet);
+function updateCalendar(cyclesSheet, peopleCalendarsSheet) {
+  data.people = getPeople(peopleCalendarsSheet);
+  data.people.forEach(function(person) {
+    clearCalendar(person);
+    populateCalendar(cyclesSheet, person);
   });
 }
 
-function getPeople(valuesSheet) {
-  const values = valuesSheet.getRange(data.values.gcalColumnId + '2:' + data.values.gcalColumnId + '5').getValues();
+function getPeople(peopleCalendarsSheet) {
+  const values = peopleCalendarsSheet.getRange(data.peopleCalendars.start + ':' + data.peopleCalendars.end).getValues();
   var people = [];
   for(var i = 0; i < values.length; i+=2) {
     if(values[i][0] && values[i + 1][0]){
@@ -53,22 +54,23 @@ function getPeople(valuesSheet) {
   return people;
 }
 
-function clearCalendar(calendar) {
+function clearCalendar(person) {
   const fromDate = new Date('January 1, 2000');
   const toDate = new Date('January 1, 3000');
-  const events = calendar.getEvents(fromDate, toDate);
+  const events = person.calendar.getEvents(fromDate, toDate);
   for(var i = 0; i < events.length; i++){
     events[i].deleteEvent();
   }
 }
 
-function populateCalendar(calendar, cyclesSheet) {
+function populateCalendar(cyclesSheet, person) {
   const values = cyclesSheet.getRange(data.range.offsets.row, data.range.offsets.col, data.range.maxRows, data.range.maxCols).getValues();
   data.cycles.rangeColumns = getRangeColumns();
-  var events = getEvents(values);
+  data.otherPeopleNames = getOtherPeopleNames(person);
+  var events = getEvents(values, person);
   var season = getSeason(values);
   alertEvents(events, season);
-  calendar.createAllDayEvent('TEST', new Date('May 12, 2021'));
+  person.calendar.createAllDayEvent('TEST', new Date('May 12, 2021'));
 }
 
 function getRangeColumns() {
@@ -80,7 +82,17 @@ function getRangeColumns() {
   };
 }
 
-function getEvents(values) {
+function getOtherPeopleNames(person) {
+  var otherPeopleNames = [];
+  data.people.forEach(function(possibleOther) {
+    if(possibleOther.name != person.name) {
+      otherPeopleNames.push(possibleOther.name);
+    }
+  });
+  return otherPeopleNames;
+}
+
+function getEvents(values, person) {
   var events = [];
   var currentRange = 0;
   events[currentRange] = [];
@@ -89,7 +101,7 @@ function getEvents(values) {
     if(values[i][data.cycles.rangeColumns.date] === data.cycles.dateLabel) {
       currentRange++;
       events[currentRange] = [];
-    } else if(values[i][data.cycles.rangeColumns.date] instanceof Date){
+    } else if(isApplicableEvent(values[i])){
       events[currentRange].push({
         title: values[i][data.cycles.rangeColumns.noun] + ': ' + values[i][data.cycles.rangeColumns.verb],
         name: values[i][data.cycles.rangeColumns.name],
@@ -99,6 +111,11 @@ function getEvents(values) {
   }
 
   return events;
+}
+
+function isApplicableEvent(value) {
+  return value[data.cycles.rangeColumns.date] instanceof Date &&
+         !data.otherPeopleNames.includes(value[data.cycles.rangeColumns.name])
 }
 
 function getSeason(values) {
