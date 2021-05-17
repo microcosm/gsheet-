@@ -1,15 +1,33 @@
-//const eventRangeLabels = ['BLANK', 'Evergreen', 'Summer', 'Winter'];
-const rangeRowOffset = 2, rangeColOffset = 2, rangeMaxRows = 500, rangeMaxCols = 9;
-const cyclesSheetName = 'Cycles', cyclesDateLabel = 'Last done', valuesSheetName = '(dropdowns)', valuesCalendarIdCol = 'K';
-var cyclesNounColIndex, cyclesVerbColIndex, cyclesDateColIndex, cyclesNameColIndex;
-const cyclesNounCol = 2, cyclesVerbCol = 3, cyclesDateCol = 4, cyclesNameCol = 6;
-const cyclesWatchColumns = [cyclesNounCol, cyclesVerbCol, cyclesDateCol, cyclesNameCol];
+var data = {
+  range: {
+    offsets: {
+      row: 2,
+      col: 2
+    },
+    maxRows: 500,
+    maxCols: 9
+  },
+  values: {
+    sheetName: '(dropdowns)',
+    gcalColumnId: 'K'
+  },
+  cycles: {
+    sheetName: 'Cycles',
+    dateLabel: 'Last done',
+    sheetColumns: {
+      noun: 2,
+      verb: 3,
+      date: 4,
+      name: 6
+    }
+  }
+};
 
 function onEditInstalledTrigger(e) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const triggeringSheet = spreadsheet.getActiveSheet();
-  if (triggeringSheet.getName() !== cyclesSheetName || cyclesWatchColumns.indexOf(e.range.columnStart) == -1) return;
-  const valuesSheet = spreadsheet.getSheetByName(valuesSheetName);
+  if (triggeringSheet.getName() !== data.cycles.sheetName || Object.values(data.cycles.sheetColumns).indexOf(e.range.columnStart) == -1) return;
+  const valuesSheet = spreadsheet.getSheetByName(data.values.sheetName);
   updateCalendar(triggeringSheet, valuesSheet);
 }
 
@@ -22,7 +40,7 @@ function updateCalendar(cyclesSheet, valuesSheet) {
 }
 
 function getPeople(valuesSheet) {
-  const values = valuesSheet.getRange(valuesCalendarIdCol + '2:' + valuesCalendarIdCol + '5').getValues();
+  const values = valuesSheet.getRange(data.values.gcalColumnId + '2:' + data.values.gcalColumnId + '5').getValues();
   var people = [];
   for(var i = 0; i < values.length; i+=2) {
     if(values[i][0] && values[i + 1][0]){
@@ -45,19 +63,21 @@ function clearCalendar(calendar) {
 }
 
 function populateCalendar(calendar, cyclesSheet) {
-  const values = cyclesSheet.getRange(rangeRowOffset, rangeColOffset, rangeMaxRows, rangeMaxCols).getValues();
-  calculateColumnDataIndices();
+  const values = cyclesSheet.getRange(data.range.offsets.row, data.range.offsets.col, data.range.maxRows, data.range.maxCols).getValues();
+  data.cycles.rangeColumns = getRangeColumns();
   var events = getEvents(values);
   var season = getSeason(values);
   alertEvents(events, season);
-  //calendar.createAllDayEvent('TEST', new Date('May 11, 2021'));
+  calendar.createAllDayEvent('TEST', new Date('May 12, 2021'));
 }
 
-function calculateColumnDataIndices() {
-  cyclesNounColIndex = cyclesNounCol - rangeColOffset;
-  cyclesVerbColIndex = cyclesVerbCol - rangeColOffset;
-  cyclesDateColIndex = cyclesDateCol - rangeColOffset;
-  cyclesNameColIndex = cyclesNameCol - rangeColOffset;
+function getRangeColumns() {
+  return {
+    noun: data.cycles.sheetColumns.noun - data.range.offsets.col,
+    verb: data.cycles.sheetColumns.verb - data.range.offsets.col,
+    date: data.cycles.sheetColumns.date - data.range.offsets.col,
+    name: data.cycles.sheetColumns.name - data.range.offsets.col
+  };
 }
 
 function getEvents(values) {
@@ -66,14 +86,14 @@ function getEvents(values) {
   events[currentRange] = [];
 
   for(var i = 0; i < values.length; i++) {
-    if(values[i][cyclesDateColIndex] === cyclesDateLabel) {
+    if(values[i][data.cycles.rangeColumns.date] === data.cycles.dateLabel) {
       currentRange++;
       events[currentRange] = [];
-    } else if(values[i][cyclesDateColIndex] instanceof Date){
+    } else if(values[i][data.cycles.rangeColumns.date] instanceof Date){
       events[currentRange].push({
-        title: values[i][cyclesNounColIndex] + ': ' + values[i][cyclesVerbColIndex],
-        name: values[i][cyclesNameColIndex],
-        date: values[i][cyclesDateColIndex]
+        title: values[i][data.cycles.rangeColumns.noun] + ': ' + values[i][data.cycles.rangeColumns.verb],
+        name: values[i][data.cycles.rangeColumns.name],
+        date: values[i][data.cycles.rangeColumns.date]
       });
     }
   }
