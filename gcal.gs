@@ -2,7 +2,7 @@ var data;
 
 function loadData() {
   data = {
-    spreadsheet: null,
+    spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     people: null,
     values: {
       sheetName: '(dropdowns)',
@@ -35,9 +35,15 @@ function loadData() {
         durationHours: 13,
         workDate: 14
       },
-      triggerColumns: null
+      triggerColumns: null,
+      rangeColumns: null
     }
   };
+
+  data.cycles.sheet = data.spreadsheet.getSheetByName(data.cycles.sheetName);
+  data.values.sheet = data.spreadsheet.getSheetByName(data.values.sheetName);
+
+  data.people = getPeople();
 
   data.cycles.triggerColumns = [
     data.cycles.columns.noun,
@@ -50,9 +56,12 @@ function loadData() {
     data.cycles.columns.durationHours
   ];
 
-  data.spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  data.cycles.sheet = data.spreadsheet.getSheetByName(data.cycles.sheetName);
-  data.values.sheet = data.spreadsheet.getSheetByName(data.values.sheetName);
+  data.cycles.rangeColumns = {
+    noun: data.cycles.columns.noun - data.cycles.range.offsets.col,
+    verb: data.cycles.columns.verb - data.cycles.range.offsets.col,
+    name: data.cycles.columns.name - data.cycles.range.offsets.col,
+    workDate: data.cycles.columns.workDate - data.cycles.range.offsets.col
+  }
 }
 
 function onEditInstalledTrigger(e) {
@@ -67,7 +76,6 @@ function isValidTrigger(e){
 }
 
 function updateCalendar() {
-  data.people = getPeople();
   data.people.forEach(function(person) {
     clearCalendar(person);
     populateCalendar(person);
@@ -99,21 +107,32 @@ function clearCalendar(person) {
 
 function populateCalendar(person) {
   const values = data.cycles.sheet.getRange(data.cycles.range.offsets.row, data.cycles.range.offsets.col, data.cycles.range.maxRows, data.cycles.range.maxCols).getValues();
-  data.cycles.rangeColumns = getRangeColumns();
-  data.otherPeopleNames = getOtherPeopleNames(person);
-  var events = getEvents(values);
+  var events = getEvents(values, person);
   var season = getSeason(values);
   alertEvents(events, season);
   //person.calendar.createAllDayEvent('TEST5', new Date('May 12, 2021'));
 }
 
-function getRangeColumns() {
-  return {
-    noun: data.cycles.columns.noun - data.cycles.range.offsets.col,
-    verb: data.cycles.columns.verb - data.cycles.range.offsets.col,
-    name: data.cycles.columns.name - data.cycles.range.offsets.col,
-    workDate: data.cycles.columns.workDate - data.cycles.range.offsets.col
-  };
+function getEvents(values, person) {
+  var events = [];
+  var currentRange = 0;
+  events[currentRange] = [];
+  const exclusionListNames = getOtherPeopleNames(person);
+
+  for(var i = 0; i < values.length; i++) {
+    if(values[i][data.cycles.rangeColumns.workDate] === data.cycles.workDateLabel) {
+      currentRange++;
+      events[currentRange] = [];
+    } else if(isApplicableEvent(values[i], exclusionListNames)){
+      events[currentRange].push({
+        title: values[i][data.cycles.rangeColumns.noun] + ': ' + values[i][data.cycles.rangeColumns.verb],
+        name: values[i][data.cycles.rangeColumns.name],
+        date: values[i][data.cycles.rangeColumns.workDate]
+      });
+    }
+  }
+
+  return events;
 }
 
 function getOtherPeopleNames(person) {
@@ -126,30 +145,9 @@ function getOtherPeopleNames(person) {
   return otherPeopleNames;
 }
 
-function getEvents(values) {
-  var events = [];
-  var currentRange = 0;
-  events[currentRange] = [];
-
-  for(var i = 0; i < values.length; i++) {
-    if(values[i][data.cycles.rangeColumns.workDate] === data.cycles.workDateLabel) {
-      currentRange++;
-      events[currentRange] = [];
-    } else if(isApplicableEvent(values[i])){
-      events[currentRange].push({
-        title: values[i][data.cycles.rangeColumns.noun] + ': ' + values[i][data.cycles.rangeColumns.verb],
-        name: values[i][data.cycles.rangeColumns.name],
-        date: values[i][data.cycles.rangeColumns.workDate]
-      });
-    }
-  }
-
-  return events;
-}
-
-function isApplicableEvent(value) {
+function isApplicableEvent(value, exclusionListNames) {
   return value[data.cycles.rangeColumns.workDate] instanceof Date &&
-         !data.otherPeopleNames.includes(value[data.cycles.rangeColumns.name])
+         !exclusionListNames.includes(value[data.cycles.rangeColumns.name])
 }
 
 function getSeason(values) {
