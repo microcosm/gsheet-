@@ -25,6 +25,7 @@ function loadData() {
         maxCols: 14
       },
       workDateLabel: 'Work date (calc)',
+      seasonStringLength: 6,
       columns: {
         noun: 2,
         verb: 3,
@@ -34,7 +35,8 @@ function loadData() {
         nudgeDays: 11,
         startTime: 12,
         durationHours: 13,
-        workDate: 14
+        workDate: 14,
+        season: 15
       },
       triggerColumns: null,
       rangeColumns: null
@@ -54,14 +56,16 @@ function loadData() {
     data.cycles.columns.cycleDays,
     data.cycles.columns.nudgeDays,
     data.cycles.columns.startTime,
-    data.cycles.columns.durationHours
+    data.cycles.columns.durationHours,
+    data.cycles.columns.season
   ];
 
   data.cycles.rangeColumns = {
     noun: data.cycles.columns.noun - data.cycles.range.offsets.col,
     verb: data.cycles.columns.verb - data.cycles.range.offsets.col,
     name: data.cycles.columns.name - data.cycles.range.offsets.col,
-    workDate: data.cycles.columns.workDate - data.cycles.range.offsets.col
+    workDate: data.cycles.columns.workDate - data.cycles.range.offsets.col,
+    season: data.cycles.columns.season - data.cycles.range.offsets.col
   }
 }
 
@@ -152,8 +156,8 @@ function isApplicableEvent(value, exclusionListNames) {
 }
 
 function getSeason(cyclesRange) {
-  const statusStr = cyclesRange[0][cyclesRange[0].length - 1];
-  return statusStr.substring(statusStr.length - 6);
+  const statusStr = cyclesRange[0][data.cycles.rangeColumns.season];
+  return statusStr.substring(statusStr.length - data.cycles.seasonStringLength);
 }
 
 function alertEvents(events) {
