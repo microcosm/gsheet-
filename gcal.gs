@@ -1,47 +1,83 @@
-var data = {
-  range: {
-    offsets: {
-      row: 2,
-      col: 2
-    },
-    maxRows: 500,
-    maxCols: 9
-  },
-  peopleCalendars: {
-    sheetName: '(dropdowns)',
-    start: 'K2',
-    end: 'K5'
-  },
-  cycles: {
-    sheetName: 'Cycles',
-    dateLabel: 'Last done',
-    sheetColumns: {
-      noun: 2,
-      verb: 3,
-      date: 4,
-      name: 6
-    }
-  }
-};
+var data;
 
-function onEditInstalledTrigger(e) {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  const triggeringSheet = spreadsheet.getActiveSheet();
-  if (triggeringSheet.getName() !== data.cycles.sheetName || Object.values(data.cycles.sheetColumns).indexOf(e.range.columnStart) == -1) return;
-  const peopleCalendarsSheet = spreadsheet.getSheetByName(data.peopleCalendars.sheetName);
-  updateCalendar(triggeringSheet, peopleCalendarsSheet);
+function loadData() {
+  data = {
+    gsheets: {
+      spreadsheet: null,
+      cyclesSheet: null,
+      valuesSheet: null
+    },
+    people: null,
+    range: {
+      offsets: {
+        row: 2,
+        col: 2
+      },
+      maxRows: 500,
+      maxCols: 14
+    },
+    valuesSheet: {
+      name: '(dropdowns)',
+      peopleCalendars: {
+        start: 'K2',
+        end: 'K5'
+      }
+    },
+    cyclesSheet: {
+      name: 'Cycles',
+      workDateLabel: 'Work date (calc)',
+      columns: {
+        noun: 2,
+        verb: 3,
+        lastDone: 4,
+        name: 6,
+        cycleDays: 7,
+        nudgeDays: 11,
+        startTime: 12,
+        durationHours: 13,
+        workDate: 14
+      },
+      triggerColumns: null
+    }
+  };
+
+  data.cyclesSheet.triggerColumns = [
+    data.cyclesSheet.columns.noun,
+    data.cyclesSheet.columns.verb,
+    data.cyclesSheet.columns.lastDone,
+    data.cyclesSheet.columns.name,
+    data.cyclesSheet.columns.cycleDays,
+    data.cyclesSheet.columns.nudgeDays,
+    data.cyclesSheet.columns.startTime,
+    data.cyclesSheet.columns.durationHours
+  ];
+
+  data.gsheets.spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  data.gsheets.cyclesSheet = data.gsheets.spreadsheet.getSheetByName(data.cyclesSheet.name);
+  data.gsheets.valuesSheet = data.gsheets.spreadsheet.getSheetByName(data.valuesSheet.name);
 }
 
-function updateCalendar(cyclesSheet, peopleCalendarsSheet) {
-  data.people = getPeople(peopleCalendarsSheet);
+function onEditInstalledTrigger(e) {
+  loadData();
+  if (!isValidTrigger(e)) return;
+  updateCalendar();
+}
+
+function isValidTrigger(e){
+  return data.gsheets.spreadsheet.getActiveSheet().getName() === data.cyclesSheet.name &&
+    data.cyclesSheet.triggerColumns.indexOf(e.range.columnStart) != -1
+}
+
+function updateCalendar() {
+  data.people = getPeople();
   data.people.forEach(function(person) {
     clearCalendar(person);
-    populateCalendar(cyclesSheet, person);
+    populateCalendar(person);
   });
 }
 
-function getPeople(peopleCalendarsSheet) {
-  const values = peopleCalendarsSheet.getRange(data.peopleCalendars.start + ':' + data.peopleCalendars.end).getValues();
+function getPeople() {
+  const values = data.gsheets.valuesSheet.getRange(data.valuesSheet.peopleCalendars.start + ':' + data.valuesSheet.peopleCalendars.end).getValues();
   var people = [];
   for(var i = 0; i < values.length; i+=2) {
     if(values[i][0] && values[i + 1][0]){
@@ -63,22 +99,22 @@ function clearCalendar(person) {
   }
 }
 
-function populateCalendar(cyclesSheet, person) {
-  const values = cyclesSheet.getRange(data.range.offsets.row, data.range.offsets.col, data.range.maxRows, data.range.maxCols).getValues();
-  data.cycles.rangeColumns = getRangeColumns();
+function populateCalendar(person) {
+  const values = data.gsheets.cyclesSheet.getRange(data.range.offsets.row, data.range.offsets.col, data.range.maxRows, data.range.maxCols).getValues();
+  data.cyclesSheet.rangeColumns = getRangeColumns();
   data.otherPeopleNames = getOtherPeopleNames(person);
-  var events = getEvents(values, person);
+  var events = getEvents(values);
   var season = getSeason(values);
   alertEvents(events, season);
-  person.calendar.createAllDayEvent('TEST', new Date('May 12, 2021'));
+  //person.calendar.createAllDayEvent('TEST5', new Date('May 12, 2021'));
 }
 
 function getRangeColumns() {
   return {
-    noun: data.cycles.sheetColumns.noun - data.range.offsets.col,
-    verb: data.cycles.sheetColumns.verb - data.range.offsets.col,
-    date: data.cycles.sheetColumns.date - data.range.offsets.col,
-    name: data.cycles.sheetColumns.name - data.range.offsets.col
+    noun: data.cyclesSheet.columns.noun - data.range.offsets.col,
+    verb: data.cyclesSheet.columns.verb - data.range.offsets.col,
+    name: data.cyclesSheet.columns.name - data.range.offsets.col,
+    workDate: data.cyclesSheet.columns.workDate - data.range.offsets.col
   };
 }
 
@@ -92,20 +128,21 @@ function getOtherPeopleNames(person) {
   return otherPeopleNames;
 }
 
-function getEvents(values, person) {
+function getEvents(values) {
   var events = [];
   var currentRange = 0;
   events[currentRange] = [];
 
   for(var i = 0; i < values.length; i++) {
-    if(values[i][data.cycles.rangeColumns.date] === data.cycles.dateLabel) {
+    str += values[i][data.cyclesSheet.rangeColumns.workDate] + " ";
+    if(values[i][data.cyclesSheet.rangeColumns.workDate] === data.cyclesSheet.workDateLabel) {
       currentRange++;
       events[currentRange] = [];
     } else if(isApplicableEvent(values[i])){
       events[currentRange].push({
-        title: values[i][data.cycles.rangeColumns.noun] + ': ' + values[i][data.cycles.rangeColumns.verb],
-        name: values[i][data.cycles.rangeColumns.name],
-        date: values[i][data.cycles.rangeColumns.date]
+        title: values[i][data.cyclesSheet.rangeColumns.noun] + ': ' + values[i][data.cyclesSheet.rangeColumns.verb],
+        name: values[i][data.cyclesSheet.rangeColumns.name],
+        date: values[i][data.cyclesSheet.rangeColumns.workDate]
       });
     }
   }
@@ -114,8 +151,8 @@ function getEvents(values, person) {
 }
 
 function isApplicableEvent(value) {
-  return value[data.cycles.rangeColumns.date] instanceof Date &&
-         !data.otherPeopleNames.includes(value[data.cycles.rangeColumns.name])
+  return value[data.cyclesSheet.rangeColumns.workDate] instanceof Date &&
+         !data.otherPeopleNames.includes(value[data.cyclesSheet.rangeColumns.name])
 }
 
 function getSeason(values) {
