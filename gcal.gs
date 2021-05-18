@@ -3,6 +3,7 @@ var data;
 function loadData() {
   data = {
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
+    season: null,
     people: null,
     values: {
       sheetName: '(dropdowns)',
@@ -77,8 +78,11 @@ function isValidTrigger(e){
 
 function updateCalendar() {
   data.people.forEach(function(person) {
+    const cyclesRange = data.cycles.sheet.getRange(data.cycles.range.offsets.row, data.cycles.range.offsets.col, data.cycles.range.maxRows, data.cycles.range.maxCols).getValues();
+    data.season = getSeason(cyclesRange);
+    var events = getEvents(person, cyclesRange);
     clearCalendar(person);
-    populateCalendar(person);
+    populateCalendar(events);
   });
 }
 
@@ -105,29 +109,26 @@ function clearCalendar(person) {
   }
 }
 
-function populateCalendar(person) {
-  const values = data.cycles.sheet.getRange(data.cycles.range.offsets.row, data.cycles.range.offsets.col, data.cycles.range.maxRows, data.cycles.range.maxCols).getValues();
-  var events = getEvents(values, person);
-  var season = getSeason(values);
-  alertEvents(events, season);
+function populateCalendar(events) {
+  alertEvents(events);
   //person.calendar.createAllDayEvent('TEST5', new Date('May 12, 2021'));
 }
 
-function getEvents(values, person) {
+function getEvents(person, cyclesRange) {
   var events = [];
   var currentRange = 0;
   events[currentRange] = [];
   const exclusionListNames = getOtherPeopleNames(person);
 
-  for(var i = 0; i < values.length; i++) {
-    if(values[i][data.cycles.rangeColumns.workDate] === data.cycles.workDateLabel) {
+  for(var i = 0; i < cyclesRange.length; i++) {
+    if(cyclesRange[i][data.cycles.rangeColumns.workDate] === data.cycles.workDateLabel) {
       currentRange++;
       events[currentRange] = [];
-    } else if(isApplicableEvent(values[i], exclusionListNames)){
+    } else if(isApplicableEvent(cyclesRange[i], exclusionListNames)){
       events[currentRange].push({
-        title: values[i][data.cycles.rangeColumns.noun] + ': ' + values[i][data.cycles.rangeColumns.verb],
-        name: values[i][data.cycles.rangeColumns.name],
-        date: values[i][data.cycles.rangeColumns.workDate]
+        title: cyclesRange[i][data.cycles.rangeColumns.noun] + ': ' + cyclesRange[i][data.cycles.rangeColumns.verb],
+        name: cyclesRange[i][data.cycles.rangeColumns.name],
+        date: cyclesRange[i][data.cycles.rangeColumns.workDate]
       });
     }
   }
@@ -150,12 +151,12 @@ function isApplicableEvent(value, exclusionListNames) {
          !exclusionListNames.includes(value[data.cycles.rangeColumns.name])
 }
 
-function getSeason(values) {
-  const statusStr = values[0][values[0].length - 1];
+function getSeason(cyclesRange) {
+  const statusStr = cyclesRange[0][cyclesRange[0].length - 1];
   return statusStr.substring(statusStr.length - 6);
 }
 
-function alertEvents(events, season) {
+function alertEvents(events) {
   var str = '';
 
   str += 'Evergreen\n';
@@ -164,8 +165,8 @@ function alertEvents(events, season) {
     str += '[' + events[i][j].name + '] ' + events[i][j].title + ' ' + events[i][j].date + '\n';
   }
 
-  str += season + '\n';
-  i = season === 'Summer' ? 2 : 3;
+  str += data.season + '\n';
+  i = data.season === 'Summer' ? 2 : 3;
   for(var j = 0; j < events[i].length; j++) {
     str += '[' + events[i][j].name + '] ' + events[i][j].title + ' ' + events[i][j].date + '\n';
   }
