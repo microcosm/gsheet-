@@ -39,7 +39,7 @@ function loadData() {
         season: 15
       },
       triggerColumns: null,
-      rangeColumns: null
+      rangeColumns: {}
     }
   };
 
@@ -60,12 +60,8 @@ function loadData() {
     data.cycles.columns.season
   ];
 
-  data.cycles.rangeColumns = {
-    noun: data.cycles.columns.noun - data.cycles.range.offsets.col,
-    verb: data.cycles.columns.verb - data.cycles.range.offsets.col,
-    name: data.cycles.columns.name - data.cycles.range.offsets.col,
-    workDate: data.cycles.columns.workDate - data.cycles.range.offsets.col,
-    season: data.cycles.columns.season - data.cycles.range.offsets.col
+  for(var key in data.cycles.columns) {
+    data.cycles.rangeColumns[key] = data.cycles.columns[key] - data.cycles.range.offsets.col;
   }
 }
 
@@ -115,7 +111,10 @@ function clearCalendar(person) {
 
 function populateCalendar(events) {
   alertEvents(events);
-  //person.calendar.createAllDayEvent('TEST5', new Date('May 12, 2021'));
+  events.forEach(function(event){
+    var eventName = event.title + " (" + event.personName + ")";
+    //person.calendar.createAllDayEvent(eventName, new Date('May 12, 2021'));
+  });
 }
 
 function getEvents(person, cyclesRange) {
@@ -125,19 +124,38 @@ function getEvents(person, cyclesRange) {
   const exclusionListNames = getOtherPeopleNames(person);
 
   for(var i = 0; i < cyclesRange.length; i++) {
-    if(cyclesRange[i][data.cycles.rangeColumns.workDate] === data.cycles.workDateLabel) {
+    const cyclesRow = cyclesRange[i];
+    if(cyclesRow[data.cycles.rangeColumns.workDate] === data.cycles.workDateLabel) {
       currentRange++;
       events[currentRange] = [];
-    } else if(isApplicableEvent(cyclesRange[i], exclusionListNames)){
-      events[currentRange].push({
-        title: cyclesRange[i][data.cycles.rangeColumns.noun] + ': ' + cyclesRange[i][data.cycles.rangeColumns.verb],
-        name: cyclesRange[i][data.cycles.rangeColumns.name],
-        date: cyclesRange[i][data.cycles.rangeColumns.workDate]
-      });
+    } else if(isApplicableEvent(cyclesRow, exclusionListNames)){
+      events[currentRange].push(buildNewEvent(cyclesRow));
     }
   }
 
   return events;
+}
+
+function buildNewEvent(cyclesRow) {
+  const startTime = cyclesRow[data.cycles.rangeColumns.startTime];
+  const durationHours = cyclesRow[data.cycles.rangeColumns.durationHours];
+  const allDay = isAllDay(startTime, durationHours);
+
+  return {
+    title: cyclesRow[data.cycles.rangeColumns.noun] + ': ' + cyclesRow[data.cycles.rangeColumns.verb],
+    personName: cyclesRow[data.cycles.rangeColumns.name],
+    date: cyclesRow[data.cycles.rangeColumns.workDate],
+    startTime: startTime,
+    finishTime: startTime + durationHours,
+    isAllDay: allDay
+  };
+}
+
+function isAllDay(startTime, durationHours) {
+  return !(
+    startTime >= 0 &&
+    startTime <= 24 &&
+    durationHours > 0);
 }
 
 function getOtherPeopleNames(person) {
@@ -150,9 +168,9 @@ function getOtherPeopleNames(person) {
   return otherPeopleNames;
 }
 
-function isApplicableEvent(value, exclusionListNames) {
-  return value[data.cycles.rangeColumns.workDate] instanceof Date &&
-         !exclusionListNames.includes(value[data.cycles.rangeColumns.name])
+function isApplicableEvent(cyclesRow, exclusionListNames) {
+  return cyclesRow[data.cycles.rangeColumns.workDate] instanceof Date &&
+         !exclusionListNames.includes(cyclesRow[data.cycles.rangeColumns.name])
 }
 
 function getSeason(cyclesRange) {
@@ -162,17 +180,19 @@ function getSeason(cyclesRange) {
 
 function alertEvents(events) {
   var str = '';
-
-  str += 'Evergreen\n';
-  var i = 1;
-  for(var j = 0; j < events[i].length; j++) {
-    str += '[' + events[i][j].name + '] ' + events[i][j].title + ' ' + events[i][j].date + '\n';
-  }
-
-  str += data.season + '\n';
-  i = data.season === 'Summer' ? 2 : 3;
-  for(var j = 0; j < events[i].length; j++) {
-    str += '[' + events[i][j].name + '] ' + events[i][j].title + ' ' + events[i][j].date + '\n';
-  }
+  str += buildEventAlertStr('Evergreen', events[1]);
+  str += buildEventAlertStr(data.season, data.season === 'Summer' ? events[2] : events[3]);
   SpreadsheetApp.getUi().alert(str);
+}
+
+function buildEventAlertStr(seasonLabel, seasonEvents) {
+  var str = seasonLabel + '\n';
+  seasonEvents.forEach(function(event) {
+    str += '[' +
+      event.personName + '] ' +
+      event.title + ' ' +
+      event.date + ' ' +
+      (event.isAllDay ? 'ALL DAY' : event.startTime + '-' + event.finishTime)  + '\n';
+  });
+  return str;
 }
