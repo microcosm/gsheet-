@@ -5,6 +5,7 @@ function loadData() {
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,
     people: null,
+    eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>',
     values: {
       sheetName: '(dropdowns)',
       sheet: null,
@@ -26,6 +27,16 @@ function loadData() {
       },
       workDateLabel: 'Work date (calc)',
       seasonStringLength: 6,
+      seasons: {
+        evergreen: 1,
+        summer: 2,
+        winter: 3
+      },
+      seasonNames: {
+        1: 'Evergreen',
+        2: 'Summer',
+        3: 'Winter'
+      },
       columns: {
         noun: 2,
         verb: 3,
@@ -82,7 +93,7 @@ function updateCalendar() {
     data.season = getSeason(cyclesRange);
     var events = getEvents(person, cyclesRange);
     clearCalendar(person);
-    populateCalendar(events);
+    populateCalendar(person, events);
   });
 }
 
@@ -109,11 +120,12 @@ function clearCalendar(person) {
   }
 }
 
-function populateCalendar(events) {
-  alertEvents(events);
+function populateCalendar(person, events) {
+  //alertEvents(events);
   events.forEach(function(event){
-    var eventName = event.title + " (" + event.personName + ")";
-    //person.calendar.createAllDayEvent(eventName, new Date('May 12, 2021'));
+    event.isAllDay ?
+      person.calendar.createAllDayEvent(event.title, event.startDateTime, event.options) :
+      person.calendar.createEvent(event.title, event.startDateTime, event.endDateTime, event.options);
   });
 }
 
@@ -129,14 +141,14 @@ function getEvents(person, cyclesRange) {
       currentRange++;
       events[currentRange] = [];
     } else if(isApplicableEvent(cyclesRow, exclusionListNames)){
-      events[currentRange].push(buildNewEvent(cyclesRow));
+      events[currentRange].push(buildNewEvent(cyclesRow, currentRange));
     }
   }
 
-  return events;
+  return events[data.cycles.seasons.evergreen].concat(data.season === 'Summer' ? events[data.cycles.seasons.summer] : events[data.cycles.seasons.winter]);
 }
 
-function buildNewEvent(cyclesRow) {
+function buildNewEvent(cyclesRow, seasonIndex) {
   const startTime = cyclesRow[data.cycles.rangeColumns.startTime];
   const durationHours = cyclesRow[data.cycles.rangeColumns.durationHours];
   var startDateTime = new Date(cyclesRow[data.cycles.rangeColumns.workDate]);
@@ -149,7 +161,11 @@ function buildNewEvent(cyclesRow) {
     title: cyclesRow[data.cycles.rangeColumns.noun] + ': ' + cyclesRow[data.cycles.rangeColumns.verb] + ' (' + cyclesRow[data.cycles.rangeColumns.name] + ')',
     startDateTime: startDateTime,
     endDateTime: endDateTime,
-    isAllDay: isAllDay(startTime, durationHours)
+    isAllDay: isAllDay(startTime, durationHours),
+    seasonIndex: seasonIndex,
+    options: {
+      description: data.eventDescription
+    }
   };
 }
 
@@ -182,19 +198,14 @@ function getSeason(cyclesRange) {
 
 function alertEvents(events) {
   var str = '';
-  str += buildEventAlertStr('Evergreen', events[1]);
-  str += buildEventAlertStr(data.season, data.season === 'Summer' ? events[2] : events[3]);
-  SpreadsheetApp.getUi().alert(str);
-}
-
-function buildEventAlertStr(seasonLabel, seasonEvents) {
-  var str = seasonLabel + '\n';
-  seasonEvents.forEach(function(event) {
-    str += event.title + ' ' +
+  events.forEach(function(event) {
+    str +=
+      '[' + data.cycles.seasonNames[event.seasonIndex] + '] ' +
+      event.title + ' ' +
       (event.isAllDay ?
         event.startDateTime + ' ALL DAY' :
         event.startDateTime + ' until ' + event.endDateTime.getHours() + ':' + event.endDateTime.getMinutes()
       ) + '\n';
   });
-  return str;
+  SpreadsheetApp.getUi().alert(str);
 }
