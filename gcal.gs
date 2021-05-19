@@ -139,15 +139,17 @@ function getEvents(person, cyclesRange) {
 function buildNewEvent(cyclesRow) {
   const startTime = cyclesRow[data.cycles.rangeColumns.startTime];
   const durationHours = cyclesRow[data.cycles.rangeColumns.durationHours];
-  const allDay = isAllDay(startTime, durationHours);
+  var startDateTime = new Date(cyclesRow[data.cycles.rangeColumns.workDate]);
+  startDateTime.setHours(startTime);
+  var endDateTime = new Date(cyclesRow[data.cycles.rangeColumns.workDate]);
+  endDateTime.setHours(startTime + durationHours);
+  endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
 
   return {
-    title: cyclesRow[data.cycles.rangeColumns.noun] + ': ' + cyclesRow[data.cycles.rangeColumns.verb],
-    personName: cyclesRow[data.cycles.rangeColumns.name],
-    date: cyclesRow[data.cycles.rangeColumns.workDate],
-    startTime: startTime,
-    finishTime: startTime + durationHours,
-    isAllDay: allDay
+    title: cyclesRow[data.cycles.rangeColumns.noun] + ': ' + cyclesRow[data.cycles.rangeColumns.verb] + ' (' + cyclesRow[data.cycles.rangeColumns.name] + ')',
+    startDateTime: startDateTime,
+    endDateTime: endDateTime,
+    isAllDay: isAllDay(startTime, durationHours)
   };
 }
 
@@ -188,11 +190,11 @@ function alertEvents(events) {
 function buildEventAlertStr(seasonLabel, seasonEvents) {
   var str = seasonLabel + '\n';
   seasonEvents.forEach(function(event) {
-    str += '[' +
-      event.personName + '] ' +
-      event.title + ' ' +
-      event.date + ' ' +
-      (event.isAllDay ? 'ALL DAY' : event.startTime + '-' + event.finishTime)  + '\n';
+    str += event.title + ' ' +
+      (event.isAllDay ?
+        event.startDateTime + ' ALL DAY' :
+        event.startDateTime + ' until ' + event.endDateTime.getHours() + ':' + event.endDateTime.getMinutes()
+      ) + '\n';
   });
   return str;
 }
