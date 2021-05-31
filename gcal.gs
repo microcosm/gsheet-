@@ -201,8 +201,9 @@ function buildEventFromCalendar(googleCalendarEvent) {
 function buildEventFromSpreadsheet(cyclesRow, seasonName) {
   const startTime = cyclesRow[data.cycles.rangeColumns.startTime];
   const durationHours = cyclesRow[data.cycles.rangeColumns.durationHours];
+  const isAllDay = getIsAllDay(startTime, durationHours)
   var startDateTime = new Date(cyclesRow[data.cycles.rangeColumns.workDate]);
-  startDateTime.setHours(startTime);
+  if(!isAllDay) startDateTime.setHours(startTime);
   var endDateTime = new Date(cyclesRow[data.cycles.rangeColumns.workDate]);
   endDateTime.setHours(startTime + durationHours);
   endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
@@ -211,7 +212,7 @@ function buildEventFromSpreadsheet(cyclesRow, seasonName) {
     title: cyclesRow[data.cycles.rangeColumns.noun] + ': ' + cyclesRow[data.cycles.rangeColumns.verb] + ' (' + cyclesRow[data.cycles.rangeColumns.name] + ')',
     startDateTime: startDateTime,
     endDateTime: endDateTime,
-    isAllDay: isAllDay(startTime, durationHours),
+    isAllDay: isAllDay,
     options: {
       description: data.eventDescription,
       location: seasonName
@@ -220,7 +221,7 @@ function buildEventFromSpreadsheet(cyclesRow, seasonName) {
   };
 }
 
-function isAllDay(startTime, durationHours) {
+function getIsAllDay(startTime, durationHours) {
   return !(
     startTime >= 0 &&
     startTime <= 24 &&
