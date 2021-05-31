@@ -3,7 +3,7 @@ var state;
 function init() {
   state = {
     execution: {
-      performDataUpdates: true,
+      performDataUpdates: false,
       showLogAlert: true
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
@@ -13,6 +13,7 @@ function init() {
     eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>',
     log: '',
     lock: null,
+    workDateLabelText: 'Work date',
     values: {
       sheetName: '(dropdowns)',
       sheet: null,
@@ -32,7 +33,6 @@ function init() {
         maxRows: 500,
         maxCols: 24
       },
-      workDateLabel: 'Work date (calc)',
       seasonStringLength: 6,
       seasons: {
         evergreen: 1,
@@ -221,17 +221,28 @@ function getSpreadsheetEvents(person, rangeValues) {
   events[currentRange] = [];
   const exclusionListNames = getOtherPeopleNames(person);
 
+  var dateColumn = state.cycles.rangeColumns.workDate;
+
   for(var i = 0; i < rangeValues.length; i++) {
-    const cyclesRow = rangeValues[i];
-    if(cyclesRow[state.cycles.rangeColumns.workDate] === state.cycles.workDateLabel) {
+    const row = rangeValues[i];
+    if(isWorkDateLabel(row[dateColumn])) {
       currentRange++;
       events[currentRange] = [];
-    } else if(isApplicableEvent(cyclesRow, exclusionListNames)){
-      events[currentRange].push(buildEventFromSpreadsheet(cyclesRow, state.cycles.seasonNames[currentRange]));
+    } else if(isApplicableEvent(row, exclusionListNames)){
+      events[currentRange].push(buildEventFromSpreadsheet(row, state.cycles.seasonNames[currentRange]));
     }
   }
 
   return generateEventArray(events);
+}
+
+function isWorkDateLabel(str) {
+  return typeof str == 'string' && str.substring(0, state.workDateLabelText.length) === state.workDateLabelText;
+}
+
+function isApplicableEvent(row, exclusionListNames) {
+  return row[state.cycles.rangeColumns.workDate] instanceof Date &&
+         !exclusionListNames.includes(row[state.cycles.rangeColumns.name])
 }
 
 function generateEventArray(eventsHash) {
@@ -299,11 +310,6 @@ function getOtherPeopleNames(person) {
     }
   });
   return otherPeopleNames;
-}
-
-function isApplicableEvent(cyclesRow, exclusionListNames) {
-  return cyclesRow[state.cycles.rangeColumns.workDate] instanceof Date &&
-         !exclusionListNames.includes(cyclesRow[state.cycles.rangeColumns.name])
 }
 
 function setSeason(rangeValues) {
