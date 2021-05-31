@@ -1,7 +1,7 @@
-var data;
+var state;
 
 function init() {
-  data = {
+  state = {
     execution: {
       performDataUpdates: true,
       showLogAlert: true
@@ -75,36 +75,36 @@ function init() {
     triggerColumns: null
   };
 
-  data.cycles.sheet = data.spreadsheet.getSheetByName(data.cycles.sheetName);
-  data.values.sheet = data.spreadsheet.getSheetByName(data.values.sheetName);
+  state.cycles.sheet = state.spreadsheet.getSheetByName(state.cycles.sheetName);
+  state.values.sheet = state.spreadsheet.getSheetByName(state.values.sheetName);
 
-  data.people = getPeople();
+  state.people = getPeople();
 
-  data.triggerColumns = [
-    data.cycles.columns.noun,
-    data.cycles.columns.verb,
-    data.cycles.columns.lastDone,
-    data.cycles.columns.name,
-    data.cycles.columns.cycleDays,
-    data.cycles.columns.nudgeDays,
-    data.cycles.columns.startTime,
-    data.cycles.columns.durationHours,
-    data.cycles.columns.season,
-    data.checklists.columns.noun,
-    data.checklists.columns.verb,
-    data.checklists.columns.done,
-    data.checklists.columns.name,
-    data.checklists.columns.day,
-    data.checklists.columns.startTime,
-    data.checklists.columns.durationHours
+  state.triggerColumns = [
+    state.cycles.columns.noun,
+    state.cycles.columns.verb,
+    state.cycles.columns.lastDone,
+    state.cycles.columns.name,
+    state.cycles.columns.cycleDays,
+    state.cycles.columns.nudgeDays,
+    state.cycles.columns.startTime,
+    state.cycles.columns.durationHours,
+    state.cycles.columns.season,
+    state.checklists.columns.noun,
+    state.checklists.columns.verb,
+    state.checklists.columns.done,
+    state.checklists.columns.name,
+    state.checklists.columns.day,
+    state.checklists.columns.startTime,
+    state.checklists.columns.durationHours
   ];
 
-  for(var key in data.cycles.columns) {
-    data.cycles.rangeColumns[key] = data.cycles.columns[key] - data.cycles.range.offsets.col;
+  for(var key in state.cycles.columns) {
+    state.cycles.rangeColumns[key] = state.cycles.columns[key] - state.cycles.range.offsets.col;
   }
 
-  for(var key in data.checklists.columns) {
-    data.checklists.rangeColumns[key] = data.checklists.columns[key] - data.cycles.range.offsets.col;
+  for(var key in state.checklists.columns) {
+    state.checklists.rangeColumns[key] = state.checklists.columns[key] - state.cycles.range.offsets.col;
   }
 }
 
@@ -118,14 +118,14 @@ function onEditInstalledTrigger(e) {
 }
 
 function isValidTrigger(e){
-  return data.spreadsheet.getActiveSheet().getName() === data.cycles.sheetName &&
-    data.triggerColumns.indexOf(e.range.columnStart) != -1
+  return state.spreadsheet.getActiveSheet().getName() === state.cycles.sheetName &&
+    state.triggerColumns.indexOf(e.range.columnStart) != -1
 }
 
 function waitForLocks(){
-  data.lock = LockService.getScriptLock();
+  state.lock = LockService.getScriptLock();
   try {
-    data.lock.waitLock(60000);
+    state.lock.waitLock(60000);
     logLockObtained();
     return true;
   } catch(e) {
@@ -135,12 +135,12 @@ function waitForLocks(){
 
 function releaseLock() {
   SpreadsheetApp.flush();
-  data.lock.releaseLock();
+  state.lock.releaseLock();
   logLockReleased();
 }
 
 function getPeople() {
-  const values = data.values.sheet.getRange(data.values.range.start + ':' + data.values.range.end).getValues();
+  const values = state.values.sheet.getRange(state.values.range.start + ':' + state.values.range.end).getValues();
   var people = [];
   for(var i = 0; i < values.length; i+=2) {
     if(values[i][0] && values[i + 1][0]){
@@ -154,7 +154,7 @@ function getPeople() {
 }
 
 function updateCalendars() {
-  data.people.forEach(function(person) {
+  state.people.forEach(function(person) {
     const rangeValues = getRangeValues();
     setSeason(rangeValues);
     var spreadsheetEvents = getSpreadsheetEvents(person, rangeValues);
@@ -180,13 +180,13 @@ function updateChangedEvents(person, spreadsheetEvents, calendarEvents) {
   calendarEvents.forEach(function(calendarEvent) {
     if(!calendarEvent.existsInSpreadsheet){
       logEventDeleted(calendarEvent);
-      if(data.execution.performDataUpdates) calendarEvent.gcal.deleteEvent();
+      if(state.execution.performDataUpdates) calendarEvent.gcal.deleteEvent();
     }
   });
   spreadsheetEvents.forEach(function(spreadsheetEvent){
     if(!spreadsheetEvent.existsInCalendar) {
       logEventCreated(spreadsheetEvent);
-      if(data.execution.performDataUpdates) {
+      if(state.execution.performDataUpdates) {
         spreadsheetEvent.isAllDay ?
           person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
           person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
@@ -197,11 +197,11 @@ function updateChangedEvents(person, spreadsheetEvents, calendarEvents) {
 }
 
 function getRangeValues() {
-  return data.cycles.sheet.getRange(
-    data.cycles.range.offsets.row,
-    data.cycles.range.offsets.col,
-    data.cycles.range.maxRows,
-    data.cycles.range.maxCols).getValues();
+  return state.cycles.sheet.getRange(
+    state.cycles.range.offsets.row,
+    state.cycles.range.offsets.col,
+    state.cycles.range.maxRows,
+    state.cycles.range.maxCols).getValues();
 }
 
 function getCalendarEvents(person) {
@@ -223,11 +223,11 @@ function getSpreadsheetEvents(person, rangeValues) {
 
   for(var i = 0; i < rangeValues.length; i++) {
     const cyclesRow = rangeValues[i];
-    if(cyclesRow[data.cycles.rangeColumns.workDate] === data.cycles.workDateLabel) {
+    if(cyclesRow[state.cycles.rangeColumns.workDate] === state.cycles.workDateLabel) {
       currentRange++;
       events[currentRange] = [];
     } else if(isApplicableEvent(cyclesRow, exclusionListNames)){
-      events[currentRange].push(buildEventFromSpreadsheet(cyclesRow, data.cycles.seasonNames[currentRange]));
+      events[currentRange].push(buildEventFromSpreadsheet(cyclesRow, state.cycles.seasonNames[currentRange]));
     }
   }
 
@@ -235,12 +235,12 @@ function getSpreadsheetEvents(person, rangeValues) {
 }
 
 function generateEventArray(eventsHash) {
-  var eventArray = eventsHash[data.cycles.seasons.evergreen];
+  var eventArray = eventsHash[state.cycles.seasons.evergreen];
 
   eventArray = eventArray.concat(
-    data.season === 'Summer' ?
-    eventsHash[data.cycles.seasons.summer] :
-    eventsHash[data.cycles.seasons.winter]);
+    state.season === 'Summer' ?
+    eventsHash[state.cycles.seasons.summer] :
+    eventsHash[state.cycles.seasons.winter]);
 
   return eventArray;
 }
@@ -262,22 +262,22 @@ function buildEventFromCalendar(googleCalendarEvent) {
 }
 
 function buildEventFromSpreadsheet(cyclesRow, seasonName) {
-  const startTime = cyclesRow[data.cycles.rangeColumns.startTime];
-  const durationHours = cyclesRow[data.cycles.rangeColumns.durationHours];
+  const startTime = cyclesRow[state.cycles.rangeColumns.startTime];
+  const durationHours = cyclesRow[state.cycles.rangeColumns.durationHours];
   const isAllDay = getIsAllDay(startTime, durationHours)
-  var startDateTime = new Date(cyclesRow[data.cycles.rangeColumns.workDate]);
+  var startDateTime = new Date(cyclesRow[state.cycles.rangeColumns.workDate]);
   if(!isAllDay) startDateTime.setHours(startTime);
-  var endDateTime = new Date(cyclesRow[data.cycles.rangeColumns.workDate]);
+  var endDateTime = new Date(cyclesRow[state.cycles.rangeColumns.workDate]);
   endDateTime.setHours(startTime + durationHours);
   endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
 
   return {
-    title: cyclesRow[data.cycles.rangeColumns.noun] + ': ' + cyclesRow[data.cycles.rangeColumns.verb] + ' (' + cyclesRow[data.cycles.rangeColumns.name] + ')',
+    title: cyclesRow[state.cycles.rangeColumns.noun] + ': ' + cyclesRow[state.cycles.rangeColumns.verb] + ' (' + cyclesRow[state.cycles.rangeColumns.name] + ')',
     startDateTime: startDateTime,
     endDateTime: endDateTime,
     isAllDay: isAllDay,
     options: {
-      description: data.eventDescription,
+      description: state.eventDescription,
       location: seasonName
     },
     isAlreadyInCalendar: false
@@ -293,7 +293,7 @@ function getIsAllDay(startTime, durationHours) {
 
 function getOtherPeopleNames(person) {
   var otherPeopleNames = [];
-  data.people.forEach(function(possibleOther) {
+  state.people.forEach(function(possibleOther) {
     if(possibleOther.name != person.name) {
       otherPeopleNames.push(possibleOther.name);
     }
@@ -302,15 +302,15 @@ function getOtherPeopleNames(person) {
 }
 
 function isApplicableEvent(cyclesRow, exclusionListNames) {
-  return cyclesRow[data.cycles.rangeColumns.workDate] instanceof Date &&
-         !exclusionListNames.includes(cyclesRow[data.cycles.rangeColumns.name])
+  return cyclesRow[state.cycles.rangeColumns.workDate] instanceof Date &&
+         !exclusionListNames.includes(cyclesRow[state.cycles.rangeColumns.name])
 }
 
 function setSeason(rangeValues) {
-  const statusStr = rangeValues[0][data.cycles.rangeColumns.season];
-  data.season = statusStr.substring(statusStr.length - data.cycles.seasonStringLength);
-  var fromSeason = statusStr.substring(0, data.cycles.seasonStringLength);
-  data.transition = fromSeason === data.season ? false : statusStr;
+  const statusStr = rangeValues[0][state.cycles.rangeColumns.season];
+  state.season = statusStr.substring(statusStr.length - state.cycles.seasonStringLength);
+  var fromSeason = statusStr.substring(0, state.cycles.seasonStringLength);
+  state.transition = fromSeason === state.season ? false : statusStr;
 }
 
 function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
@@ -330,11 +330,11 @@ function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
 }
 
 function logString(str) {
-  data.log += str + "\n";
+  state.log += str + "\n";
 }
 
 function logEventFound(event, hasMatch) {
-  data.log +=
+  state.log +=
     (hasMatch ? '' : '* ') +
     ' [' + event.options.location + '] ' +
     event.title + ' ' +
@@ -346,25 +346,25 @@ function logEventFound(event, hasMatch) {
 }
 
 function logEventDeleted(event) {
-  data.log += "Deleting " + event.title + "\n";
+  state.log += "Deleting " + event.title + "\n";
 }
 
 function logEventCreated(event) {
-  data.log += "Creating " + event.title + "\n";
+  state.log += "Creating " + event.title + "\n";
 }
 
 function logLockObtained() {
-  data.log += "Lock obtained...\n";
+  state.log += "Lock obtained...\n";
 }
 
 function logLockReleased() {
-  data.log += "Lock released.\n";
+  state.log += "Lock released.\n";
 }
 
 function logNewline() {
-  data.log += "\n";
+  state.log += "\n";
 }
 
 function alertLog() {
-  if(data.execution.showLogAlert) SpreadsheetApp.getUi().alert(data.log);
+  if(state.execution.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
 }
