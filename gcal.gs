@@ -3,7 +3,7 @@ var state, cyclesGlobal, cyclesRegular, cyclesChecklist;
 function init() {
   state = {
     execution: {
-      performDataUpdates: false,
+      performDataUpdates: true,
       showLogAlert: true
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
@@ -45,7 +45,9 @@ function init() {
       seasonNames: {
         1: 'Evergreen',
         2: 'Summer',
-        3: 'Winter'
+        3: 'Winter',
+        4: 'Winter->Summer',
+        5: 'Summer->Winter'
       },
       sections: {
         global: {
@@ -74,7 +76,7 @@ function init() {
             verb: 18,
             done: 19,
             name: 21,
-            day: 22,
+            workDate: 22,
             startTime: 23,
             durationHours: 24
           },
@@ -110,7 +112,7 @@ function init() {
     cyclesChecklist.columns.verb,
     cyclesChecklist.columns.done,
     cyclesChecklist.columns.name,
-    cyclesChecklist.columns.day,
+    cyclesChecklist.columns.workDate,
     cyclesChecklist.columns.startTime,
     cyclesChecklist.columns.durationHours
   ];
@@ -230,42 +232,51 @@ function getCalendarEvents(person) {
 }
 
 function getSpreadsheetEvents(person, rangeValues) {
-  var events = [];
-  var currentRange = 0;
-  events[currentRange] = [];
-  const exclusionListNames = getOtherPeopleNames(person);
+  var extractionState = {
+    rangeValues: rangeValues,
+    eventsBySeason: [],
+    seasonIndex: 0,
+    exclusionListNames: getOtherPeopleNames(person)
+  }
+  extractionState.eventsBySeason[extractionState.seasonIndex] = [];
 
-  var dateColumn = cyclesRegular.rangeColumns.workDate;
+  populateSpreadsheetSectionEvents(extractionState, cyclesRegular);
+  populateSpreadsheetSectionEvents(extractionState, cyclesChecklist);
 
-  for(var i = 0; i < rangeValues.length; i++) {
-    const row = rangeValues[i];
-    if(isWorkDateLabel(row[dateColumn])) {
-      currentRange++;
-      events[currentRange] = [];
-    } else if(isApplicableEvent(row, exclusionListNames)){
-      events[currentRange].push(buildEventFromSpreadsheet(row, state.cycles.seasonNames[currentRange]));
+  return collapseEventsToArray(extractionState.eventsBySeason);
+}
+
+function populateSpreadsheetSectionEvents(extractionState, section) {
+  for(var i = 0; i < extractionState.rangeValues.length; i++) {
+    const row = extractionState.rangeValues[i];
+    if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
+      extractionState.seasonIndex++;
+      extractionState.eventsBySeason[extractionState.seasonIndex] = [];
+    } else if(isValidEventData(row, extractionState.exclusionListNames, section)){
+      var eventFromSpreadsheet = buildEventFromSpreadsheet(row, state.cycles.seasonNames[extractionState.seasonIndex], section);
+      extractionState.eventsBySeason[extractionState.seasonIndex].push(eventFromSpreadsheet);
     }
   }
-
-  return generateEventArray(events);
 }
 
 function isWorkDateLabel(str) {
   return typeof str == 'string' && str.substring(0, state.workDateLabelText.length) === state.workDateLabelText;
 }
 
-function isApplicableEvent(row, exclusionListNames) {
-  return row[cyclesRegular.rangeColumns.workDate] instanceof Date &&
-         !exclusionListNames.includes(row[cyclesRegular.rangeColumns.name])
-}
-
-function generateEventArray(eventsHash) {
-  var eventArray = eventsHash[state.cycles.seasons.evergreen];
+function collapseEventsToArray(eventsBySeason) {
+  var eventArray = eventsBySeason[state.cycles.seasons.evergreen];
 
   eventArray = eventArray.concat(
     state.season === 'Summer' ?
-    eventsHash[state.cycles.seasons.summer] :
-    eventsHash[state.cycles.seasons.winter]);
+      eventsBySeason[state.cycles.seasons.summer] :
+      eventsBySeason[state.cycles.seasons.winter]);
+
+  if(state.transition) {
+    var checklistEvents = state.transition === 'Winter->Summer' ?
+      eventsBySeason[state.cycles.seasons.winterToSummer] :
+      eventsBySeason[state.cycles.seasons.summerToWinter];
+    eventArray = eventArray.concat(checklistEvents);
+  }
 
   return eventArray;
 }
@@ -286,18 +297,23 @@ function buildEventFromCalendar(googleCalendarEvent) {
   };
 }
 
-function buildEventFromSpreadsheet(cyclesRow, seasonName) {
-  const startTime = cyclesRow[cyclesRegular.rangeColumns.startTime];
-  const durationHours = cyclesRow[cyclesRegular.rangeColumns.durationHours];
+function isValidEventData(row, exclusionListNames, section) {
+  return row[section.rangeColumns.workDate] instanceof Date &&
+         !exclusionListNames.includes(row[section.rangeColumns.name])
+}
+
+function buildEventFromSpreadsheet(row, seasonName, section) {
+  const startTime = row[section.rangeColumns.startTime];
+  const durationHours = row[section.rangeColumns.durationHours];
   const isAllDay = getIsAllDay(startTime, durationHours)
-  var startDateTime = new Date(cyclesRow[cyclesRegular.rangeColumns.workDate]);
+  var startDateTime = new Date(row[section.rangeColumns.workDate]);
   if(!isAllDay) startDateTime.setHours(startTime);
-  var endDateTime = new Date(cyclesRow[cyclesRegular.rangeColumns.workDate]);
+  var endDateTime = new Date(row[section.rangeColumns.workDate]);
   endDateTime.setHours(startTime + durationHours);
   endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
 
   return {
-    title: cyclesRow[cyclesRegular.rangeColumns.noun] + ': ' + cyclesRow[cyclesRegular.rangeColumns.verb] + ' (' + cyclesRow[cyclesRegular.rangeColumns.name] + ')',
+    title: row[section.rangeColumns.noun] + ': ' + row[section.rangeColumns.verb] + ' (' + row[section.rangeColumns.name] + ')',
     startDateTime: startDateTime,
     endDateTime: endDateTime,
     isAllDay: isAllDay,
