@@ -1,6 +1,7 @@
-var data;
+var data, log;
 
-function loadData() {
+function init() {
+  log = "";
   data = {
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,
@@ -77,7 +78,7 @@ function loadData() {
 }
 
 function onEditInstalledTrigger(e) {
-  loadData();
+  init();
   if(!isValidTrigger(e)) return;
   updateCalendar();
 }
@@ -115,28 +116,30 @@ function updateCalendar() {
         matchingCalendarEvent.existsInSpreadsheet = true;
         spreadsheetEvent.existsInCalendar = true;
       }
+      logEventFound(spreadsheetEvent, matchingCalendarEvent);
     });
 
-    var deleteCreateStr = "";
+    logNewline();
     
     calendarEvents.forEach(function(calendarEvent) {
       if(!calendarEvent.existsInSpreadsheet){
-        deleteCreateStr += "Deleting " + calendarEvent.title + "\n";
+        logEventDeleted(calendarEvent);
         //calendarEvent.gcal.deleteEvent();
       }
     });
 
     spreadsheetEvents.forEach(function(spreadsheetEvent){
       if(!spreadsheetEvent.existsInCalendar) {
-        deleteCreateStr += "Creating " + spreadsheetEvent.title + "\n";
+        logEventCreated(spreadsheetEvent);
         /*spreadsheetEvent.isAllDay ?
           person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
           person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);*/
       }
     });
 
-    alertEvents(spreadsheetEvents, calendarEvents, deleteCreateStr);
+    logNewline();
   });
+  alertLog();
 }
 
 function getCyclesRangeValues() {
@@ -258,17 +261,30 @@ function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
   return match;
 }
 
-function alertEvents(spreadsheetEvents, calendarEvents, additional) {
-  var str = '';
-  spreadsheetEvents.forEach(function(spreadsheetEvent) {
-    var modificationStr = findInCalendarEvents(spreadsheetEvent, calendarEvents) ? '' : '* ';
-    str += modificationStr +
-      ' [' + spreadsheetEvent.options.location + '] ' +
-      spreadsheetEvent.title + ' ' +
-      (spreadsheetEvent.isAllDay ?
-        spreadsheetEvent.startDateTime + ' ALL DAY' :
-        spreadsheetEvent.startDateTime + ' until ' + spreadsheetEvent.endDateTime.getHours() + ':' + spreadsheetEvent.endDateTime.getMinutes()
-      ) + '\n';
-  });
-  SpreadsheetApp.getUi().alert(str + "\n" + additional);
+function logEventFound(event, hasMatch) {
+  log +=
+    (hasMatch ? '' : '* ') +
+    ' [' + event.options.location + '] ' +
+    event.title + ' ' +
+    event.startDateTime + 
+    (event.isAllDay ?
+      ' ALL DAY' :
+      ' until ' + event.endDateTime.getHours() + ':' + event.endDateTime.getMinutes()
+    ) + '\n';
+}
+
+function logEventDeleted(event) {
+  log += "Deleting " + event.title + "\n";
+}
+
+function logEventCreated(event) {
+  log += "Creating " + event.title + "\n";
+}
+
+function logNewline() {
+  log += "\n";
+}
+
+function alertLog() {
+  SpreadsheetApp.getUi().alert(log);
 }
