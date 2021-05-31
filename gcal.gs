@@ -1,12 +1,13 @@
-var data, log;
+var data;
 
 function init() {
-  log = "";
   data = {
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,
     people: null,
     eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>',
+    log: '',
+    lock: null,
     values: {
       sheetName: '(dropdowns)',
       sheet: null,
@@ -80,12 +81,32 @@ function init() {
 function onEditInstalledTrigger(e) {
   init();
   if(!isValidTrigger(e)) return;
+  if(!waitForLocks()) return;
   updateCalendars();
+  releaseLock();
+  //alertLog();
 }
 
 function isValidTrigger(e){
   return data.spreadsheet.getActiveSheet().getName() === data.cycles.sheetName &&
     data.cycles.triggerColumns.indexOf(e.range.columnStart) != -1
+}
+
+function waitForLocks(){
+  data.lock = LockService.getScriptLock();
+  try {
+    data.lock.waitLock(60000);
+    logLockObtained();
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function releaseLock() {
+  SpreadsheetApp.flush();
+  data.lock.releaseLock();
+  logLockReleased();
 }
 
 function getPeople() {
@@ -111,7 +132,6 @@ function updateCalendars() {
     linkMatchingEvents(spreadsheetEvents, calendarEvents);
     updateChangedEvents(person, spreadsheetEvents, calendarEvents);
   });
-  alertLog();
 }
 
 function linkMatchingEvents(spreadsheetEvents, calendarEvents) {
@@ -265,7 +285,7 @@ function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
 }
 
 function logEventFound(event, hasMatch) {
-  log +=
+  data.log +=
     (hasMatch ? '' : '* ') +
     ' [' + event.options.location + '] ' +
     event.title + ' ' +
@@ -277,17 +297,25 @@ function logEventFound(event, hasMatch) {
 }
 
 function logEventDeleted(event) {
-  log += "Deleting " + event.title + "\n";
+  data.log += "Deleting " + event.title + "\n";
 }
 
 function logEventCreated(event) {
-  log += "Creating " + event.title + "\n";
+  data.log += "Creating " + event.title + "\n";
+}
+
+function logLockObtained() {
+  data.log += "Lock obtained...\n";
+}
+
+function logLockReleased() {
+  data.log += "Lock released.\n";
 }
 
 function logNewline() {
-  log += "\n";
+  data.log += "\n";
 }
 
 function alertLog() {
-  SpreadsheetApp.getUi().alert(log);
+  SpreadsheetApp.getUi().alert(data.log);
 }
