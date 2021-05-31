@@ -80,7 +80,7 @@ function init() {
 function onEditInstalledTrigger(e) {
   init();
   if(!isValidTrigger(e)) return;
-  updateCalendar();
+  updateCalendars();
 }
 
 function isValidTrigger(e){
@@ -102,44 +102,46 @@ function getPeople() {
   return people;
 }
 
-function updateCalendar() {
+function updateCalendars() {
   data.people.forEach(function(person) {
-    const cyclesRange = getCyclesRangeValues();
-    data.season = getSeason(cyclesRange);
-
-    var spreadsheetEvents = getSpreadsheetEvents(person, cyclesRange);
+    const cyclesRangeValues = getCyclesRangeValues();
+    data.season = getSeason(cyclesRangeValues);
+    var spreadsheetEvents = getSpreadsheetEvents(person, cyclesRangeValues);
     var calendarEvents = getCalendarEvents(person);
-
-    spreadsheetEvents.forEach(function(spreadsheetEvent) {
-      var matchingCalendarEvent = findInCalendarEvents(spreadsheetEvent, calendarEvents);
-      if(matchingCalendarEvent) {
-        matchingCalendarEvent.existsInSpreadsheet = true;
-        spreadsheetEvent.existsInCalendar = true;
-      }
-      logEventFound(spreadsheetEvent, matchingCalendarEvent);
-    });
-
-    logNewline();
-    
-    calendarEvents.forEach(function(calendarEvent) {
-      if(!calendarEvent.existsInSpreadsheet){
-        logEventDeleted(calendarEvent);
-        //calendarEvent.gcal.deleteEvent();
-      }
-    });
-
-    spreadsheetEvents.forEach(function(spreadsheetEvent){
-      if(!spreadsheetEvent.existsInCalendar) {
-        logEventCreated(spreadsheetEvent);
-        /*spreadsheetEvent.isAllDay ?
-          person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
-          person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);*/
-      }
-    });
-
-    logNewline();
+    linkMatchingEvents(spreadsheetEvents, calendarEvents);
+    updateChangedEvents(person, spreadsheetEvents, calendarEvents);
   });
   alertLog();
+}
+
+function linkMatchingEvents(spreadsheetEvents, calendarEvents) {
+  spreadsheetEvents.forEach(function(spreadsheetEvent) {
+    var matchingCalendarEvent = findInCalendarEvents(spreadsheetEvent, calendarEvents);
+    if(matchingCalendarEvent) {
+      matchingCalendarEvent.existsInSpreadsheet = true;
+      spreadsheetEvent.existsInCalendar = true;
+    }
+    logEventFound(spreadsheetEvent, matchingCalendarEvent);
+  });
+  logNewline();
+}
+
+function updateChangedEvents(person, spreadsheetEvents, calendarEvents) {
+  calendarEvents.forEach(function(calendarEvent) {
+    if(!calendarEvent.existsInSpreadsheet){
+      logEventDeleted(calendarEvent);
+      calendarEvent.gcal.deleteEvent();
+    }
+  });
+  spreadsheetEvents.forEach(function(spreadsheetEvent){
+    if(!spreadsheetEvent.existsInCalendar) {
+      logEventCreated(spreadsheetEvent);
+      spreadsheetEvent.isAllDay ?
+        person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
+        person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
+    }
+  });
+  logNewline();
 }
 
 function getCyclesRangeValues() {
