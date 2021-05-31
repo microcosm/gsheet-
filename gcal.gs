@@ -87,15 +87,6 @@ function isValidTrigger(e){
     data.cycles.triggerColumns.indexOf(e.range.columnStart) != -1
 }
 
-function updateCalendar() {
-  data.people.forEach(function(person) {
-    const cyclesRange = data.cycles.sheet.getRange(data.cycles.range.offsets.row, data.cycles.range.offsets.col, data.cycles.range.maxRows, data.cycles.range.maxCols).getValues();
-    data.season = getSeason(cyclesRange);
-    var events = getSpreadsheetEvents(person, cyclesRange);
-    populateCalendar(person, events);
-  });
-}
-
 function getPeople() {
   const values = data.values.sheet.getRange(data.values.range.start + ':' + data.values.range.end).getValues();
   var people = [];
@@ -110,23 +101,50 @@ function getPeople() {
   return people;
 }
 
-function populateCalendar(person, spreadsheetEvents) {
-  var calendarEvents = getCalendarEvents(person);
-  //alertEvents(spreadsheetEvents, calendarEvents);
+function updateCalendar() {
+  data.people.forEach(function(person) {
+    const cyclesRange = getCyclesRangeValues();
+    data.season = getSeason(cyclesRange);
 
-  //loop through spreadsheetEvents
-  //for each, look for a corresponding match in calendarEvents (based on title, start time, end time and whether its all day)
-  //if a match is found
-  //  delete the event from spreadsheetEvents
-  //  note the calendarEventId in a doNotDelete list
-  
-  //delete all from calendarEvents except those in the doNotDelete list
+    var spreadsheetEvents = getSpreadsheetEvents(person, cyclesRange);
+    var calendarEvents = getCalendarEvents(person);
 
-  /*events.forEach(function(event){
-    event.isAllDay ?
-      person.calendar.createAllDayEvent(event.title, event.startDateTime, event.options) :
-      person.calendar.createEvent(event.title, event.startDateTime, event.endDateTime, event.options);
-  });*/
+    spreadsheetEvents.forEach(function(spreadsheetEvent) {
+      var matchingCalendarEvent = findInCalendarEvents(spreadsheetEvent, calendarEvents);
+      if(matchingCalendarEvent) {
+        matchingCalendarEvent.existsInSpreadsheet = true;
+        spreadsheetEvent.existsInCalendar = true;
+      }
+    });
+
+    var deleteCreateStr = "";
+    
+    calendarEvents.forEach(function(calendarEvent) {
+      if(!calendarEvent.existsInSpreadsheet){
+        deleteCreateStr += "Deleting " + calendarEvent.title + "\n";
+        //calendarEvent.gcal.deleteEvent();
+      }
+    });
+
+    spreadsheetEvents.forEach(function(spreadsheetEvent){
+      if(!spreadsheetEvent.existsInCalendar) {
+        deleteCreateStr += "Creating " + spreadsheetEvent.title + "\n";
+        /*spreadsheetEvent.isAllDay ?
+          person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
+          person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);*/
+      }
+    });
+
+    alertEvents(spreadsheetEvents, calendarEvents, deleteCreateStr);
+  });
+}
+
+function getCyclesRangeValues() {
+  return data.cycles.sheet.getRange(
+    data.cycles.range.offsets.row,
+    data.cycles.range.offsets.col,
+    data.cycles.range.maxRows,
+    data.cycles.range.maxCols).getValues();
 }
 
 function getCalendarEvents(person) {
@@ -165,10 +183,13 @@ function buildEventFromCalendar(googleCalendarEvent) {
     startDateTime: googleCalendarEvent.getStartTime(),
     endDateTime: googleCalendarEvent.getEndTime(),
     isAllDay: googleCalendarEvent.isAllDayEvent(),
+    existsInSpreadsheet: false,
     options: {
       description: googleCalendarEvent.getDescription(),
       location: googleCalendarEvent.getLocation()
-    }
+    },
+    gcal: googleCalendarEvent,
+    gcalId: googleCalendarEvent.getId()
   };
 }
 
@@ -189,7 +210,8 @@ function buildEventFromSpreadsheet(cyclesRow, seasonName) {
     options: {
       description: data.eventDescription,
       location: seasonName
-    }
+    },
+    isAlreadyInCalendar: false
   };
 }
 
@@ -220,8 +242,8 @@ function getSeason(cyclesRange) {
   return statusStr.substring(statusStr.length - data.cycles.seasonStringLength);
 }
 
-function existsInCalendarEvents(spreadsheetEvent, calendarEvents) {
-  var numFound = 0;
+function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
+  var match = false;
   calendarEvents.forEach(function(calendarEvent) {
     var isEqual =
       calendarEvent.title === spreadsheetEvent.title &&
@@ -230,16 +252,16 @@ function existsInCalendarEvents(spreadsheetEvent, calendarEvents) {
       calendarEvent.isAllDay === spreadsheetEvent.isAllDay &&
       calendarEvent.options.location === spreadsheetEvent.options.location;
     if(isEqual) {
-      numFound++;
+      match = calendarEvent;
     }
   });
-  return numFound > 0;
+  return match;
 }
 
-function alertEvents(spreadsheetEvents, calendarEvents) {
+function alertEvents(spreadsheetEvents, calendarEvents, additional) {
   var str = '';
   spreadsheetEvents.forEach(function(spreadsheetEvent) {
-    var modificationStr = existsInCalendarEvents(spreadsheetEvent, calendarEvents) ? '' : '* ';
+    var modificationStr = findInCalendarEvents(spreadsheetEvent, calendarEvents) ? '' : '* ';
     str += modificationStr +
       ' [' + spreadsheetEvent.options.location + '] ' +
       spreadsheetEvent.title + ' ' +
@@ -248,5 +270,5 @@ function alertEvents(spreadsheetEvents, calendarEvents) {
         spreadsheetEvent.startDateTime + ' until ' + spreadsheetEvent.endDateTime.getHours() + ':' + spreadsheetEvent.endDateTime.getMinutes()
       ) + '\n';
   });
-  SpreadsheetApp.getUi().alert(str);
+  SpreadsheetApp.getUi().alert(str + "\n" + additional);
 }
