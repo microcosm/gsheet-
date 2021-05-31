@@ -2,6 +2,10 @@ var data;
 
 function init() {
   data = {
+    execution: {
+      performDataUpdates: true,
+      showLogAlert: true
+    },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,
     transition: null,
@@ -176,15 +180,17 @@ function updateChangedEvents(person, spreadsheetEvents, calendarEvents) {
   calendarEvents.forEach(function(calendarEvent) {
     if(!calendarEvent.existsInSpreadsheet){
       logEventDeleted(calendarEvent);
-      //calendarEvent.gcal.deleteEvent();
+      if(data.execution.performDataUpdates) calendarEvent.gcal.deleteEvent();
     }
   });
   spreadsheetEvents.forEach(function(spreadsheetEvent){
     if(!spreadsheetEvent.existsInCalendar) {
       logEventCreated(spreadsheetEvent);
-      //spreadsheetEvent.isAllDay ?
-      //  person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
-      //  person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
+      if(data.execution.performDataUpdates) {
+        spreadsheetEvent.isAllDay ?
+          person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
+          person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
+      }
     }
   });
   logNewline();
@@ -360,5 +366,5 @@ function logNewline() {
 }
 
 function alertLog() {
-  SpreadsheetApp.getUi().alert(data.log);
+  if(data.execution.showLogAlert) SpreadsheetApp.getUi().alert(data.log);
 }
