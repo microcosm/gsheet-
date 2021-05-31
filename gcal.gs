@@ -4,6 +4,7 @@ function init() {
   data = {
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,
+    transition: null,
     people: null,
     eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>',
     log: '',
@@ -25,14 +26,16 @@ function init() {
           col: 2
         },
         maxRows: 500,
-        maxCols: 14
+        maxCols: 24
       },
       workDateLabel: 'Work date (calc)',
       seasonStringLength: 6,
       seasons: {
         evergreen: 1,
         summer: 2,
-        winter: 3
+        winter: 3,
+        winterToSummer: 4,
+        summerToWinter: 5
       },
       seasonNames: {
         1: 'Evergreen',
@@ -51,9 +54,21 @@ function init() {
         workDate: 14,
         season: 15
       },
-      triggerColumns: null,
       rangeColumns: {}
-    }
+    },
+    checklists: {
+      columns: {
+        noun: 17,
+        verb: 18,
+        done: 19,
+        name: 21,
+        day: 22,
+        startTime: 23,
+        durationHours: 24
+      },
+      rangeColumns: {}
+    },
+    triggerColumns: null
   };
 
   data.cycles.sheet = data.spreadsheet.getSheetByName(data.cycles.sheetName);
@@ -61,7 +76,7 @@ function init() {
 
   data.people = getPeople();
 
-  data.cycles.triggerColumns = [
+  data.triggerColumns = [
     data.cycles.columns.noun,
     data.cycles.columns.verb,
     data.cycles.columns.lastDone,
@@ -70,11 +85,22 @@ function init() {
     data.cycles.columns.nudgeDays,
     data.cycles.columns.startTime,
     data.cycles.columns.durationHours,
-    data.cycles.columns.season
+    data.cycles.columns.season,
+    data.checklists.columns.noun,
+    data.checklists.columns.verb,
+    data.checklists.columns.done,
+    data.checklists.columns.name,
+    data.checklists.columns.day,
+    data.checklists.columns.startTime,
+    data.checklists.columns.durationHours
   ];
 
   for(var key in data.cycles.columns) {
     data.cycles.rangeColumns[key] = data.cycles.columns[key] - data.cycles.range.offsets.col;
+  }
+
+  for(var key in data.checklists.columns) {
+    data.checklists.rangeColumns[key] = data.checklists.columns[key] - data.cycles.range.offsets.col;
   }
 }
 
@@ -84,12 +110,12 @@ function onEditInstalledTrigger(e) {
   if(!waitForLocks()) return;
   updateCalendars();
   releaseLock();
-  //alertLog();
+  alertLog();
 }
 
 function isValidTrigger(e){
   return data.spreadsheet.getActiveSheet().getName() === data.cycles.sheetName &&
-    data.cycles.triggerColumns.indexOf(e.range.columnStart) != -1
+    data.triggerColumns.indexOf(e.range.columnStart) != -1
 }
 
 function waitForLocks(){
@@ -125,9 +151,9 @@ function getPeople() {
 
 function updateCalendars() {
   data.people.forEach(function(person) {
-    const cyclesRangeValues = getCyclesRangeValues();
-    data.season = getSeason(cyclesRangeValues);
-    var spreadsheetEvents = getSpreadsheetEvents(person, cyclesRangeValues);
+    const rangeValues = getRangeValues();
+    setSeason(rangeValues);
+    var spreadsheetEvents = getSpreadsheetEvents(person, rangeValues);
     var calendarEvents = getCalendarEvents(person);
     linkMatchingEvents(spreadsheetEvents, calendarEvents);
     updateChangedEvents(person, spreadsheetEvents, calendarEvents);
@@ -150,21 +176,21 @@ function updateChangedEvents(person, spreadsheetEvents, calendarEvents) {
   calendarEvents.forEach(function(calendarEvent) {
     if(!calendarEvent.existsInSpreadsheet){
       logEventDeleted(calendarEvent);
-      calendarEvent.gcal.deleteEvent();
+      //calendarEvent.gcal.deleteEvent();
     }
   });
   spreadsheetEvents.forEach(function(spreadsheetEvent){
     if(!spreadsheetEvent.existsInCalendar) {
       logEventCreated(spreadsheetEvent);
-      spreadsheetEvent.isAllDay ?
-        person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
-        person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
+      //spreadsheetEvent.isAllDay ?
+      //  person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
+      //  person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
     }
   });
   logNewline();
 }
 
-function getCyclesRangeValues() {
+function getRangeValues() {
   return data.cycles.sheet.getRange(
     data.cycles.range.offsets.row,
     data.cycles.range.offsets.col,
@@ -183,14 +209,14 @@ function getCalendarEvents(person) {
   return calendarEvents;
 }
 
-function getSpreadsheetEvents(person, cyclesRange) {
+function getSpreadsheetEvents(person, rangeValues) {
   var events = [];
   var currentRange = 0;
   events[currentRange] = [];
   const exclusionListNames = getOtherPeopleNames(person);
 
-  for(var i = 0; i < cyclesRange.length; i++) {
-    const cyclesRow = cyclesRange[i];
+  for(var i = 0; i < rangeValues.length; i++) {
+    const cyclesRow = rangeValues[i];
     if(cyclesRow[data.cycles.rangeColumns.workDate] === data.cycles.workDateLabel) {
       currentRange++;
       events[currentRange] = [];
@@ -199,7 +225,18 @@ function getSpreadsheetEvents(person, cyclesRange) {
     }
   }
 
-  return events[data.cycles.seasons.evergreen].concat(data.season === 'Summer' ? events[data.cycles.seasons.summer] : events[data.cycles.seasons.winter]);
+  return generateEventArray(events);
+}
+
+function generateEventArray(eventsHash) {
+  var eventArray = eventsHash[data.cycles.seasons.evergreen];
+
+  eventArray = eventArray.concat(
+    data.season === 'Summer' ?
+    eventsHash[data.cycles.seasons.summer] :
+    eventsHash[data.cycles.seasons.winter]);
+
+  return eventArray;
 }
 
 function buildEventFromCalendar(googleCalendarEvent) {
@@ -263,9 +300,11 @@ function isApplicableEvent(cyclesRow, exclusionListNames) {
          !exclusionListNames.includes(cyclesRow[data.cycles.rangeColumns.name])
 }
 
-function getSeason(cyclesRange) {
-  const statusStr = cyclesRange[0][data.cycles.rangeColumns.season];
-  return statusStr.substring(statusStr.length - data.cycles.seasonStringLength);
+function setSeason(rangeValues) {
+  const statusStr = rangeValues[0][data.cycles.rangeColumns.season];
+  data.season = statusStr.substring(statusStr.length - data.cycles.seasonStringLength);
+  var fromSeason = statusStr.substring(0, data.cycles.seasonStringLength);
+  data.transition = fromSeason === data.season ? false : statusStr;
 }
 
 function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
@@ -282,6 +321,10 @@ function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
     }
   });
   return match;
+}
+
+function logString(str) {
+  data.log += str + "\n";
 }
 
 function logEventFound(event, hasMatch) {
