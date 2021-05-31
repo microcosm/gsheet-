@@ -1,4 +1,4 @@
-var state;
+var state, cyclesGlobal, cyclesRegular, cyclesChecklist;
 
 function init() {
   state = {
@@ -7,6 +7,7 @@ function init() {
       showLogAlert: true
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
+    triggerColumns: null,
     season: null,
     transition: null,
     people: null,
@@ -46,33 +47,41 @@ function init() {
         2: 'Summer',
         3: 'Winter'
       },
-      columns: {
-        noun: 2,
-        verb: 3,
-        lastDone: 4,
-        name: 6,
-        cycleDays: 7,
-        nudgeDays: 11,
-        startTime: 12,
-        durationHours: 13,
-        workDate: 14,
-        season: 15
-      },
-      rangeColumns: {}
-    },
-    checklists: {
-      columns: {
-        noun: 17,
-        verb: 18,
-        done: 19,
-        name: 21,
-        day: 22,
-        startTime: 23,
-        durationHours: 24
-      },
-      rangeColumns: {}
-    },
-    triggerColumns: null
+      sections: {
+        global: {
+          columns: {
+            season: 15
+          },
+          rangeColumns: {}
+        },
+        regular: {
+          columns: {
+            noun: 2,
+            verb: 3,
+            lastDone: 4,
+            name: 6,
+            cycleDays: 7,
+            nudgeDays: 11,
+            startTime: 12,
+            durationHours: 13,
+            workDate: 14
+          },
+          rangeColumns: {}
+        },
+        checklist: {
+          columns: {
+            noun: 17,
+            verb: 18,
+            done: 19,
+            name: 21,
+            day: 22,
+            startTime: 23,
+            durationHours: 24
+          },
+          rangeColumns: {}
+        }
+      }
+    }
   };
 
   state.cycles.sheet = state.spreadsheet.getSheetByName(state.cycles.sheetName);
@@ -80,31 +89,36 @@ function init() {
 
   state.people = getPeople();
 
+  cyclesGlobal = state.cycles.sections.global;
+  cyclesRegular = state.cycles.sections.regular;
+  cyclesChecklist = state.cycles.sections.checklist;
+  generateRangeColumns(cyclesGlobal);
+  generateRangeColumns(cyclesRegular);
+  generateRangeColumns(cyclesChecklist);
+
   state.triggerColumns = [
-    state.cycles.columns.noun,
-    state.cycles.columns.verb,
-    state.cycles.columns.lastDone,
-    state.cycles.columns.name,
-    state.cycles.columns.cycleDays,
-    state.cycles.columns.nudgeDays,
-    state.cycles.columns.startTime,
-    state.cycles.columns.durationHours,
-    state.cycles.columns.season,
-    state.checklists.columns.noun,
-    state.checklists.columns.verb,
-    state.checklists.columns.done,
-    state.checklists.columns.name,
-    state.checklists.columns.day,
-    state.checklists.columns.startTime,
-    state.checklists.columns.durationHours
+    cyclesGlobal.columns.season,
+    cyclesRegular.columns.noun,
+    cyclesRegular.columns.verb,
+    cyclesRegular.columns.lastDone,
+    cyclesRegular.columns.name,
+    cyclesRegular.columns.cycleDays,
+    cyclesRegular.columns.nudgeDays,
+    cyclesRegular.columns.startTime,
+    cyclesRegular.columns.durationHours,
+    cyclesChecklist.columns.noun,
+    cyclesChecklist.columns.verb,
+    cyclesChecklist.columns.done,
+    cyclesChecklist.columns.name,
+    cyclesChecklist.columns.day,
+    cyclesChecklist.columns.startTime,
+    cyclesChecklist.columns.durationHours
   ];
+}
 
-  for(var key in state.cycles.columns) {
-    state.cycles.rangeColumns[key] = state.cycles.columns[key] - state.cycles.range.offsets.col;
-  }
-
-  for(var key in state.checklists.columns) {
-    state.checklists.rangeColumns[key] = state.checklists.columns[key] - state.cycles.range.offsets.col;
+function generateRangeColumns(cyclesSection){
+  for(var key in cyclesSection.columns) {
+    cyclesSection.rangeColumns[key] = cyclesSection.columns[key] - state.cycles.range.offsets.col;
   }
 }
 
@@ -221,7 +235,7 @@ function getSpreadsheetEvents(person, rangeValues) {
   events[currentRange] = [];
   const exclusionListNames = getOtherPeopleNames(person);
 
-  var dateColumn = state.cycles.rangeColumns.workDate;
+  var dateColumn = cyclesRegular.rangeColumns.workDate;
 
   for(var i = 0; i < rangeValues.length; i++) {
     const row = rangeValues[i];
@@ -241,8 +255,8 @@ function isWorkDateLabel(str) {
 }
 
 function isApplicableEvent(row, exclusionListNames) {
-  return row[state.cycles.rangeColumns.workDate] instanceof Date &&
-         !exclusionListNames.includes(row[state.cycles.rangeColumns.name])
+  return row[cyclesRegular.rangeColumns.workDate] instanceof Date &&
+         !exclusionListNames.includes(row[cyclesRegular.rangeColumns.name])
 }
 
 function generateEventArray(eventsHash) {
@@ -273,17 +287,17 @@ function buildEventFromCalendar(googleCalendarEvent) {
 }
 
 function buildEventFromSpreadsheet(cyclesRow, seasonName) {
-  const startTime = cyclesRow[state.cycles.rangeColumns.startTime];
-  const durationHours = cyclesRow[state.cycles.rangeColumns.durationHours];
+  const startTime = cyclesRow[cyclesRegular.rangeColumns.startTime];
+  const durationHours = cyclesRow[cyclesRegular.rangeColumns.durationHours];
   const isAllDay = getIsAllDay(startTime, durationHours)
-  var startDateTime = new Date(cyclesRow[state.cycles.rangeColumns.workDate]);
+  var startDateTime = new Date(cyclesRow[cyclesRegular.rangeColumns.workDate]);
   if(!isAllDay) startDateTime.setHours(startTime);
-  var endDateTime = new Date(cyclesRow[state.cycles.rangeColumns.workDate]);
+  var endDateTime = new Date(cyclesRow[cyclesRegular.rangeColumns.workDate]);
   endDateTime.setHours(startTime + durationHours);
   endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
 
   return {
-    title: cyclesRow[state.cycles.rangeColumns.noun] + ': ' + cyclesRow[state.cycles.rangeColumns.verb] + ' (' + cyclesRow[state.cycles.rangeColumns.name] + ')',
+    title: cyclesRow[cyclesRegular.rangeColumns.noun] + ': ' + cyclesRow[cyclesRegular.rangeColumns.verb] + ' (' + cyclesRow[cyclesRegular.rangeColumns.name] + ')',
     startDateTime: startDateTime,
     endDateTime: endDateTime,
     isAllDay: isAllDay,
@@ -313,7 +327,7 @@ function getOtherPeopleNames(person) {
 }
 
 function setSeason(rangeValues) {
-  const statusStr = rangeValues[0][state.cycles.rangeColumns.season];
+  const statusStr = rangeValues[0][cyclesGlobal.rangeColumns.season];
   state.season = statusStr.substring(statusStr.length - state.cycles.seasonStringLength);
   var fromSeason = statusStr.substring(0, state.cycles.seasonStringLength);
   state.transition = fromSeason === state.season ? false : statusStr;
