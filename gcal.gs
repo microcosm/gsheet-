@@ -54,7 +54,8 @@ function init() {
           columns: {
             season: 15
           },
-          rangeColumns: {}
+          rangeColumns: {},
+          hasDoneCol: false
         },
         regular: {
           columns: {
@@ -68,7 +69,8 @@ function init() {
             durationHours: 13,
             workDate: 14
           },
-          rangeColumns: {}
+          rangeColumns: {},
+          hasDoneCol: false
         },
         checklist: {
           columns: {
@@ -80,7 +82,8 @@ function init() {
             startTime: 23,
             durationHours: 24
           },
-          rangeColumns: {}
+          rangeColumns: {},
+          hasDoneCol: true
         }
       }
     }
@@ -254,7 +257,9 @@ function populateSpreadsheetSectionEvents(extractionState, section) {
       extractionState.eventsBySeason[extractionState.seasonIndex] = [];
     } else if(isValidEventData(row, extractionState.exclusionListNames, section)){
       var eventFromSpreadsheet = buildEventFromSpreadsheet(row, state.cycles.seasonNames[extractionState.seasonIndex], section);
-      extractionState.eventsBySeason[extractionState.seasonIndex].push(eventFromSpreadsheet);
+      if((!section.hasDoneCol) || (section.hasDoneCol && !eventFromSpreadsheet.isDone)) {
+        extractionState.eventsBySeason[extractionState.seasonIndex].push(eventFromSpreadsheet);
+      }
     }
   }
 }
@@ -305,7 +310,8 @@ function isValidEventData(row, exclusionListNames, section) {
 function buildEventFromSpreadsheet(row, seasonName, section) {
   const startTime = row[section.rangeColumns.startTime];
   const durationHours = row[section.rangeColumns.durationHours];
-  const isAllDay = getIsAllDay(startTime, durationHours)
+  const isAllDay = getIsAllDay(startTime, durationHours);
+  const isDone = getIsDone(section, row);
   var startDateTime = new Date(row[section.rangeColumns.workDate]);
   if(!isAllDay) startDateTime.setHours(startTime);
   var endDateTime = new Date(row[section.rangeColumns.workDate]);
@@ -317,6 +323,7 @@ function buildEventFromSpreadsheet(row, seasonName, section) {
     startDateTime: startDateTime,
     endDateTime: endDateTime,
     isAllDay: isAllDay,
+    isDone: isDone,
     options: {
       description: state.eventDescription,
       location: seasonName
@@ -330,6 +337,13 @@ function getIsAllDay(startTime, durationHours) {
     startTime >= 0 &&
     startTime <= 24 &&
     durationHours > 0);
+}
+
+function getIsDone(section, row) {
+  if(section.hasDoneCol) {
+    return row[section.rangeColumns.done] === 'Yes';
+  }
+  return false;
 }
 
 function getOtherPeopleNames(person) {
