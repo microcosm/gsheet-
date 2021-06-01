@@ -283,16 +283,21 @@ function getSpreadsheetEvents(person, rangeValues) {
     eventsBySeason: [],
     seasonIndex: 0,
     exclusionListNames: getOtherPeopleNames(person),
-    fillInTheBlanksDate: new Date()
+    fillInTheBlanksDate: getStarterDate()
   }
-  extractionState.fillInTheBlanksDate.setHours(0);
-  extractionState.fillInTheBlanksDate.setMinutes(0);
-  extractionState.fillInTheBlanksDate.setSeconds(0);
-  extractionState.fillInTheBlanksDate.setMilliseconds(0);
   extractionState.eventsBySeason[extractionState.seasonIndex] = [];
   populateSpreadsheetSectionEvents(extractionState, cyclesRegular);
   populateSpreadsheetSectionEvents(extractionState, cyclesChecklist);
   return collapseEventsToArray(extractionState.eventsBySeason);
+}
+
+function getStarterDate() {
+  var date = new Date();
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
 }
 
 function populateSpreadsheetSectionEvents(extractionState, section) {
