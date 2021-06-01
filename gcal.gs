@@ -3,8 +3,8 @@ var state, cyclesGlobal, cyclesRegular, cyclesChecklist;
 function init() {
   state = {
     execution: {
-      performDataUpdates: false,
-      showLogAlert: true
+      performDataUpdates: true,
+      showLogAlert: false
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     triggerColumns: null,
@@ -70,7 +70,8 @@ function init() {
             workDate: 14
           },
           rangeColumns: {},
-          hasDoneCol: false
+          hasDoneCol: false,
+          allowFillInTheBlanksDates: false
         },
         checklist: {
           columns: {
@@ -83,7 +84,8 @@ function init() {
             durationHours: 24
           },
           rangeColumns: {},
-          hasDoneCol: true
+          hasDoneCol: true,
+          allowFillInTheBlanksDates: true
         }
       }
     }
@@ -239,13 +241,15 @@ function getSpreadsheetEvents(person, rangeValues) {
     rangeValues: rangeValues,
     eventsBySeason: [],
     seasonIndex: 0,
-    exclusionListNames: getOtherPeopleNames(person)
+    exclusionListNames: getOtherPeopleNames(person),
+    fillInTheBlanksDate: new Date()
   }
+  extractionState.fillInTheBlanksDate.setHours(0);
+  extractionState.fillInTheBlanksDate.setMinutes(0);
+  extractionState.fillInTheBlanksDate.setSeconds(0);
   extractionState.eventsBySeason[extractionState.seasonIndex] = [];
-
   populateSpreadsheetSectionEvents(extractionState, cyclesRegular);
   populateSpreadsheetSectionEvents(extractionState, cyclesChecklist);
-
   return collapseEventsToArray(extractionState.eventsBySeason);
 }
 
@@ -255,19 +259,11 @@ function populateSpreadsheetSectionEvents(extractionState, section) {
     if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
       extractionState.seasonIndex++;
       extractionState.eventsBySeason[extractionState.seasonIndex] = [];
-    } else if(isValidEventData(row, extractionState, section)){
+    } else if(isValidEventData(row, extractionState, section)) {
       var eventFromSpreadsheet = buildEventFromSpreadsheet(row, extractionState, section);
       extractionState.eventsBySeason[extractionState.seasonIndex].push(eventFromSpreadsheet);
     }
   }
-}
-
-function isValidEventData(row, extractionState, section) {
-  var currentExtractionSeason = state.cycles.seasonNames[extractionState.seasonIndex];
-  return (currentExtractionSeason === state.season || currentExtractionSeason === state.transition || currentExtractionSeason === 'Evergreen') &&
-         !getIsDone(section, row) &&
-         row[section.rangeColumns.workDate] instanceof Date &&
-         !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
 }
 
 function isWorkDateLabel(str) {
@@ -308,17 +304,43 @@ function buildEventFromCalendar(googleCalendarEvent) {
   };
 }
 
+function isValidEventData(row, extractionState, section) {
+  var currentExtractionSeason = state.cycles.seasonNames[extractionState.seasonIndex];
+  return (currentExtractionSeason === state.season || currentExtractionSeason === state.transition || currentExtractionSeason === 'Evergreen') &&
+         !getIsDone(section, row) &&
+         (typeof row[section.rangeColumns.noun] == 'string' &&  row[section.rangeColumns.noun].length > 0) &&
+         (typeof row[section.rangeColumns.verb] == 'string' &&  row[section.rangeColumns.verb].length > 0) &&
+         (section.allowFillInTheBlanksDates || row[section.rangeColumns.workDate] instanceof Date) &&
+         !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
+}
+
 function buildEventFromSpreadsheet(row, extractionState, section) {
-  const startTime = row[section.rangeColumns.startTime];
-  const durationHours = row[section.rangeColumns.durationHours];
-  const isAllDay = getIsAllDay(startTime, durationHours);
+  const fillInTheBlanks = section.allowFillInTheBlanksDates && (!(row[section.rangeColumns.workDate] instanceof Date));
+  var startDateTime, endDateTime, isAllDay;
+
+  if(fillInTheBlanks) {
+    isAllDay = true;
+    extractionState.fillInTheBlanksDate = extractionState.fillInTheBlanksDate.addDays(1);
+    startDateTime = new Date(extractionState.fillInTheBlanksDate);
+    endDateTime = null;
+  } else {
+    const startTime = row[section.rangeColumns.startTime];
+    const durationHours = row[section.rangeColumns.durationHours];
+    isAllDay = getIsAllDay(startTime, durationHours);
+    startDateTime = new Date(row[section.rangeColumns.workDate]);
+
+    if(isAllDay) {
+      endDateTime = null;
+    } else {
+      startDateTime.setHours(startTime);
+      endDateTime = new Date(row[section.rangeColumns.workDate]);
+      endDateTime.setHours(startTime + durationHours);
+      endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
+    }
+  }
+
   const isDone = getIsDone(section, row);
   const seasonName = state.cycles.seasonNames[extractionState.seasonIndex];
-  var startDateTime = new Date(row[section.rangeColumns.workDate]);
-  if(!isAllDay) startDateTime.setHours(startTime);
-  var endDateTime = new Date(row[section.rangeColumns.workDate]);
-  endDateTime.setHours(startTime + durationHours);
-  endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
 
   return {
     title: row[section.rangeColumns.noun] + ': ' + row[section.rangeColumns.verb] + ' (' + row[section.rangeColumns.name] + ')',
@@ -419,4 +441,10 @@ function logNewline() {
 
 function alertLog() {
   if(state.execution.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
+}
+
+Date.prototype.addDays = function(days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
 }
