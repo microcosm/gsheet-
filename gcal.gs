@@ -257,11 +257,17 @@ function populateSpreadsheetSectionEvents(extractionState, section) {
       extractionState.eventsBySeason[extractionState.seasonIndex] = [];
     } else if(isValidEventData(row, extractionState, section)){
       var eventFromSpreadsheet = buildEventFromSpreadsheet(row, extractionState, section);
-      if((!section.hasDoneCol) || (section.hasDoneCol && !eventFromSpreadsheet.isDone)) {
-        extractionState.eventsBySeason[extractionState.seasonIndex].push(eventFromSpreadsheet);
-      }
+      extractionState.eventsBySeason[extractionState.seasonIndex].push(eventFromSpreadsheet);
     }
   }
+}
+
+function isValidEventData(row, extractionState, section) {
+  var currentExtractionSeason = state.cycles.seasonNames[extractionState.seasonIndex];
+  return (currentExtractionSeason === state.season || currentExtractionSeason === state.transition || currentExtractionSeason === 'Evergreen') &&
+         !getIsDone(section, row) &&
+         row[section.rangeColumns.workDate] instanceof Date &&
+         !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
 }
 
 function isWorkDateLabel(str) {
@@ -300,13 +306,6 @@ function buildEventFromCalendar(googleCalendarEvent) {
     gcal: googleCalendarEvent,
     gcalId: googleCalendarEvent.getId()
   };
-}
-
-function isValidEventData(row, extractionState, section) {
-  var currentExtractionSeason = state.cycles.seasonNames[extractionState.seasonIndex];
-  return (currentExtractionSeason === state.season || currentExtractionSeason === state.transition || currentExtractionSeason === 'Evergreen') &&
-         row[section.rangeColumns.workDate] instanceof Date &&
-         !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
 }
 
 function buildEventFromSpreadsheet(row, extractionState, section) {
