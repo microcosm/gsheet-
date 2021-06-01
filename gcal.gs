@@ -8,10 +8,10 @@ function init() {
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     triggerColumns: null,
-    season: null,        //Can be: Summer, Winter
-    transition: null,    //Can be: false, Summer->Winter, Winter->Summer
+    season: null,        //Can be: ['Summer', 'Winter']
+    transition: null,    //Can be: [false, 'Summer->Winter', 'Winter->Summer']
     people: null,
-    eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>',
+    eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>&nbsp;&larr; Click here for more',
     log: '',
     lock: null,
     workDateLabelText: 'Work date',
@@ -247,6 +247,7 @@ function getSpreadsheetEvents(person, rangeValues) {
   extractionState.fillInTheBlanksDate.setHours(0);
   extractionState.fillInTheBlanksDate.setMinutes(0);
   extractionState.fillInTheBlanksDate.setSeconds(0);
+  extractionState.fillInTheBlanksDate.setMilliseconds(0);
   extractionState.eventsBySeason[extractionState.seasonIndex] = [];
   populateSpreadsheetSectionEvents(extractionState, cyclesRegular);
   populateSpreadsheetSectionEvents(extractionState, cyclesChecklist);
@@ -336,6 +337,8 @@ function buildEventFromSpreadsheet(row, extractionState, section) {
       endDateTime = new Date(row[section.rangeColumns.workDate]);
       endDateTime.setHours(startTime + durationHours);
       endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
+      endDateTime.setSeconds(0);
+      endDateTime.setMilliSeconds(0);
     }
   }
 
@@ -343,17 +346,25 @@ function buildEventFromSpreadsheet(row, extractionState, section) {
   const seasonName = state.cycles.seasonNames[extractionState.seasonIndex];
 
   return {
-    title: row[section.rangeColumns.noun] + ': ' + row[section.rangeColumns.verb] + ' (' + row[section.rangeColumns.name] + ')',
+    title: row[section.rangeColumns.noun] + ': ' + row[section.rangeColumns.verb],
     startDateTime: startDateTime,
     endDateTime: endDateTime,
     isAllDay: isAllDay,
     isDone: isDone,
     options: {
-      description: state.eventDescription,
+      description: generateDescription(row, section, seasonName),
       location: seasonName
     },
     isAlreadyInCalendar: false
   };
+}
+
+function generateDescription(row, section, seasonName) {
+  var name = row[section.rangeColumns.name];
+  name = name.replace('Either', 'either Julie or Andy');
+  name = name.replace('Both', 'both Julie and Andy together');
+  return 'This is a ' + seasonName + ' ' + (seasonName.includes('->') ? 'checklist' : 'regular') + ' task for ' +  name + '.\n\n' +
+    state.eventDescription;
 }
 
 function getIsAllDay(startTime, durationHours) {
