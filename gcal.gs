@@ -1,13 +1,12 @@
-var state, cyclesGlobal, cyclesRegular, cyclesChecklist;
+var state, cyclesGlobal, cyclesRegular, cyclesChecklist, todoList;
 
 function init() {
   state = {
     execution: {
       performDataUpdates: true,
-      showLogAlert: false
+      showLogAlert: true
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
-    triggerColumns: null,
     season: null,        //Can be: ['Summer', 'Winter']
     transition: null,    //Can be: [false, 'Summer->Winter', 'Winter->Summer']
     people: null,
@@ -23,9 +22,35 @@ function init() {
         end: 'K5'
       }
     },
+    todo: {
+      sheetName: 'Todo',
+      sheet: null,
+      triggerColumns: null,
+      range: {
+        offsets: {
+          row: 2,
+          col: 2
+        },
+        maxRows: 500,
+        maxCols: 11
+      },
+      columns: {
+        noun: 2,
+        verb: 3,
+        done: 5,
+        name: 7,
+        workDate: 8,
+        startTime: 9,
+        durationHours: 10
+      },
+      rangeColumns: {},
+      hasDoneCol: true,
+      allowFillInTheBlanksDates: true
+    },
     cycles: {
       sheetName: 'Cycles',
       sheet: null,
+      triggerColumns: null,
       range: {
         offsets: {
           row: 2,
@@ -93,17 +118,30 @@ function init() {
 
   state.cycles.sheet = state.spreadsheet.getSheetByName(state.cycles.sheetName);
   state.values.sheet = state.spreadsheet.getSheetByName(state.values.sheetName);
+  state.todo.sheet = state.spreadsheet.getSheetByName(state.todo.sheetName);
 
   state.people = getPeople();
 
   cyclesGlobal = state.cycles.sections.global;
   cyclesRegular = state.cycles.sections.regular;
   cyclesChecklist = state.cycles.sections.checklist;
-  generateRangeColumns(cyclesGlobal);
-  generateRangeColumns(cyclesRegular);
-  generateRangeColumns(cyclesChecklist);
+  todoList = state.todo;
+  generateRangeColumns(cyclesGlobal, state.cycles.range.offsets);
+  generateRangeColumns(cyclesRegular, state.cycles.range.offsets);
+  generateRangeColumns(cyclesChecklist, state.cycles.range.offsets);
+  generateRangeColumns(todoList, state.todo.range.offsets);
 
-  state.triggerColumns = [
+  state.todo.triggerColumns = [
+    todoList.columns.noun,
+    todoList.columns.verb,
+    todoList.columns.done,
+    todoList.columns.name,
+    todoList.columns.workDate,
+    todoList.columns.startTime,
+    todoList.columns.durationHours
+  ];
+
+  state.cycles.triggerColumns = [
     cyclesGlobal.columns.season,
     cyclesRegular.columns.noun,
     cyclesRegular.columns.verb,
@@ -123,9 +161,9 @@ function init() {
   ];
 }
 
-function generateRangeColumns(cyclesSection){
-  for(var key in cyclesSection.columns) {
-    cyclesSection.rangeColumns[key] = cyclesSection.columns[key] - state.cycles.range.offsets.col;
+function generateRangeColumns(section, rangeOffsets){
+  for(var key in section.columns) {
+    section.rangeColumns[key] = section.columns[key] - rangeOffsets.col;
   }
 }
 
@@ -139,8 +177,11 @@ function onEditInstalledTrigger(e) {
 }
 
 function isValidTrigger(e){
-  return state.spreadsheet.getActiveSheet().getName() === state.cycles.sheetName &&
-    state.triggerColumns.indexOf(e.range.columnStart) != -1
+  const activeSheetName = state.spreadsheet.getActiveSheet().getName();
+  return (
+    activeSheetName === state.cycles.sheetName && state.cycles.triggerColumns.includes(e.range.columnStart)) || (
+    activeSheetName === state.todo.sheetName && state.todo.triggerColumns.includes(e.range.columnStart)
+  );
 }
 
 function waitForLocks(){
@@ -338,7 +379,7 @@ function buildEventFromSpreadsheet(row, extractionState, section) {
       endDateTime.setHours(startTime + durationHours);
       endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
       endDateTime.setSeconds(0);
-      endDateTime.setMilliSeconds(0);
+      endDateTime.setMilliseconds(0);
     }
   }
 
