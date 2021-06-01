@@ -3,13 +3,13 @@ var state, cyclesGlobal, cyclesRegular, cyclesChecklist;
 function init() {
   state = {
     execution: {
-      performDataUpdates: true,
+      performDataUpdates: false,
       showLogAlert: true
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     triggerColumns: null,
-    season: null,
-    transition: null,
+    season: null,        //Can be: Summer, Winter
+    transition: null,    //Can be: false, Summer->Winter, Winter->Summer
     people: null,
     eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>',
     log: '',
@@ -255,8 +255,8 @@ function populateSpreadsheetSectionEvents(extractionState, section) {
     if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
       extractionState.seasonIndex++;
       extractionState.eventsBySeason[extractionState.seasonIndex] = [];
-    } else if(isValidEventData(row, extractionState.exclusionListNames, section)){
-      var eventFromSpreadsheet = buildEventFromSpreadsheet(row, state.cycles.seasonNames[extractionState.seasonIndex], section);
+    } else if(isValidEventData(row, extractionState, section)){
+      var eventFromSpreadsheet = buildEventFromSpreadsheet(row, extractionState, section);
       if((!section.hasDoneCol) || (section.hasDoneCol && !eventFromSpreadsheet.isDone)) {
         extractionState.eventsBySeason[extractionState.seasonIndex].push(eventFromSpreadsheet);
       }
@@ -302,16 +302,19 @@ function buildEventFromCalendar(googleCalendarEvent) {
   };
 }
 
-function isValidEventData(row, exclusionListNames, section) {
-  return row[section.rangeColumns.workDate] instanceof Date &&
-         !exclusionListNames.includes(row[section.rangeColumns.name])
+function isValidEventData(row, extractionState, section) {
+  var currentExtractionSeason = state.cycles.seasonNames[extractionState.seasonIndex];
+  return (currentExtractionSeason === state.season || currentExtractionSeason === state.transition || currentExtractionSeason === 'Evergreen') &&
+         row[section.rangeColumns.workDate] instanceof Date &&
+         !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
 }
 
-function buildEventFromSpreadsheet(row, seasonName, section) {
+function buildEventFromSpreadsheet(row, extractionState, section) {
   const startTime = row[section.rangeColumns.startTime];
   const durationHours = row[section.rangeColumns.durationHours];
   const isAllDay = getIsAllDay(startTime, durationHours);
   const isDone = getIsDone(section, row);
+  const seasonName = state.cycles.seasonNames[extractionState.seasonIndex];
   var startDateTime = new Date(row[section.rangeColumns.workDate]);
   if(!isAllDay) startDateTime.setHours(startTime);
   var endDateTime = new Date(row[section.rangeColumns.workDate]);
