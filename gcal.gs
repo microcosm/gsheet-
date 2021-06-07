@@ -9,6 +9,7 @@ function init() {
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,        //Can be: ['Summer', 'Winter']
     transition: null,    //Can be: [false, 'Summer->Winter', 'Winter->Summer']
+    validEventCategories: null,
     people: [],
     rangeValues: {},
     eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>&nbsp;&larr; Click here for more',
@@ -61,16 +62,7 @@ function init() {
         maxCols: 24
       },
       seasonStringLength: 6,
-      eventIndices: {
-        evergreen: 1,
-        summer: 2,
-        winter: 3,
-        winterToSummer: 4,
-        summerToWinter: 5,
-        todo: 6,
-        completed: 7
-      },
-      eventIndexNames: {
+      eventCategories: {
         1: 'Evergreen',
         2: 'Summer',
         3: 'Winter',

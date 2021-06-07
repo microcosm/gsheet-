@@ -1,72 +1,52 @@
 function getSpreadsheetEvents(person) {
   var extractionState = {
-    eventsByIndex: [],
-    eventIndex: 0,
+    currentEventCategoryIndex: 0,
+    currentEventCategory: '',
+    eventsByCategory: {},
     exclusionListNames: getOtherPeopleNames(person),
     fillInTheBlanksDate: getStarterDate()
   }
-  extractionState.eventsByIndex[extractionState.eventIndex] = [];
 
   extractEvents(state.cycles, state.regularSection, extractionState);
   extractEvents(state.cycles, state.checklistSection, extractionState);
   extractEvents(state.todo, state.todoSection, extractionState);
 
-  return collapseEventsToArray(extractionState.eventsByIndex);
+  return collapseEventsToArray(extractionState.eventsByCategory);
 }
 
 function extractEvents(sheet, section, extractionState) {
   const rangeValues = state.rangeValues[sheet.sheetName];
-  rangeValues.forEach(function(row) {
+
+  for(var i = 0; i < rangeValues.length; i++) {
+    const row = rangeValues[i];
+
     if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
-      extractionState.eventIndex++;
-      extractionState.eventsByIndex[extractionState.eventIndex] = [];
+      extractionState.currentEventCategoryIndex++;
+      extractionState.currentEventCategory = state.cycles.eventCategories[extractionState.currentEventCategoryIndex];
+      extractionState.eventsByCategory[extractionState.currentEventCategory] = [];
+
     } else if(isValidEventData(row, section, extractionState)) {
       var eventFromSpreadsheet = buildEventFromSpreadsheet(row, section, extractionState);
-      extractionState.eventsByIndex[extractionState.eventIndex].push(eventFromSpreadsheet);
+      extractionState.eventsByCategory[extractionState.currentEventCategory].push(eventFromSpreadsheet);
     }
-  });
-}
-
-function getOtherPeopleNames(person) {
-  var otherPeopleNames = [];
-  state.people.forEach(function(possibleOther) {
-    if(possibleOther.name != person.name) {
-      otherPeopleNames.push(possibleOther.name);
-    }
-  });
-  return otherPeopleNames;
-}
-
-function isWorkDateLabel(str) {
-  return typeof str == 'string' && str.substring(0, state.workDateLabelText.length) === state.workDateLabelText;
-}
-
-function collapseEventsToArray(eventsByIndex) {
-  var eventArray = eventsByIndex[state.cycles.eventIndices.evergreen];
-
-  eventArray = eventArray.concat(
-    state.season === 'Summer' ?
-      eventsByIndex[state.cycles.eventIndices.summer] :
-      eventsByIndex[state.cycles.eventIndices.winter]);
-
-  if(state.transition) {
-    var checklistEvents = state.transition === 'Winter->Summer' ?
-      eventsByIndex[state.cycles.eventIndices.winterToSummer] :
-      eventsByIndex[state.cycles.eventIndices.summerToWinter];
-    eventArray = eventArray.concat(checklistEvents);
   }
+}
 
-  eventArray = eventArray.concat(eventsByIndex[state.cycles.eventIndices.todo]);
-
+function collapseEventsToArray(eventsByCategory) {
+  var eventArray = eventsByCategory['Evergreen'];
+  eventArray = eventArray.concat(eventsByCategory[state.season]);
+  if(state.transition) {
+    eventArray = eventArray.concat(eventsByCategory[state.transition]);
+  }
+  eventArray = eventArray.concat(eventsByCategory['Todo']);
   return eventArray;
 }
 
 function isValidEventData(row, section, extractionState) {
-  var currentExtractionIndex = state.cycles.eventIndexNames[extractionState.eventIndex];
-  return (currentExtractionIndex === state.season || currentExtractionIndex === state.transition || currentExtractionIndex === 'Evergreen' || currentExtractionIndex === 'Todo') &&
+  return state.validEventCategories.includes(extractionState.currentEventCategory) &&
          !getIsDone(section, row) &&
-         (typeof row[section.rangeColumns.noun] == 'string' &&  row[section.rangeColumns.noun].length > 0) &&
-         (typeof row[section.rangeColumns.verb] == 'string' &&  row[section.rangeColumns.verb].length > 0) &&
+         (typeof row[section.rangeColumns.noun] == 'string' && row[section.rangeColumns.noun].length > 0) &&
+         (typeof row[section.rangeColumns.verb] == 'string' && row[section.rangeColumns.verb].length > 0) &&
          (section.allowFillInTheBlanksDates || row[section.rangeColumns.workDate] instanceof Date) &&
          !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
 }
@@ -97,18 +77,15 @@ function buildEventFromSpreadsheet(row, section, extractionState) {
     }
   }
 
-  const isDone = getIsDone(section, row);
-  const eventIndexName = state.cycles.eventIndexNames[extractionState.eventIndex];
-
   return {
     title: row[section.rangeColumns.noun] + ': ' + row[section.rangeColumns.verb],
     startDateTime: startDateTime,
     endDateTime: endDateTime,
     isAllDay: isAllDay,
-    isDone: isDone,
+    isDone: getIsDone(section, row),
     options: {
-      description: generateDescription(row, section, eventIndexName),
-      location: eventIndexName
+      description: generateDescription(row, section, extractionState.currentEventCategory),
+      location: extractionState.currentEventCategory
     },
     isAlreadyInCalendar: false
   };
@@ -125,11 +102,25 @@ function getIsDone(section, row) {
   return false;
 }
 
-function generateDescription(row, section, eventIndexName) {
+function getOtherPeopleNames(person) {
+  var otherPeopleNames = [];
+  state.people.forEach(function(possibleOther) {
+    if(possibleOther.name != person.name) {
+      otherPeopleNames.push(possibleOther.name);
+    }
+  });
+  return otherPeopleNames;
+}
+
+function isWorkDateLabel(str) {
+  return typeof str == 'string' && str.substring(0, state.workDateLabelText.length) === state.workDateLabelText;
+}
+
+function generateDescription(row, section, eventCategory) {
   var name = row[section.rangeColumns.name];
   name = name.replace('Either', 'either Julie or Andy');
   name = name.replace('Both', 'both Julie and Andy together');
-  return 'This is a ' + eventIndexName + ' ' + (eventIndexName.includes('->') ? 'checklist' : 'regular') + ' task for ' +  name + '.\n\n' +
+  return 'This is a ' + eventCategory + ' ' + (eventCategory.includes('->') ? 'checklist' : 'regular') + ' task for ' +  name + '.\n\n' +
     state.eventDescription;
 }
 
@@ -153,4 +144,5 @@ function setSeason() {
   state.season = statusStr.substring(statusStr.length - state.cycles.seasonStringLength);
   var fromSeason = statusStr.substring(0, state.cycles.seasonStringLength);
   state.transition = fromSeason === state.season ? false : statusStr;
+  state.validEventCategories = [state.season, state.transition, 'Evergreen', 'Todo'];
 }
