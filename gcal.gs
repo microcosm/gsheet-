@@ -10,7 +10,7 @@ function init() {
     season: null,        //Can be: ['Summer', 'Winter']
     transition: null,    //Can be: [false, 'Summer->Winter', 'Winter->Summer']
     people: [],
-    rangeValues: null,
+    rangeValues: {},
     eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>&nbsp;&larr; Click here for more',
     log: '',
     lock: null,
@@ -61,14 +61,14 @@ function init() {
         maxCols: 24
       },
       seasonStringLength: 6,
-      seasons: {
+      eventIndices: {
         evergreen: 1,
         summer: 2,
         winter: 3,
         winterToSummer: 4,
         summerToWinter: 5
       },
-      seasonNames: {
+      eventIndexNames: {
         1: 'Evergreen',
         2: 'Summer',
         3: 'Winter',

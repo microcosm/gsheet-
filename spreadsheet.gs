@@ -12,30 +12,36 @@ function updateSpreadsheetChangedEvents(person) {
 }
 
 function setRangeValues() {
-  state.rangeValues = {
-    'Todo': state.todo.sheet.getRange (
+  const todoRangeValues = state.todo.sheet.getRange (
         state.todo.range.offsets.row, state.todo.range.offsets.col,
         state.todo.range.maxRows, state.todo.range.maxCols
-      ).getValues(),
-    'Cycles': state.cycles.sheet.getRange (
+      ).getValues();
+
+  const cyclesRangeValues = state.cycles.sheet.getRange (
         state.cycles.range.offsets.row, state.cycles.range.offsets.col,
         state.cycles.range.maxRows, state.cycles.range.maxCols
-      ).getValues()
-    };
+      ).getValues();
+
+  state.rangeValues[state.todo.sheetName] = todoRangeValues;
+  state.rangeValues[state.cycles.sheetName] = cyclesRangeValues;
 }
 
 function getSpreadsheetEvents(person) {
-  var extractionState = {
-    rangeValues: state.rangeValues[state.cycles.sheetName], //to genericize
-    eventsBySeason: [],
-    seasonIndex: 0,
-    exclusionListNames: getOtherPeopleNames(person),
-    fillInTheBlanksDate: getStarterDate()
+  for (var sheetName in state.rangeValues) {
+    if(sheetName === 'Cycles') {
+      var extractionState = {
+        sheetRangeValues: state.rangeValues[sheetName],
+        eventsByIndex: [],
+        eventIndex: 0,
+        exclusionListNames: getOtherPeopleNames(person),
+        fillInTheBlanksDate: getStarterDate()
+      }
+      extractionState.eventsByIndex[extractionState.eventIndex] = [];
+      populateSpreadsheetSectionEvents(extractionState, state.regularSection);
+      populateSpreadsheetSectionEvents(extractionState, state.checklistSection);
+      return collapseEventsToArray(extractionState.eventsByIndex);
+    }
   }
-  extractionState.eventsBySeason[extractionState.seasonIndex] = [];
-  populateSpreadsheetSectionEvents(extractionState, state.regularSection);
-  populateSpreadsheetSectionEvents(extractionState, state.checklistSection);
-  return collapseEventsToArray(extractionState.eventsBySeason);
 }
 
 function getOtherPeopleNames(person) {
@@ -49,14 +55,14 @@ function getOtherPeopleNames(person) {
 }
 
 function populateSpreadsheetSectionEvents(extractionState, section) {
-  for(var i = 0; i < extractionState.rangeValues.length; i++) {
-    const row = extractionState.rangeValues[i];
+  for(var i = 0; i < extractionState.sheetRangeValues.length; i++) {
+    const row = extractionState.sheetRangeValues[i];
     if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
-      extractionState.seasonIndex++;
-      extractionState.eventsBySeason[extractionState.seasonIndex] = [];
+      extractionState.eventIndex++;
+      extractionState.eventsByIndex[extractionState.eventIndex] = [];
     } else if(isValidEventData(row, extractionState, section)) {
       var eventFromSpreadsheet = buildEventFromSpreadsheet(row, extractionState, section);
-      extractionState.eventsBySeason[extractionState.seasonIndex].push(eventFromSpreadsheet);
+      extractionState.eventsByIndex[extractionState.eventIndex].push(eventFromSpreadsheet);
     }
   }
 }
@@ -65,18 +71,18 @@ function isWorkDateLabel(str) {
   return typeof str == 'string' && str.substring(0, state.workDateLabelText.length) === state.workDateLabelText;
 }
 
-function collapseEventsToArray(eventsBySeason) {
-  var eventArray = eventsBySeason[state.cycles.seasons.evergreen];
+function collapseEventsToArray(eventsByIndex) {
+  var eventArray = eventsByIndex[state.cycles.eventIndices.evergreen];
 
   eventArray = eventArray.concat(
     state.season === 'Summer' ?
-      eventsBySeason[state.cycles.seasons.summer] :
-      eventsBySeason[state.cycles.seasons.winter]);
+      eventsByIndex[state.cycles.eventIndices.summer] :
+      eventsByIndex[state.cycles.eventIndices.winter]);
 
   if(state.transition) {
     var checklistEvents = state.transition === 'Winter->Summer' ?
-      eventsBySeason[state.cycles.seasons.winterToSummer] :
-      eventsBySeason[state.cycles.seasons.summerToWinter];
+      eventsByIndex[state.cycles.eventIndices.winterToSummer] :
+      eventsByIndex[state.cycles.eventIndices.summerToWinter];
     eventArray = eventArray.concat(checklistEvents);
   }
 
@@ -84,7 +90,7 @@ function collapseEventsToArray(eventsBySeason) {
 }
 
 function isValidEventData(row, extractionState, section) {
-  var currentExtractionSeason = state.cycles.seasonNames[extractionState.seasonIndex];
+  var currentExtractionSeason = state.cycles.eventIndexNames[extractionState.eventIndex];
   return (currentExtractionSeason === state.season || currentExtractionSeason === state.transition || currentExtractionSeason === 'Evergreen') &&
          !getIsDone(section, row) &&
          (typeof row[section.rangeColumns.noun] == 'string' &&  row[section.rangeColumns.noun].length > 0) &&
@@ -121,7 +127,7 @@ function buildEventFromSpreadsheet(row, extractionState, section) {
   }
 
   const isDone = getIsDone(section, row);
-  const seasonName = state.cycles.seasonNames[extractionState.seasonIndex];
+  const eventIndexName = state.cycles.eventIndexNames[extractionState.eventIndex];
 
   return {
     title: row[section.rangeColumns.noun] + ': ' + row[section.rangeColumns.verb],
@@ -130,8 +136,8 @@ function buildEventFromSpreadsheet(row, extractionState, section) {
     isAllDay: isAllDay,
     isDone: isDone,
     options: {
-      description: generateDescription(row, section, seasonName),
-      location: seasonName
+      description: generateDescription(row, section, eventIndexName),
+      location: eventIndexName
     },
     isAlreadyInCalendar: false
   };

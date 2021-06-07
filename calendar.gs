@@ -33,10 +33,10 @@ function buildEventFromCalendar(googleCalendarEvent) {
   };
 }
 
-function generateDescription(row, section, seasonName) {
+function generateDescription(row, section, eventIndexName) {
   var name = row[section.rangeColumns.name];
   name = name.replace('Either', 'either Julie or Andy');
   name = name.replace('Both', 'both Julie and Andy together');
-  return 'This is a ' + seasonName + ' ' + (seasonName.includes('->') ? 'checklist' : 'regular') + ' task for ' +  name + '.\n\n' +
+  return 'This is a ' + eventIndexName + ' ' + (eventIndexName.includes('->') ? 'checklist' : 'regular') + ' task for ' +  name + '.\n\n' +
     state.eventDescription;
 }
