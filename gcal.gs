@@ -9,7 +9,8 @@ function init() {
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,        //Can be: ['Summer', 'Winter']
     transition: null,    //Can be: [false, 'Summer->Winter', 'Winter->Summer']
-    people: null,
+    people: [],
+    rangeValues: null,
     eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>&nbsp;&larr; Click here for more',
     log: '',
     lock: null,
@@ -129,8 +130,6 @@ function init() {
   state.values.sheet = state.spreadsheet.getSheetByName(state.values.sheetName);
   state.todo.sheet = state.spreadsheet.getSheetByName(state.todo.sheetName);
 
-  state.people = getPeople();
-
   generateRangeColumns(state.cyclesGlobal, state.cycles.range.offsets);
   generateRangeColumns(state.regularSection, state.cycles.range.offsets);
   generateRangeColumns(state.checklistSection, state.cycles.range.offsets);
@@ -164,6 +163,10 @@ function init() {
     state.checklistSection.columns.startTime,
     state.checklistSection.columns.durationHours
   ];
+
+  state.rangeValues = getRangeValuesBySheetName();
+  setSeason();
+  setPeople();
 }
 
 function onEditInstalledTrigger(e) {
@@ -189,41 +192,34 @@ function generateRangeColumns(section, rangeOffsets){
   }
 }
 
-function getPeople() {
+function setPeople() {
   const values = state.values.sheet.getRange(state.values.range.start + ':' + state.values.range.end).getValues();
-  var people = [];
   for(var i = 0; i < values.length; i+=2) {
     if(values[i][0] && values[i + 1][0]){
       const name = values[i][0];
       const calendar = CalendarApp.getCalendarById(values[i + 1][0]);
-      const calendarEvents = getCalendarEvents(calendar);
-      people.push({ name: name, calendar: calendar, calendarEvents: calendarEvents });
+      state.people.push({
+        name: name,
+        calendar: calendar,
+        calendarEvents: getCalendarEvents(calendar),
+        spreadsheetEvents: null });
     }
   }
-  return people;
+  state.people.forEach(function(person) {
+    person.spreadsheetEvents = getSpreadsheetEvents(person);
+  });
 }
 
 function updateCalendars() {
   state.people.forEach(function(person) {
-    const rangeValuesBySheetName = getRangeValuesBySheetName();
-    updateCalendarFromTodo(person, rangeValuesBySheetName[state.todo.sheetName]);
-    updateCalendarFromCycles(person, rangeValuesBySheetName[state.cycles.sheetName]);
+    //updateCalendarFromTodo(person, state.rangeValuesBySheetName[state.todo.sheetName]);
+    linkMatchingEvents(person);
+    updateChangedEvents(person);
   });
 }
 
-function updateCalendarFromTodo(person, rangeValues) {
-  //?
-}
-
-function updateCalendarFromCycles(person, rangeValues) {
-  setSeason(rangeValues);
-  var spreadsheetEvents = getSpreadsheetEvents(person, rangeValues);
-  linkMatchingEvents(person, spreadsheetEvents);
-  updateChangedEvents(person, spreadsheetEvents);
-}
-
-function linkMatchingEvents(person, spreadsheetEvents) {
-  spreadsheetEvents.forEach(function(spreadsheetEvent) {
+function linkMatchingEvents(person) {
+  person.spreadsheetEvents.forEach(function(spreadsheetEvent) {
     var matchingCalendarEvent = findInCalendarEvents(spreadsheetEvent, person.calendarEvents);
     if(matchingCalendarEvent) {
       matchingCalendarEvent.existsInSpreadsheet = true;
@@ -234,9 +230,9 @@ function linkMatchingEvents(person, spreadsheetEvents) {
   logNewline();
 }
 
-function updateChangedEvents(person, spreadsheetEvents) { ///rm spreadsheetEvents...
+function updateChangedEvents(person) {
   updateCalendarChangedEvents(person);
-  updateSpreadsheetChangedEvents(person, spreadsheetEvents);
+  updateSpreadsheetChangedEvents(person);
   logNewline();
 }
 
@@ -245,16 +241,6 @@ function getIsAllDay(startTime, durationHours) {
     startTime >= 0 &&
     startTime <= 24 &&
     durationHours > 0);
-}
-
-function getOtherPeopleNames(person) {
-  var otherPeopleNames = [];
-  state.people.forEach(function(possibleOther) {
-    if(possibleOther.name != person.name) {
-      otherPeopleNames.push(possibleOther.name);
-    }
-  });
-  return otherPeopleNames;
 }
 
 function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
