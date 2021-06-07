@@ -4,7 +4,7 @@ function init() {
   state = {
     execution: {
       performDataUpdates: true,
-      showLogAlert: true
+      showLogAlert: false
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,        //Can be: ['Summer', 'Winter']
@@ -206,29 +206,47 @@ function getPeople() {
   var people = [];
   for(var i = 0; i < values.length; i+=2) {
     if(values[i][0] && values[i + 1][0]){
-      people.push({
-        name: values[i][0],
-        calendar: CalendarApp.getCalendarById(values[i + 1][0])
-      });
+      const name = values[i][0];
+      const calendar = CalendarApp.getCalendarById(values[i + 1][0]);
+      const calendarEvents = getCalendarEvents(calendar);
+      people.push({ name: name, calendar: calendar, calendarEvents: calendarEvents });
     }
   }
   return people;
 }
 
+function getCalendarEvents(calendar) {
+  const fromDate = new Date('January 1, 2000'), toDate = new Date('January 1, 3000');
+  const googleCalendarEvents = calendar.getEvents(fromDate, toDate);
+  var calendarEvents = [];
+  googleCalendarEvents.forEach(function(googleCalendarEvent) {
+    calendarEvents.push(buildEventFromCalendar(googleCalendarEvent));
+  });
+  return calendarEvents;
+}
+
 function updateCalendars() {
   state.people.forEach(function(person) {
-    const rangeValues = getRangeValues();
-    setSeason(rangeValues);
-    var spreadsheetEvents = getSpreadsheetEvents(person, rangeValues);
-    var calendarEvents = getCalendarEvents(person);
-    linkMatchingEvents(spreadsheetEvents, calendarEvents);
-    updateChangedEvents(person, spreadsheetEvents, calendarEvents);
+    const rangeValuesBySheetName = getRangeValuesBySheetName();
+    updateCalendarFromTodo(person, rangeValuesBySheetName[state.todo.sheetName]);
+    updateCalendarFromCycles(person, rangeValuesBySheetName[state.cycles.sheetName]);
   });
 }
 
-function linkMatchingEvents(spreadsheetEvents, calendarEvents) {
+function updateCalendarFromTodo(person, rangeValues) {
+  //?
+}
+
+function updateCalendarFromCycles(person, rangeValues) {
+  setSeason(rangeValues);
+  var spreadsheetEvents = getSpreadsheetEvents(person, rangeValues);
+  linkMatchingEvents(person, spreadsheetEvents);
+  updateChangedEvents(person, spreadsheetEvents);
+}
+
+function linkMatchingEvents(person, spreadsheetEvents) {
   spreadsheetEvents.forEach(function(spreadsheetEvent) {
-    var matchingCalendarEvent = findInCalendarEvents(spreadsheetEvent, calendarEvents);
+    var matchingCalendarEvent = findInCalendarEvents(spreadsheetEvent, person.calendarEvents);
     if(matchingCalendarEvent) {
       matchingCalendarEvent.existsInSpreadsheet = true;
       spreadsheetEvent.existsInCalendar = true;
@@ -238,8 +256,8 @@ function linkMatchingEvents(spreadsheetEvents, calendarEvents) {
   logNewline();
 }
 
-function updateChangedEvents(person, spreadsheetEvents, calendarEvents) {
-  calendarEvents.forEach(function(calendarEvent) {
+function updateChangedEvents(person, spreadsheetEvents) {
+  person.calendarEvents.forEach(function(calendarEvent) {
     if(!calendarEvent.existsInSpreadsheet){
       logEventDeleted(calendarEvent);
       if(state.execution.performDataUpdates) calendarEvent.gcal.deleteEvent();
@@ -258,23 +276,19 @@ function updateChangedEvents(person, spreadsheetEvents, calendarEvents) {
   logNewline();
 }
 
-function getRangeValues() {
-  return state.cycles.sheet.getRange(
-    state.cycles.range.offsets.row,
-    state.cycles.range.offsets.col,
-    state.cycles.range.maxRows,
-    state.cycles.range.maxCols).getValues();
-}
-
-function getCalendarEvents(person) {
-  const fromDate = new Date('January 1, 2000');
-  const toDate = new Date('January 1, 3000');
-  const googleCalendarEvents = person.calendar.getEvents(fromDate, toDate);
-  var calendarEvents = [];
-  googleCalendarEvents.forEach(function(googleCalendarEvent) {
-    calendarEvents.push(buildEventFromCalendar(googleCalendarEvent));
-  });
-  return calendarEvents;
+function getRangeValuesBySheetName() {
+  return {
+    'Todo': state.todo.sheet.getRange(
+      state.todo.range.offsets.row,
+      state.todo.range.offsets.col,
+      state.todo.range.maxRows,
+      state.todo.range.maxCols).getValues(),
+    'Cycles': state.cycles.sheet.getRange(
+      state.cycles.range.offsets.row,
+      state.cycles.range.offsets.col,
+      state.cycles.range.maxRows,
+      state.cycles.range.maxCols).getValues()
+    };
 }
 
 function getSpreadsheetEvents(person, rangeValues) {
