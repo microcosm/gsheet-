@@ -189,23 +189,6 @@ function isValidTrigger(e){
   );
 }
 
-function waitForLocks(){
-  state.lock = LockService.getScriptLock();
-  try {
-    state.lock.waitLock(60000);
-    logLockObtained();
-    return true;
-  } catch(e) {
-    return false;
-  }
-}
-
-function releaseLock() {
-  SpreadsheetApp.flush();
-  state.lock.releaseLock();
-  logLockReleased();
-}
-
 function getPeople() {
   const values = state.values.sheet.getRange(state.values.range.start + ':' + state.values.range.end).getValues();
   var people = [];
@@ -308,15 +291,6 @@ function getSpreadsheetEvents(person, rangeValues) {
   populateSpreadsheetSectionEvents(extractionState, state.regularSection);
   populateSpreadsheetSectionEvents(extractionState, state.checklistSection);
   return collapseEventsToArray(extractionState.eventsBySeason);
-}
-
-function getStarterDate() {
-  var date = new Date();
-  date.setHours(0);
-  date.setMinutes(0);
-  date.setSeconds(0);
-  date.setMilliseconds(0);
-  return date;
 }
 
 function populateSpreadsheetSectionEvents(extractionState, section) {
@@ -477,50 +451,4 @@ function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
     }
   });
   return match;
-}
-
-function logString(str) {
-  state.log += str + "\n";
-}
-
-function logEventFound(event, hasMatch) {
-  state.log +=
-    (hasMatch ? '' : '* ') +
-    ' [' + event.options.location + '] ' +
-    event.title + ' ' +
-    event.startDateTime + 
-    (event.isAllDay ?
-      ' ALL DAY' :
-      ' until ' + event.endDateTime.getHours() + ':' + event.endDateTime.getMinutes()
-    ) + '\n';
-}
-
-function logEventDeleted(event) {
-  state.log += "Deleting " + event.title + "\n";
-}
-
-function logEventCreated(event) {
-  state.log += "Creating " + event.title + "\n";
-}
-
-function logLockObtained() {
-  state.log += "Lock obtained...\n";
-}
-
-function logLockReleased() {
-  state.log += "Lock released.\n";
-}
-
-function logNewline() {
-  state.log += "\n";
-}
-
-function alertLog() {
-  if(state.execution.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
-}
-
-Date.prototype.addDays = function(days) {
-  var date = new Date(this.valueOf());
-  date.setDate(date.getDate() + days);
-  return date;
 }
