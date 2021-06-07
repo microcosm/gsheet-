@@ -66,14 +66,18 @@ function init() {
         summer: 2,
         winter: 3,
         winterToSummer: 4,
-        summerToWinter: 5
+        summerToWinter: 5,
+        todo: 6,
+        completed: 7
       },
       eventIndexNames: {
         1: 'Evergreen',
         2: 'Summer',
         3: 'Winter',
         4: 'Winter->Summer',
-        5: 'Summer->Winter'
+        5: 'Summer->Winter',
+        6: 'Todo',
+        7: 'Completed',
       },
       sections: {
         global: {

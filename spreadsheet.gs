@@ -27,18 +27,19 @@ function setRangeValues() {
 }
 
 function getSpreadsheetEvents(person) {
-    var extractionState = {
-      eventsByIndex: [],
-      eventIndex: 0,
-      exclusionListNames: getOtherPeopleNames(person),
-      fillInTheBlanksDate: getStarterDate()
-    }
-    extractionState.eventsByIndex[extractionState.eventIndex] = [];
+  var extractionState = {
+    eventsByIndex: [],
+    eventIndex: 0,
+    exclusionListNames: getOtherPeopleNames(person),
+    fillInTheBlanksDate: getStarterDate()
+  }
+  extractionState.eventsByIndex[extractionState.eventIndex] = [];
 
-    extractEvents(state.cycles, state.regularSection, extractionState);
-    extractEvents(state.cycles, state.checklistSection, extractionState);
+  extractEvents(state.cycles, state.regularSection, extractionState);
+  extractEvents(state.cycles, state.checklistSection, extractionState);
+  extractEvents(state.todo, state.todoSection, extractionState);
 
-    return collapseEventsToArray(extractionState.eventsByIndex);
+  return collapseEventsToArray(extractionState.eventsByIndex);
 }
 
 function extractEvents(sheet, section, extractionState) {
@@ -47,8 +48,8 @@ function extractEvents(sheet, section, extractionState) {
     if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
       extractionState.eventIndex++;
       extractionState.eventsByIndex[extractionState.eventIndex] = [];
-    } else if(isValidEventData(row, extractionState, section)) {
-      var eventFromSpreadsheet = buildEventFromSpreadsheet(row, extractionState, section);
+    } else if(isValidEventData(row, section, extractionState)) {
+      var eventFromSpreadsheet = buildEventFromSpreadsheet(row, section, extractionState);
       extractionState.eventsByIndex[extractionState.eventIndex].push(eventFromSpreadsheet);
     }
   });
@@ -83,12 +84,14 @@ function collapseEventsToArray(eventsByIndex) {
     eventArray = eventArray.concat(checklistEvents);
   }
 
+  eventArray = eventArray.concat(eventsByIndex[state.cycles.eventIndices.todo]);
+
   return eventArray;
 }
 
-function isValidEventData(row, extractionState, section) {
-  var currentExtractionSeason = state.cycles.eventIndexNames[extractionState.eventIndex];
-  return (currentExtractionSeason === state.season || currentExtractionSeason === state.transition || currentExtractionSeason === 'Evergreen') &&
+function isValidEventData(row, section, extractionState) {
+  var currentExtractionIndex = state.cycles.eventIndexNames[extractionState.eventIndex];
+  return (currentExtractionIndex === state.season || currentExtractionIndex === state.transition || currentExtractionIndex === 'Evergreen' || currentExtractionIndex === 'Todo') &&
          !getIsDone(section, row) &&
          (typeof row[section.rangeColumns.noun] == 'string' &&  row[section.rangeColumns.noun].length > 0) &&
          (typeof row[section.rangeColumns.verb] == 'string' &&  row[section.rangeColumns.verb].length > 0) &&
@@ -96,11 +99,10 @@ function isValidEventData(row, extractionState, section) {
          !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
 }
 
-function buildEventFromSpreadsheet(row, extractionState, section) {
-  const fillInTheBlanks = section.allowFillInTheBlanksDates && (!(row[section.rangeColumns.workDate] instanceof Date));
+function buildEventFromSpreadsheet(row, section, extractionState) {
   var startDateTime, endDateTime, isAllDay;
 
-  if(fillInTheBlanks) {
+  if(isFillInTheBlanks(row, section)) {
     isAllDay = true;
     extractionState.fillInTheBlanksDate = extractionState.fillInTheBlanksDate.addDays(1);
     startDateTime = new Date(extractionState.fillInTheBlanksDate);
@@ -138,6 +140,10 @@ function buildEventFromSpreadsheet(row, extractionState, section) {
     },
     isAlreadyInCalendar: false
   };
+}
+
+function isFillInTheBlanks(row, section) {
+  return section.allowFillInTheBlanksDates && (!(row[section.rangeColumns.workDate] instanceof Date));
 }
 
 function getIsDone(section, row) {
