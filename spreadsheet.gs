@@ -27,21 +27,31 @@ function setRangeValues() {
 }
 
 function getSpreadsheetEvents(person) {
-  for (var sheetName in state.rangeValues) {
-    if(sheetName === 'Cycles') {
-      var extractionState = {
-        sheetRangeValues: state.rangeValues[sheetName],
-        eventsByIndex: [],
-        eventIndex: 0,
-        exclusionListNames: getOtherPeopleNames(person),
-        fillInTheBlanksDate: getStarterDate()
-      }
-      extractionState.eventsByIndex[extractionState.eventIndex] = [];
-      populateSpreadsheetSectionEvents(extractionState, state.regularSection);
-      populateSpreadsheetSectionEvents(extractionState, state.checklistSection);
-      return collapseEventsToArray(extractionState.eventsByIndex);
+    var extractionState = {
+      eventsByIndex: [],
+      eventIndex: 0,
+      exclusionListNames: getOtherPeopleNames(person),
+      fillInTheBlanksDate: getStarterDate()
     }
-  }
+    extractionState.eventsByIndex[extractionState.eventIndex] = [];
+
+    extractEvents(state.cycles, state.regularSection, extractionState);
+    extractEvents(state.cycles, state.checklistSection, extractionState);
+
+    return collapseEventsToArray(extractionState.eventsByIndex);
+}
+
+function extractEvents(sheet, section, extractionState) {
+  const rangeValues = state.rangeValues[sheet.sheetName];
+  rangeValues.forEach(function(row) {
+    if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
+      extractionState.eventIndex++;
+      extractionState.eventsByIndex[extractionState.eventIndex] = [];
+    } else if(isValidEventData(row, extractionState, section)) {
+      var eventFromSpreadsheet = buildEventFromSpreadsheet(row, extractionState, section);
+      extractionState.eventsByIndex[extractionState.eventIndex].push(eventFromSpreadsheet);
+    }
+  });
 }
 
 function getOtherPeopleNames(person) {
@@ -52,19 +62,6 @@ function getOtherPeopleNames(person) {
     }
   });
   return otherPeopleNames;
-}
-
-function populateSpreadsheetSectionEvents(extractionState, section) {
-  for(var i = 0; i < extractionState.sheetRangeValues.length; i++) {
-    const row = extractionState.sheetRangeValues[i];
-    if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
-      extractionState.eventIndex++;
-      extractionState.eventsByIndex[extractionState.eventIndex] = [];
-    } else if(isValidEventData(row, extractionState, section)) {
-      var eventFromSpreadsheet = buildEventFromSpreadsheet(row, extractionState, section);
-      extractionState.eventsByIndex[extractionState.eventIndex].push(eventFromSpreadsheet);
-    }
-  }
 }
 
 function isWorkDateLabel(str) {
