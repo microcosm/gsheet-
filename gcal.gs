@@ -164,7 +164,7 @@ function init() {
     state.checklistSection.columns.durationHours
   ];
 
-  state.rangeValues = getRangeValuesBySheetName();
+  setRangeValues();
   setSeason();
   setPeople();
 }
@@ -212,7 +212,6 @@ function setPeople() {
 
 function updateCalendars() {
   state.people.forEach(function(person) {
-    //updateCalendarFromTodo(person, state.rangeValuesBySheetName[state.todo.sheetName]);
     linkMatchingEvents(person);
     updateChangedEvents(person);
   });
