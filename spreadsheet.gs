@@ -1,31 +1,3 @@
-function updateSpreadsheetChangedEvents(person) {
-  person.spreadsheetEvents.forEach(function(spreadsheetEvent){
-    if(!spreadsheetEvent.existsInCalendar) {
-      logEventCreated(spreadsheetEvent);
-      if(state.execution.performDataUpdates) {
-        spreadsheetEvent.isAllDay ?
-          person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
-          person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
-      }
-    }
-  });
-}
-
-function setRangeValues() {
-  const todoRangeValues = state.todo.sheet.getRange (
-        state.todo.range.offsets.row, state.todo.range.offsets.col,
-        state.todo.range.maxRows, state.todo.range.maxCols
-      ).getValues();
-
-  const cyclesRangeValues = state.cycles.sheet.getRange (
-        state.cycles.range.offsets.row, state.cycles.range.offsets.col,
-        state.cycles.range.maxRows, state.cycles.range.maxCols
-      ).getValues();
-
-  state.rangeValues[state.todo.sheetName] = todoRangeValues;
-  state.rangeValues[state.cycles.sheetName] = cyclesRangeValues;
-}
-
 function getSpreadsheetEvents(person) {
   var extractionState = {
     eventsByIndex: [],
@@ -151,6 +123,29 @@ function getIsDone(section, row) {
     return row[section.rangeColumns.done] === 'Yes';
   }
   return false;
+}
+
+function generateDescription(row, section, eventIndexName) {
+  var name = row[section.rangeColumns.name];
+  name = name.replace('Either', 'either Julie or Andy');
+  name = name.replace('Both', 'both Julie and Andy together');
+  return 'This is a ' + eventIndexName + ' ' + (eventIndexName.includes('->') ? 'checklist' : 'regular') + ' task for ' +  name + '.\n\n' +
+    state.eventDescription;
+}
+
+function setRangeValues() {
+  const todoRangeValues = state.todo.sheet.getRange (
+        state.todo.range.offsets.row, state.todo.range.offsets.col,
+        state.todo.range.maxRows, state.todo.range.maxCols
+      ).getValues();
+
+  const cyclesRangeValues = state.cycles.sheet.getRange (
+        state.cycles.range.offsets.row, state.cycles.range.offsets.col,
+        state.cycles.range.maxRows, state.cycles.range.maxCols
+      ).getValues();
+
+  state.rangeValues[state.todo.sheetName] = todoRangeValues;
+  state.rangeValues[state.cycles.sheetName] = cyclesRangeValues;
 }
 
 function setSeason() {

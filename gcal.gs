@@ -234,8 +234,8 @@ function linkMatchingEvents(person) {
 }
 
 function updateChangedEvents(person) {
-  updateCalendarChangedEvents(person);
-  updateSpreadsheetChangedEvents(person);
+  deleteOrphanedCalendarEvents(person);
+  createNewCalendarEvents(person);
   logNewline();
 }
 

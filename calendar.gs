@@ -8,11 +8,24 @@ function getCalendarEvents(calendar) {
   return calendarEvents;
 }
 
-function updateCalendarChangedEvents(person) {
+function deleteOrphanedCalendarEvents(person) {
   person.calendarEvents.forEach(function(calendarEvent) {
     if(!calendarEvent.existsInSpreadsheet){
       logEventDeleted(calendarEvent);
       if(state.execution.performDataUpdates) calendarEvent.gcal.deleteEvent();
+    }
+  });
+}
+
+function createNewCalendarEvents(person) {
+  person.spreadsheetEvents.forEach(function(spreadsheetEvent){
+    if(!spreadsheetEvent.existsInCalendar) {
+      logEventCreated(spreadsheetEvent);
+      if(state.execution.performDataUpdates) {
+        spreadsheetEvent.isAllDay ?
+          person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
+          person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
+      }
     }
   });
 }
@@ -31,12 +44,4 @@ function buildEventFromCalendar(googleCalendarEvent) {
     gcal: googleCalendarEvent,
     gcalId: googleCalendarEvent.getId()
   };
-}
-
-function generateDescription(row, section, eventIndexName) {
-  var name = row[section.rangeColumns.name];
-  name = name.replace('Either', 'either Julie or Andy');
-  name = name.replace('Both', 'both Julie and Andy together');
-  return 'This is a ' + eventIndexName + ' ' + (eventIndexName.includes('->') ? 'checklist' : 'regular') + ' task for ' +  name + '.\n\n' +
-    state.eventDescription;
 }
