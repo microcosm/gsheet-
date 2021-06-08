@@ -3,8 +3,8 @@ var state;
 function init() {
   state = {
     execution: {
-      performDataUpdates: false,
-      showLogAlert: true
+      performDataUpdates: true,
+      showLogAlert: false
     },
     spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
     season: null,        //Can be: ['Summer', 'Winter']

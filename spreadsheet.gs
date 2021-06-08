@@ -120,8 +120,7 @@ function generateDescription(row, section, eventCategory) {
   var name = row[section.rangeColumns.name];
   name = name.replace('Either', 'either Julie or Andy');
   name = name.replace('Both', 'both Julie and Andy together');
-  return 'This is a ' + eventCategory + ' ' + (eventCategory.includes('->') ? 'checklist' : 'regular') + ' task for ' +  name + '.\n\n' +
-    state.eventDescription;
+  return 'This event is from the "' + eventCategory + '" section, for ' +  name + '.\n\n' + state.eventDescription;
 }
 
 function setRangeValues() {
