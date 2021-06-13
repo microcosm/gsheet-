@@ -244,8 +244,8 @@ function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
     var isEqual =
       calendarEvent.title === spreadsheetEvent.title &&
       calendarEvent.startDateTime.getTime() === spreadsheetEvent.startDateTime.getTime() &&
-      (calendarEvent.isAllDay ? true : calendarEvent.endDateTime.getTime() === spreadsheetEvent.endDateTime.getTime()) &&
       calendarEvent.isAllDay === spreadsheetEvent.isAllDay &&
+      (calendarEvent.isAllDay ? true : calendarEvent.endDateTime.getTime() === spreadsheetEvent.endDateTime.getTime()) &&
       calendarEvent.options.location === spreadsheetEvent.options.location;
     if(isEqual) {
       match = calendarEvent;
