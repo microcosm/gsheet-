@@ -234,7 +234,7 @@ function updateChangedEvents(person) {
 function getIsAllDay(startTime, durationHours) {
   return !(
     startTime >= 0 &&
-    startTime <= 24 &&
+    startTime <= 23 &&
     durationHours > 0);
 }
 
