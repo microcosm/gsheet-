@@ -15,11 +15,7 @@ function init() {
     eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>&nbsp;&larr; Click here for more',
     log: '',
     lock: null,
-    error: {
-      detected: false,
-      text: 'Calendar update failed: ',
-      reason: '',
-    },
+    errorText: 'Calendar update failed: ',
     workDateLabelText: 'Work date',
     values: {
       sheetName: '(dropdowns)',
@@ -174,14 +170,17 @@ function onEditInstalledTrigger(e) {
   init();
   if(!isValidTrigger(e)) return;
   if(!waitForLocks()){
-    state.error.detected = true;
-    state.error.reason = "couldn't lock script";
-    alertError();
+    alertError("couldn't lock script");
     return;
   }
-  updateCalendars();
-  releaseLock();
-  alertLog();
+  try {
+    updateCalendars();
+    alertLog();
+  } catch(e) {
+    alertError(e);
+  } finally {
+    releaseLock();
+  }
 }
 
 function isValidTrigger(e){

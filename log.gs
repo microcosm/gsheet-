@@ -38,6 +38,6 @@ function alertLog() {
   if(state.execution.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
 }
 
-function alertError(){
-  if(state.error.detected) SpreadsheetApp.getUi().alert(state.error.text + state.error.reason);
+function alertError(reason){
+  SpreadsheetApp.getUi().alert(state.errorText + reason);
 }
