@@ -1,12 +1,12 @@
 var state;
 
-function init() {
+function init(spreadsheet) {
   state = {
     execution: {
       performDataUpdates: true,
       showLogAlert: false
     },
-    spreadsheet: SpreadsheetApp.getActiveSpreadsheet(),
+    spreadsheet: spreadsheet,
     season: null,        //Can be: ['Summer', 'Winter']
     transition: null,    //Can be: [false, 'Summer->Winter', 'Winter->Summer']
     validEventCategories: null,
@@ -166,16 +166,25 @@ function init() {
   setPeople();
 }
 
+function onTimedTrigger() {
+  init(SpreadsheetApp.openById('1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs'));
+  run();
+}
+
 function onEditInstalledTrigger(e) {
-  init();
+  init(SpreadsheetApp.getActiveSpreadsheet());
   if(!isValidTrigger(e)) return;
+  run();
+}
+
+function run() {
   if(!waitForLocks()){
     alertError("couldn't lock script");
     return;
   }
   try {
     updateCalendars();
-    alertLog();
+    outputLog();
   } catch(e) {
     alertError(e);
   } finally {

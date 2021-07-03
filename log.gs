@@ -34,10 +34,13 @@ function logNewline() {
   state.log += "\n";
 }
 
-function alertLog() {
+function outputLog() {
+  console.log(state.log);
   if(state.execution.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
 }
 
 function alertError(reason){
-  SpreadsheetApp.getUi().alert(state.errorText + reason);
+  var output = state.errorText + reason;
+  console.log(output);
+  if(state.execution.showLogAlert) SpreadsheetApp.getUi().alert(output);
 }
