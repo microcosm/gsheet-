@@ -56,7 +56,6 @@ function buildEventFromSpreadsheet(row, section, extractionState) {
 
   if(isFillInTheBlanks(row, section)) {
     isAllDay = true;
-    extractionState.fillInTheBlanksDate = extractionState.fillInTheBlanksDate.addDays(1);
     startDateTime = new Date(extractionState.fillInTheBlanksDate);
     endDateTime = null;
   } else {
