@@ -5,7 +5,7 @@ function getSpreadsheetEvents(person) {
     eventsByCategory: {},
     person: person,
     exclusionListNames: getOtherPeopleNames(person),
-    fillInTheBlanksDate: getStarterDate()
+    fillInTheBlanksDate: state.today
   }
 
   extractEvents(state.cycles, state.regularSection, extractionState);
