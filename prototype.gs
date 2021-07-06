@@ -4,6 +4,11 @@ Date.prototype.addDays = function(days) {
   return date;
 };
 
-String.prototype.isEmpty = function() {
-  return this.length === 0 || !this.trim();
+String.prototype.isANumber = function() {
+  return !(this.length === 0 || !this.trim()) &&
+         !isNaN(this);
+};
+
+Number.prototype.isANumber = function() {
+  return true;
 };

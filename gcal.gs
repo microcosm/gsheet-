@@ -263,10 +263,10 @@ function updateChangedEvents(person) {
 }
 
 function getIsAllDay(startTime, durationHours) {
-  return !(
-    startTime >= 0 &&
-    startTime <= 23 &&
-    durationHours > 0);
+  return startTime.isANumber() && durationHours.isANumber() &&
+    !(startTime >= 0 &&
+      startTime <= 23 &&
+      durationHours > 0);
 }
 
 function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
