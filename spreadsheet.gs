@@ -3,6 +3,7 @@ function getSpreadsheetEvents(person) {
     currentEventCategoryIndex: 0,
     currentEventCategory: '',
     eventsByCategory: {},
+    person: person,
     exclusionListNames: getOtherPeopleNames(person),
     fillInTheBlanksDate: getStarterDate()
   }
@@ -63,12 +64,13 @@ function buildEventFromSpreadsheet(row, section, extractionState) {
     const durationHours = row[section.rangeColumns.durationHours];
     isAllDay = getIsAllDay(startTime, durationHours);
     startDateTime = new Date(row[section.rangeColumns.workDate]);
+    startDateTime = getPulledForward(startDateTime);
 
     if(isAllDay) {
       endDateTime = null;
     } else {
       startDateTime.setHours(startTime);
-      endDateTime = new Date(row[section.rangeColumns.workDate]);
+      endDateTime = new Date(startDateTime);
       endDateTime.setHours(startTime + durationHours);
       endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
       endDateTime.setSeconds(0);
@@ -84,7 +86,8 @@ function buildEventFromSpreadsheet(row, section, extractionState) {
     isDone: getIsDone(section, row),
     options: {
       description: generateDescription(row, section, extractionState.currentEventCategory),
-      location: extractionState.currentEventCategory
+      location: extractionState.currentEventCategory,
+      guests: extractionState.person.inviteEmail
     },
     isAlreadyInCalendar: false
   };
@@ -92,6 +95,17 @@ function buildEventFromSpreadsheet(row, section, extractionState) {
 
 function isFillInTheBlanks(row, section) {
   return section.allowFillInTheBlanksDates && (!(row[section.rangeColumns.workDate] instanceof Date));
+}
+
+function getPulledForward(dateTime) {
+  if(dateTime < state.today) {
+    var pulledForwardDate = new Date(dateTime);
+    pulledForwardDate.setFullYear(state.today.getFullYear());
+    pulledForwardDate.setMonth(state.today.getMonth());
+    pulledForwardDate.setDate(state.today.getDate());
+    return pulledForwardDate;
+  }
+  return dateTime;
 }
 
 function getIsDone(section, row) {

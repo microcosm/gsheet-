@@ -17,12 +17,14 @@ function init(spreadsheet) {
     lock: null,
     errorText: 'Calendar update failed: ',
     workDateLabelText: 'Work date',
+    today: new Date(),
     values: {
       sheetName: '(dropdowns)',
       sheet: null,
+      numPerPerson: 3,
       range: {
         start: 'K2',
-        end: 'K5'
+        end: 'K6'
       }
     },
     todo: {
@@ -208,13 +210,15 @@ function generateRangeColumns(section, rangeOffsets){
 
 function setPeople() {
   const values = state.values.sheet.getRange(state.values.range.start + ':' + state.values.range.end).getValues();
-  for(var i = 0; i < values.length; i+=2) {
+  for(var i = 0; i < values.length; i += state.values.numPerPerson) {
     if(values[i][0] && values[i + 1][0]){
       const name = values[i][0];
+      const inviteEmail = values.length >= i + state.values.numPerPerson ? values[i + 2][0] : '';
       const calendar = CalendarApp.getCalendarById(values[i + 1][0]);
       state.people.push({
         name: name,
         calendar: calendar,
+        inviteEmail: inviteEmail,
         calendarEvents: getCalendarEvents(calendar),
         spreadsheetEvents: null });
     }
