@@ -17,7 +17,7 @@ function init(spreadsheet) {
     lock: null,
     errorText: 'Calendar update failed: ',
     workDateLabelText: 'Work date',
-    today: new Date(),
+    today: getTodaysDate(),
     values: {
       sheetName: '(dropdowns)',
       sheet: null,
@@ -233,6 +233,15 @@ function updateCalendars() {
     linkMatchingEvents(person);
     updateChangedEvents(person);
   });
+}
+
+function getTodaysDate() {
+  var date = new Date();
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
 }
 
 function linkMatchingEvents(person) {
