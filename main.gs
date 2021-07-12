@@ -12,7 +12,7 @@ function init(spreadsheet) {
     validEventCategories: null,
     people: [],
     rangeValues: {},
-    eventDescription: 'Created by <a href="https://docs.google.com/spreadsheets/d/1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs/edit?usp=sharing#gid=966806031">mega—</a>&nbsp;&larr; Click here for more',
+    eventDescription: getCalendarEventDescription(),
     log: '',
     lock: null,
     errorText: 'Calendar update failed: ',
@@ -169,7 +169,7 @@ function init(spreadsheet) {
 }
 
 function onTimedTrigger() {
-  init(SpreadsheetApp.openById('1uNxspHrfm9w-DPH1wfhTNdySxupd7h1RFrWlHCYPVcs'));
+  init(SpreadsheetApp.openById(config.gsheet.id));
   run();
 }
 
