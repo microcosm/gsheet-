@@ -113,54 +113,45 @@ function init(spreadsheet) {
           allowFillInTheBlanksDates: true
         }
       }
-    },
-    cyclesGlobal: null,
-    regularSection: null,
-    checklistSection: null,
-    todoSection: null
+    }
   };
-
-  state.cyclesGlobal = state.cycles.sections.global;
-  state.regularSection = state.cycles.sections.regular;
-  state.checklistSection = state.cycles.sections.checklist;
-  state.todoSection = state.todo;
 
   state.cycles.sheet = state.spreadsheet.getSheetByName(state.cycles.sheetName);
   state.values.sheet = state.spreadsheet.getSheetByName(state.values.sheetName);
   state.todo.sheet = state.spreadsheet.getSheetByName(state.todo.sheetName);
 
-  generateRangeColumns(state.cyclesGlobal, state.cycles.range.offsets);
-  generateRangeColumns(state.regularSection, state.cycles.range.offsets);
-  generateRangeColumns(state.checklistSection, state.cycles.range.offsets);
-  generateRangeColumns(state.todoSection, state.todo.range.offsets);
+  generateRangeColumns(state.cycles.sections.global, state.cycles.range.offsets);
+  generateRangeColumns(state.cycles.sections.regular, state.cycles.range.offsets);
+  generateRangeColumns(state.cycles.sections.checklist, state.cycles.range.offsets);
+  generateRangeColumns(state.todo, state.todo.range.offsets);
 
   state.todo.triggerColumns = [
-    state.todoSection.columns.noun,
-    state.todoSection.columns.verb,
-    state.todoSection.columns.done,
-    state.todoSection.columns.name,
-    state.todoSection.columns.workDate,
-    state.todoSection.columns.startTime,
-    state.todoSection.columns.durationHours
+    state.todo.columns.noun,
+    state.todo.columns.verb,
+    state.todo.columns.done,
+    state.todo.columns.name,
+    state.todo.columns.workDate,
+    state.todo.columns.startTime,
+    state.todo.columns.durationHours
   ];
 
   state.cycles.triggerColumns = [
-    state.cyclesGlobal.columns.season,
-    state.regularSection.columns.noun,
-    state.regularSection.columns.verb,
-    state.regularSection.columns.lastDone,
-    state.regularSection.columns.name,
-    state.regularSection.columns.cycleDays,
-    state.regularSection.columns.nudgeDays,
-    state.regularSection.columns.startTime,
-    state.regularSection.columns.durationHours,
-    state.checklistSection.columns.noun,
-    state.checklistSection.columns.verb,
-    state.checklistSection.columns.done,
-    state.checklistSection.columns.name,
-    state.checklistSection.columns.workDate,
-    state.checklistSection.columns.startTime,
-    state.checklistSection.columns.durationHours
+    state.cycles.sections.global.columns.season,
+    state.cycles.sections.regular.columns.noun,
+    state.cycles.sections.regular.columns.verb,
+    state.cycles.sections.regular.columns.lastDone,
+    state.cycles.sections.regular.columns.name,
+    state.cycles.sections.regular.columns.cycleDays,
+    state.cycles.sections.regular.columns.nudgeDays,
+    state.cycles.sections.regular.columns.startTime,
+    state.cycles.sections.regular.columns.durationHours,
+    state.cycles.sections.checklist.columns.noun,
+    state.cycles.sections.checklist.columns.verb,
+    state.cycles.sections.checklist.columns.done,
+    state.cycles.sections.checklist.columns.name,
+    state.cycles.sections.checklist.columns.workDate,
+    state.cycles.sections.checklist.columns.startTime,
+    state.cycles.sections.checklist.columns.durationHours
   ];
 
   setRangeValues();

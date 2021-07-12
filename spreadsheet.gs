@@ -8,9 +8,9 @@ function getSpreadsheetEvents(person) {
     fillInTheBlanksDate: state.today
   }
 
-  extractEvents(state.cycles, state.regularSection, extractionState);
-  extractEvents(state.cycles, state.checklistSection, extractionState);
-  extractEvents(state.todo, state.todoSection, extractionState);
+  extractEvents(state.cycles, state.cycles.sections.regular, extractionState);
+  extractEvents(state.cycles, state.cycles.sections.checklist, extractionState);
+  extractEvents(state.todo, state.todo, extractionState);
 
   return collapseEventsToArray(extractionState.eventsByCategory);
 }
@@ -152,7 +152,7 @@ function setRangeValues() {
 }
 
 function setSeason() {
-  const statusStr = state.rangeValues[state.cycles.sheetName][0][state.cyclesGlobal.rangeColumns.season];
+  const statusStr = state.rangeValues[state.cycles.sheetName][0][state.cycles.sections.global.rangeColumns.season];
   state.season = statusStr.substring(statusStr.length - state.cycles.seasonStringLength);
   var fromSeason = statusStr.substring(0, state.cycles.seasonStringLength);
   state.transition = fromSeason === state.season ? false : statusStr;
