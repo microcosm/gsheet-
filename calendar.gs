@@ -12,7 +12,7 @@ function deleteOrphanedCalendarEvents(person) {
   person.calendarEvents.forEach(function(calendarEvent) {
     if(!calendarEvent.existsInSpreadsheet){
       logEventDeleted(calendarEvent);
-      if(state.toggles.performDataUpdates) calendarEvent.gcal.deleteEvent();
+      if(config.toggles.performDataUpdates) calendarEvent.gcal.deleteEvent();
     }
   });
 }
@@ -21,7 +21,7 @@ function createNewCalendarEvents(person) {
   person.spreadsheetEvents.forEach(function(spreadsheetEvent){
     if(!spreadsheetEvent.existsInCalendar) {
       logEventCreated(spreadsheetEvent);
-      if(state.toggles.performDataUpdates) {
+      if(config.toggles.performDataUpdates) {
         spreadsheetEvent.isAllDay ?
           person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
           person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);

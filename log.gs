@@ -36,11 +36,11 @@ function logNewline() {
 
 function outputLog() {
   console.log(state.log);
-  if(state.toggles.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
+  if(config.toggles.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
 }
 
 function alertError(reason){
   var output = state.errorText + reason;
   console.log(output);
-  if(state.toggles.showLogAlert) SpreadsheetApp.getUi().alert(output);
+  if(config.toggles.showLogAlert) SpreadsheetApp.getUi().alert(output);
 }

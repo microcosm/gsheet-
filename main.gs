@@ -1,11 +1,18 @@
 var state;
 
+function onTimedTrigger() {
+  init(SpreadsheetApp.openById(config.gsheet.id));
+  run();
+}
+
+function onEditInstalledTrigger(e) {
+  init(SpreadsheetApp.getActiveSpreadsheet());
+  if(!isValidTrigger(e)) return;
+  run();
+}
+
 function init(spreadsheet) {
   state = {
-    toggles: {
-      performDataUpdates: true,
-      showLogAlert: false
-    },
     spreadsheet: spreadsheet,
     eventCategories: null,
     validEventCategories: [],
@@ -25,17 +32,6 @@ function init(spreadsheet) {
   postProcessSubsheets();
 
   setPeople();
-}
-
-function onTimedTrigger() {
-  init(SpreadsheetApp.openById(config.gsheet.id));
-  run();
-}
-
-function onEditInstalledTrigger(e) {
-  init(SpreadsheetApp.getActiveSpreadsheet());
-  if(!isValidTrigger(e)) return;
-  run();
 }
 
 function run() {
