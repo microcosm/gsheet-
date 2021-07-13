@@ -14,7 +14,6 @@ function onEditInstalledTrigger(e) {
 function init(spreadsheet) {
   state = {
     spreadsheet: spreadsheet,
-    eventCategories: null,
     validEventCategories: [],
     people: [],
     rangeValues: {},
