@@ -10,7 +10,7 @@ function getSpreadsheetEvents(person) {
 
   extractEvents(state.cycles, state.cycles.sections.regular, extractionState);
   extractEvents(state.cycles, state.cycles.sections.checklist, extractionState);
-  extractEvents(state.todo, state.todo, extractionState);
+  extractEvents(state.todo, state.todo.sections.todo, extractionState);
 
   return collapseEventsToArray(extractionState.eventsByCategory);
 }

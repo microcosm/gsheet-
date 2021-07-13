@@ -18,6 +18,7 @@ function init(spreadsheet) {
     workDateLabelText: 'Work date',
     today: getTodaysDate(),
     personValuesSubsheet: null,
+    eventSubsheets: [],
     todo: {
       tab: new Subsheet(spreadsheet, {}, 'Todo', '997054615'),
       triggerColumns: null,
@@ -29,18 +30,22 @@ function init(spreadsheet) {
         maxRows: 500,
         maxCols: 11
       },
-      columns: {
-        noun: 2,
-        verb: 3,
-        done: 5,
-        name: 7,
-        workDate: 8,
-        startTime: 9,
-        durationHours: 10
-      },
-      rangeColumns: {},
-      hasDoneCol: true,
-      allowFillInTheBlanksDates: true
+      sections: {
+        todo: {
+          columns: {
+            noun: 2,
+            verb: 3,
+            done: 5,
+            name: 7,
+            workDate: 8,
+            startTime: 9,
+            durationHours: 10
+          },
+          rangeColumns: {},
+          hasDoneCol: true,
+          allowFillInTheBlanksDates: true
+        }
+      }
     },
     cycles: {
       tab: new Subsheet(spreadsheet, {}, 'Cycles', '966806031'),
@@ -110,16 +115,16 @@ function init(spreadsheet) {
   generateRangeColumns(state.cycles.sections.global, state.cycles.range.offsets);
   generateRangeColumns(state.cycles.sections.regular, state.cycles.range.offsets);
   generateRangeColumns(state.cycles.sections.checklist, state.cycles.range.offsets);
-  generateRangeColumns(state.todo, state.todo.range.offsets);
+  generateRangeColumns(state.todo.sections.todo, state.todo.range.offsets);
 
   state.todo.triggerColumns = [
-    state.todo.columns.noun,
-    state.todo.columns.verb,
-    state.todo.columns.done,
-    state.todo.columns.name,
-    state.todo.columns.workDate,
-    state.todo.columns.startTime,
-    state.todo.columns.durationHours
+    state.todo.sections.todo.columns.noun,
+    state.todo.sections.todo.columns.verb,
+    state.todo.sections.todo.columns.done,
+    state.todo.sections.todo.columns.name,
+    state.todo.sections.todo.columns.workDate,
+    state.todo.sections.todo.columns.startTime,
+    state.todo.sections.todo.columns.durationHours
   ];
 
   state.cycles.triggerColumns = [
