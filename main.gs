@@ -12,15 +12,16 @@ function init(spreadsheet) {
     validEventCategories: null,
     people: [],
     rangeValues: {},
-    eventDescription: getCalendarEventDescription(),
     log: '',
     lock: null,
     errorText: 'Calendar update failed: ',
     workDateLabelText: 'Work date',
     today: getTodaysDate(),
     values: {
-      sheetName: '(dropdowns)',
-      sheet: null,
+      tab: {
+        name: '(dropdowns)',
+        ref: null
+      },
       numPerPerson: 3,
       range: {
         start: 'K2',
@@ -28,8 +29,11 @@ function init(spreadsheet) {
       }
     },
     todo: {
-      sheetName: 'Todo',
-      sheet: null,
+      tab: {
+        name: 'Todo',
+        id: '997054615',
+        ref: null
+      },
       triggerColumns: null,
       range: {
         offsets: {
@@ -53,8 +57,11 @@ function init(spreadsheet) {
       allowFillInTheBlanksDates: true
     },
     cycles: {
-      sheetName: 'Cycles',
-      sheet: null,
+      tab: {
+        name: 'Cycles',
+        id: '966806031',
+        ref: null
+      },
       triggerColumns: null,
       range: {
         offsets: {
@@ -116,9 +123,9 @@ function init(spreadsheet) {
     }
   };
 
-  state.cycles.sheet = state.spreadsheet.getSheetByName(state.cycles.sheetName);
-  state.values.sheet = state.spreadsheet.getSheetByName(state.values.sheetName);
-  state.todo.sheet = state.spreadsheet.getSheetByName(state.todo.sheetName);
+  state.cycles.tab.ref = state.spreadsheet.getSheetByName(state.cycles.tab.name);
+  state.values.tab.ref = state.spreadsheet.getSheetByName(state.values.tab.name);
+  state.todo.tab.ref = state.spreadsheet.getSheetByName(state.todo.tab.name);
 
   generateRangeColumns(state.cycles.sections.global, state.cycles.range.offsets);
   generateRangeColumns(state.cycles.sections.regular, state.cycles.range.offsets);
@@ -188,8 +195,8 @@ function run() {
 function isValidTrigger(e){
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   return (
-    activeSheetName === state.cycles.sheetName && state.cycles.triggerColumns.includes(e.range.columnStart)) || (
-    activeSheetName === state.todo.sheetName && state.todo.triggerColumns.includes(e.range.columnStart)
+    activeSheetName === state.cycles.tab.name && state.cycles.triggerColumns.includes(e.range.columnStart)) || (
+    activeSheetName === state.todo.tab.name && state.todo.triggerColumns.includes(e.range.columnStart)
   );
 }
 
@@ -200,7 +207,7 @@ function generateRangeColumns(section, rangeOffsets){
 }
 
 function setPeople() {
-  const values = state.values.sheet.getRange(state.values.range.start + ':' + state.values.range.end).getValues();
+  const values = state.values.tab.ref.getRange(state.values.range.start + ':' + state.values.range.end).getValues();
   for(var i = 0; i < values.length; i += state.values.numPerPerson) {
     if(values[i][0] && values[i + 1][0]){
       const name = values[i][0];

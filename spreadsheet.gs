@@ -15,8 +15,8 @@ function getSpreadsheetEvents(person) {
   return collapseEventsToArray(extractionState.eventsByCategory);
 }
 
-function extractEvents(sheet, section, extractionState) {
-  const rangeValues = state.rangeValues[sheet.sheetName];
+function extractEvents(subsheet, section, extractionState) {
+  const rangeValues = state.rangeValues[subsheet.tab.name];
 
   for(var i = 0; i < rangeValues.length; i++) {
     const row = rangeValues[i];
@@ -27,7 +27,7 @@ function extractEvents(sheet, section, extractionState) {
       extractionState.eventsByCategory[extractionState.currentEventCategory] = [];
 
     } else if(isValidEventData(row, section, extractionState)) {
-      var eventFromSpreadsheet = buildEventFromSpreadsheet(row, section, extractionState);
+      var eventFromSpreadsheet = buildEventFromSpreadsheet(subsheet, section, extractionState, row);
       extractionState.eventsByCategory[extractionState.currentEventCategory].push(eventFromSpreadsheet);
     }
   }
@@ -52,7 +52,7 @@ function isValidEventData(row, section, extractionState) {
          !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
 }
 
-function buildEventFromSpreadsheet(row, section, extractionState) {
+function buildEventFromSpreadsheet(subsheet, section, extractionState, row) {
   var startDateTime, endDateTime, isAllDay;
 
   if(isFillInTheBlanks(row, section)) {
@@ -85,7 +85,7 @@ function buildEventFromSpreadsheet(row, section, extractionState) {
     isAllDay: isAllDay,
     isDone: getIsDone(section, row),
     options: {
-      description: generateDescription(row, section, extractionState.currentEventCategory),
+      description: generateDescription(subsheet, section, extractionState, row),
       location: extractionState.currentEventCategory,
       guests: extractionState.person.inviteEmail
     },
@@ -129,30 +129,34 @@ function isWorkDateLabel(str) {
   return typeof str == 'string' && str.substring(0, state.workDateLabelText.length) === state.workDateLabelText;
 }
 
-function generateDescription(row, section, eventCategory) {
-  var name = row[section.rangeColumns.name];
-  name = name.replace('Either', 'either Julie or Andy');
-  name = name.replace('Both', 'both Julie and Andy together');
-  return 'This event is from the "' + eventCategory + '" section, for ' +  name + '.\n\n' + state.eventDescription;
+function generateDescription(subsheet, section, extractionState, row) {
+  const name = getNameSubstitution(row[section.rangeColumns.name]);
+
+  return 'This event is from the "' + extractionState.currentEventCategory +
+    '" section, for ' + name +
+    '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + config.gsheet.id +
+    '/edit?usp=sharing' +
+    (subsheet.tab.hasOwnProperty('id') ? '#gid=' + subsheet.tab.id : '') +
+    '">' + config.gsheet.name + '</a>&nbsp;&larr; Click here for more';
 }
 
 function setRangeValues() {
-  const todoRangeValues = state.todo.sheet.getRange (
+  const todoRangeValues = state.todo.tab.ref.getRange (
         state.todo.range.offsets.row, state.todo.range.offsets.col,
         state.todo.range.maxRows, state.todo.range.maxCols
       ).getValues();
 
-  const cyclesRangeValues = state.cycles.sheet.getRange (
+  const cyclesRangeValues = state.cycles.tab.ref.getRange (
         state.cycles.range.offsets.row, state.cycles.range.offsets.col,
         state.cycles.range.maxRows, state.cycles.range.maxCols
       ).getValues();
 
-  state.rangeValues[state.todo.sheetName] = todoRangeValues;
-  state.rangeValues[state.cycles.sheetName] = cyclesRangeValues;
+  state.rangeValues[state.todo.tab.name] = todoRangeValues;
+  state.rangeValues[state.cycles.tab.name] = cyclesRangeValues;
 }
 
 function setSeason() {
-  const statusStr = state.rangeValues[state.cycles.sheetName][0][state.cycles.sections.global.rangeColumns.season];
+  const statusStr = state.rangeValues[state.cycles.tab.name][0][state.cycles.sections.global.rangeColumns.season];
   state.season = statusStr.substring(statusStr.length - state.cycles.seasonStringLength);
   var fromSeason = statusStr.substring(0, state.cycles.seasonStringLength);
   state.transition = fromSeason === state.season ? false : statusStr;

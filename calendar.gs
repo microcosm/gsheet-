@@ -45,11 +45,3 @@ function buildEventFromCalendar(googleCalendarEvent) {
     gcalId: googleCalendarEvent.getId()
   };
 }
-
-function getCalendarEventDescription() {
-  return 'Created by <a href="https://docs.google.com/spreadsheets/d/' +
-    config.gsheet.id +
-    '/edit?usp=sharing' +
-    (config.gsheet.tab ? '#gid=' + config.gsheet.tab : '') +
-    '">mega—</a>&nbsp;&larr; Click here for more';
-}
