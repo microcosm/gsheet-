@@ -2,7 +2,7 @@ var state;
 
 function init(spreadsheet) {
   state = {
-    execution: {
+    toggles: {
       performDataUpdates: true,
       showLogAlert: false
     },
