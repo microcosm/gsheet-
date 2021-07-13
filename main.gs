@@ -7,9 +7,8 @@ function init(spreadsheet) {
       showLogAlert: false
     },
     spreadsheet: spreadsheet,
-    season: null,        //Can be: ['Summer', 'Winter']
-    transition: null,    //Can be: [false, 'Summer->Winter', 'Winter->Summer']
-    validEventCategories: null,
+    eventCategories: null,
+    validEventCategories: [],
     people: [],
     rangeValues: {},
     log: '',
@@ -18,136 +17,13 @@ function init(spreadsheet) {
     workDateLabelText: 'Work date',
     today: getTodaysDate(),
     personValuesSubsheet: null,
-    eventSubsheets: [],
-    todo: {
-      tab: new Subsheet(spreadsheet, {}, 'Todo', '997054615'),
-      triggerColumns: null,
-      range: {
-        offsets: {
-          row: 2,
-          col: 2
-        },
-        maxRows: 500,
-        maxCols: 11
-      },
-      sections: {
-        todo: {
-          columns: {
-            noun: 2,
-            verb: 3,
-            done: 5,
-            name: 7,
-            workDate: 8,
-            startTime: 9,
-            durationHours: 10
-          },
-          rangeColumns: {},
-          hasDoneCol: true,
-          allowFillInTheBlanksDates: true
-        }
-      }
-    },
-    cycles: {
-      tab: new Subsheet(spreadsheet, {}, 'Cycles', '966806031'),
-      triggerColumns: null,
-      range: {
-        offsets: {
-          row: 2,
-          col: 2
-        },
-        maxRows: 500,
-        maxCols: 24
-      },
-      seasonStringLength: 6,
-      eventCategories: {
-        1: 'Evergreen',
-        2: 'Summer',
-        3: 'Winter',
-        4: 'Winter->Summer',
-        5: 'Summer->Winter',
-        6: 'Todo',
-        7: 'Completed',
-      },
-      sections: {
-        global: {
-          columns: {
-            season: 15
-          },
-          rangeColumns: {},
-          hasDoneCol: false
-        },
-        regular: {
-          columns: {
-            noun: 2,
-            verb: 3,
-            lastDone: 4,
-            name: 6,
-            cycleDays: 7,
-            nudgeDays: 11,
-            startTime: 12,
-            durationHours: 13,
-            workDate: 14
-          },
-          rangeColumns: {},
-          hasDoneCol: false,
-          allowFillInTheBlanksDates: false
-        },
-        checklist: {
-          columns: {
-            noun: 17,
-            verb: 18,
-            done: 19,
-            name: 21,
-            workDate: 22,
-            startTime: 23,
-            durationHours: 24
-          },
-          rangeColumns: {},
-          hasDoneCol: true,
-          allowFillInTheBlanksDates: true
-        }
-      }
-    }
+    eventSubsheets: []
   };
 
-  buildSubsheets();
+  preProcessSubsheets();
+  populateSubsheetsFromSpreadsheet();
+  postProcessSubsheets();
 
-  generateRangeColumns(state.cycles.sections.global, state.cycles.range.offsets);
-  generateRangeColumns(state.cycles.sections.regular, state.cycles.range.offsets);
-  generateRangeColumns(state.cycles.sections.checklist, state.cycles.range.offsets);
-  generateRangeColumns(state.todo.sections.todo, state.todo.range.offsets);
-
-  state.todo.triggerColumns = [
-    state.todo.sections.todo.columns.noun,
-    state.todo.sections.todo.columns.verb,
-    state.todo.sections.todo.columns.done,
-    state.todo.sections.todo.columns.name,
-    state.todo.sections.todo.columns.workDate,
-    state.todo.sections.todo.columns.startTime,
-    state.todo.sections.todo.columns.durationHours
-  ];
-
-  state.cycles.triggerColumns = [
-    state.cycles.sections.global.columns.season,
-    state.cycles.sections.regular.columns.noun,
-    state.cycles.sections.regular.columns.verb,
-    state.cycles.sections.regular.columns.lastDone,
-    state.cycles.sections.regular.columns.name,
-    state.cycles.sections.regular.columns.cycleDays,
-    state.cycles.sections.regular.columns.nudgeDays,
-    state.cycles.sections.regular.columns.startTime,
-    state.cycles.sections.regular.columns.durationHours,
-    state.cycles.sections.checklist.columns.noun,
-    state.cycles.sections.checklist.columns.verb,
-    state.cycles.sections.checklist.columns.done,
-    state.cycles.sections.checklist.columns.name,
-    state.cycles.sections.checklist.columns.workDate,
-    state.cycles.sections.checklist.columns.startTime,
-    state.cycles.sections.checklist.columns.durationHours
-  ];
-
-  setRangeValues();
-  setSeason();
   setPeople();
 }
 
@@ -179,16 +55,16 @@ function run() {
 
 function isValidTrigger(e){
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
-  return (
-    activeSheetName === state.cycles.tab.name && state.cycles.triggerColumns.includes(e.range.columnStart)) || (
-    activeSheetName === state.todo.tab.name && state.todo.triggerColumns.includes(e.range.columnStart)
-  );
+  state.eventSubsheets.forEach(function(subsheet) {
+    if(activeSheetName === subsheet.name && subsheet.triggerCols.includes(e.range.columnStart)) return true;
+  });
+  return false;
 }
 
-function generateRangeColumns(section, rangeOffsets){
-  for(var key in section.columns) {
-    section.rangeColumns[key] = section.columns[key] - rangeOffsets.col;
-  }
+function populateSubsheetsFromSpreadsheet() {
+  state.eventSubsheets.forEach(function(subsheet) {
+    state.rangeValues[subsheet.name] = subsheet.getRangeValues();
+  });
 }
 
 function setPeople() {

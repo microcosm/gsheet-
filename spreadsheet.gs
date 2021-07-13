@@ -1,46 +1,37 @@
 function getSpreadsheetEvents(person) {
   var extractionState = {
-    currentEventCategoryIndex: 0,
     currentEventCategory: '',
-    eventsByCategory: {},
+    events: [],
     person: person,
     exclusionListNames: getOtherPeopleNames(person),
     fillInTheBlanksDate: state.today
   }
 
-  extractEvents(state.cycles, state.cycles.sections.regular, extractionState);
-  extractEvents(state.cycles, state.cycles.sections.checklist, extractionState);
-  extractEvents(state.todo, state.todo.sections.todo, extractionState);
+  state.eventSubsheets.forEach(function(subsheet) {
+    for(var sectionName in subsheet.sections) {
+      var section = subsheet.sections[sectionName];
+      if(section.hasEvents) {
+        extractEvents(subsheet, section, extractionState);
+      }
+    }
+  });
 
-  return collapseEventsToArray(extractionState.eventsByCategory);
+  return extractionState.events;
 }
 
 function extractEvents(subsheet, section, extractionState) {
-  const rangeValues = state.rangeValues[subsheet.tab.name];
+  const rangeValues = state.rangeValues[subsheet.name];
 
   for(var i = 0; i < rangeValues.length; i++) {
     const row = rangeValues[i];
 
     if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
-      extractionState.currentEventCategoryIndex++;
-      extractionState.currentEventCategory = state.cycles.eventCategories[extractionState.currentEventCategoryIndex];
-      extractionState.eventsByCategory[extractionState.currentEventCategory] = [];
-
+      extractionState.currentEventCategory = rangeValues[i - 1][section.rangeColumns.label];
     } else if(isValidEventData(row, section, extractionState)) {
       var eventFromSpreadsheet = buildEventFromSpreadsheet(subsheet, section, extractionState, row);
-      extractionState.eventsByCategory[extractionState.currentEventCategory].push(eventFromSpreadsheet);
+      extractionState.events.push(eventFromSpreadsheet);
     }
   }
-}
-
-function collapseEventsToArray(eventsByCategory) {
-  var eventArray = eventsByCategory['Evergreen'];
-  eventArray = eventArray.concat(eventsByCategory[state.season]);
-  if(state.transition) {
-    eventArray = eventArray.concat(eventsByCategory[state.transition]);
-  }
-  eventArray = eventArray.concat(eventsByCategory['Todo']);
-  return eventArray;
 }
 
 function isValidEventData(row, section, extractionState) {
@@ -138,27 +129,4 @@ function generateDescription(subsheet, section, extractionState, row) {
     '/edit?usp=sharing' +
     (subsheet.tab.hasOwnProperty('id') ? '#gid=' + subsheet.tab.id : '') +
     '">' + config.gsheet.name + '</a>&nbsp;&larr; Click here for more';
-}
-
-function setRangeValues() {
-  const todoRangeValues = state.todo.tab.tab.getRange (
-        state.todo.range.offsets.row, state.todo.range.offsets.col,
-        state.todo.range.maxRows, state.todo.range.maxCols
-      ).getValues();
-
-  const cyclesRangeValues = state.cycles.tab.tab.getRange (
-        state.cycles.range.offsets.row, state.cycles.range.offsets.col,
-        state.cycles.range.maxRows, state.cycles.range.maxCols
-      ).getValues();
-
-  state.rangeValues[state.todo.tab.name] = todoRangeValues;
-  state.rangeValues[state.cycles.tab.name] = cyclesRangeValues;
-}
-
-function setSeason() {
-  const statusStr = state.rangeValues[state.cycles.tab.name][0][state.cycles.sections.global.rangeColumns.season];
-  state.season = statusStr.substring(statusStr.length - state.cycles.seasonStringLength);
-  var fromSeason = statusStr.substring(0, state.cycles.seasonStringLength);
-  state.transition = fromSeason === state.season ? false : statusStr;
-  state.validEventCategories = [state.season, state.transition, 'Evergreen', 'Todo'];
 }
