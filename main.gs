@@ -17,23 +17,9 @@ function init(spreadsheet) {
     errorText: 'Calendar update failed: ',
     workDateLabelText: 'Work date',
     today: getTodaysDate(),
-    values: {
-      tab: {
-        name: '(dropdowns)',
-        ref: null
-      },
-      numPerPerson: 3,
-      range: {
-        start: 'K2',
-        end: 'K6'
-      }
-    },
+    personValuesSubsheet: null,
     todo: {
-      tab: {
-        name: 'Todo',
-        id: '997054615',
-        ref: null
-      },
+      tab: new Subsheet(spreadsheet, {}, 'Todo', '997054615'),
       triggerColumns: null,
       range: {
         offsets: {
@@ -57,11 +43,7 @@ function init(spreadsheet) {
       allowFillInTheBlanksDates: true
     },
     cycles: {
-      tab: {
-        name: 'Cycles',
-        id: '966806031',
-        ref: null
-      },
+      tab: new Subsheet(spreadsheet, {}, 'Cycles', '966806031'),
       triggerColumns: null,
       range: {
         offsets: {
@@ -123,9 +105,7 @@ function init(spreadsheet) {
     }
   };
 
-  state.cycles.tab.ref = state.spreadsheet.getSheetByName(state.cycles.tab.name);
-  state.values.tab.ref = state.spreadsheet.getSheetByName(state.values.tab.name);
-  state.todo.tab.ref = state.spreadsheet.getSheetByName(state.todo.tab.name);
+  buildSubsheets();
 
   generateRangeColumns(state.cycles.sections.global, state.cycles.range.offsets);
   generateRangeColumns(state.cycles.sections.regular, state.cycles.range.offsets);
@@ -207,11 +187,11 @@ function generateRangeColumns(section, rangeOffsets){
 }
 
 function setPeople() {
-  const values = state.values.tab.ref.getRange(state.values.range.start + ':' + state.values.range.end).getValues();
-  for(var i = 0; i < values.length; i += state.values.numPerPerson) {
+  const values = state.personValuesSubsheet.tab.getRange(state.personValuesSubsheet.range.start + ':' + state.personValuesSubsheet.range.end).getValues();
+  for(var i = 0; i < values.length; i += state.personValuesSubsheet.numValuesPerPerson) {
     if(values[i][0] && values[i + 1][0]){
       const name = values[i][0];
-      const inviteEmail = values.length >= i + state.values.numPerPerson ? values[i + 2][0] : '';
+      const inviteEmail = values.length >= i + state.personValuesSubsheet.numValuesPerPerson ? values[i + 2][0] : '';
       const calendar = CalendarApp.getCalendarById(values[i + 1][0]);
       state.people.push({
         name: name,

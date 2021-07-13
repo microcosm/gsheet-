@@ -141,12 +141,12 @@ function generateDescription(subsheet, section, extractionState, row) {
 }
 
 function setRangeValues() {
-  const todoRangeValues = state.todo.tab.ref.getRange (
+  const todoRangeValues = state.todo.tab.tab.getRange (
         state.todo.range.offsets.row, state.todo.range.offsets.col,
         state.todo.range.maxRows, state.todo.range.maxCols
       ).getValues();
 
-  const cyclesRangeValues = state.cycles.tab.ref.getRange (
+  const cyclesRangeValues = state.cycles.tab.tab.getRange (
         state.cycles.range.offsets.row, state.cycles.range.offsets.col,
         state.cycles.range.maxRows, state.cycles.range.maxCols
       ).getValues();
