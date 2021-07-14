@@ -145,7 +145,7 @@ function generateDescription(subsheet, section, extractionState, row) {
   const name = getNameSubstitution(row[section.rangeColumns.name]);
 
   return 'This event is from the "' + extractionState.currentEventCategory +
-    '" section, for ' + name +
+    '" section' + (name ? ' for ' + name : '') +
     '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + config.gsheet.id +
     '/edit?usp=sharing' +
     (subsheet.hasOwnProperty('id') ? '#gid=' + subsheet.id : '') +
