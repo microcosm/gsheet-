@@ -52,17 +52,22 @@ function buildEventFromSpreadsheet(subsheet, section, extractionState, row) {
     endDateTime = null;
   } else {
     const startTime = row[section.rangeColumns.startTime];
+    const startTimeHours = getStartTimeHours(startTime);
+    const startTimeMinutes = getStartTimeMinutes(startTime);
     const durationHours = row[section.rangeColumns.durationHours];
-    isAllDay = getIsAllDay(startTime, durationHours);
+    isAllDay = getIsAllDay(startTimeHours, startTimeMinutes, durationHours);
     startDateTime = new Date(row[section.rangeColumns.workDate]);
     startDateTime = getPulledForward(startDateTime);
 
     if(isAllDay) {
       endDateTime = null;
     } else {
-      startDateTime.setHours(startTime);
+      startDateTime.setHours(startTimeHours);
+      startDateTime.setMinutes(startTimeMinutes);
+      startDateTime.setSeconds(0);
+      startDateTime.setMilliseconds(0);
       endDateTime = new Date(startDateTime);
-      endDateTime.setHours(startTime + durationHours);
+      endDateTime.setHours(endDateTime.getHours() + durationHours);
       endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
       endDateTime.setSeconds(0);
       endDateTime.setMilliseconds(0);
@@ -82,6 +87,21 @@ function buildEventFromSpreadsheet(subsheet, section, extractionState, row) {
     },
     isAlreadyInCalendar: false
   };
+}
+
+function getIsAllDay(startTimeHours, startTimeMinutes, durationHours) {
+  return !(
+    isValidNumber(startTimeHours) && startTimeHours >= 0 && startTimeHours <= 23 &&
+    isValidNumber(startTimeMinutes) && startTimeMinutes >= 0 && startTimeMinutes <= 59 &&
+    isValidNumber(durationHours) && durationHours > 0);
+}
+
+function getStartTimeHours(startTime) {
+  return isValidTimeString(startTime) ? startTime.split(':')[0] : false;
+}
+
+function getStartTimeMinutes(startTime) {
+  return isValidTimeString(startTime) ? startTime.split(':')[1] : false;
 }
 
 function isFillInTheBlanks(row, section) {

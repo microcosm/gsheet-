@@ -4,11 +4,11 @@ Date.prototype.addDays = function(days) {
   return date;
 };
 
-String.prototype.isANumber = function() {
-  return !(this.length === 0 || !this.trim()) &&
-         !isNaN(this);
-};
+function isValidNumber(candidate) {
+  return typeof candidate == 'number' ||
+    (typeof candidate == 'string' && candidate.length > 0 && !isNaN(candidate));
+}
 
-Number.prototype.isANumber = function() {
-  return true;
-};
+function isValidTimeString(candidate) {
+  return typeof candidate == 'string' && candidate.includes(':');
+}
