@@ -50,10 +50,13 @@ function run() {
 
 function isValidTrigger(e){
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
+  var found = false;
   state.eventSubsheets.forEach(function(subsheet) {
-    if(activeSheetName === subsheet.name && subsheet.triggerCols.includes(e.range.columnStart)) return true;
+    if(activeSheetName === subsheet.name && subsheet.triggerCols.includes(e.range.columnStart)) {
+      found = true;
+    }
   });
-  return false;
+  return found;
 }
 
 function populateSubsheetsFromSpreadsheet() {
