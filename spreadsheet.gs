@@ -40,7 +40,8 @@ function isValidEventData(row, section, extractionState) {
          (typeof row[section.rangeColumns.noun] == 'string' && row[section.rangeColumns.noun].length > 0) &&
          (typeof row[section.rangeColumns.verb] == 'string' && row[section.rangeColumns.verb].length > 0) &&
          (section.allowFillInTheBlanksDates || row[section.rangeColumns.workDate] instanceof Date) &&
-         !extractionState.exclusionListNames.includes(row[section.rangeColumns.name])
+         !extractionState.exclusionListNames.includes(row[section.rangeColumns.name]) &&
+         isSpecificValidEventData(row, section)
 }
 
 function buildEventFromSpreadsheet(subsheet, section, extractionState, row) {
