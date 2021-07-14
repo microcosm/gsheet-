@@ -148,6 +148,6 @@ function generateDescription(subsheet, section, extractionState, row) {
     '" section, for ' + name +
     '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + config.gsheet.id +
     '/edit?usp=sharing' +
-    (subsheet.tab.hasOwnProperty('id') ? '#gid=' + subsheet.tab.id : '') +
+    (subsheet.hasOwnProperty('id') ? '#gid=' + subsheet.id : '') +
     '">' + config.gsheet.name + '</a>&nbsp;&larr; Click here for more';
 }
