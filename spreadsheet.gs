@@ -36,7 +36,7 @@ function extractEvents(subsheet, section, extractionState) {
 
 function isValidEventData(row, section, extractionState) {
   return state.validEventCategories.includes(extractionState.currentEventCategory) &&
-         !getIsDone(section, row) &&
+         !getIsDoneOrWaiting(section, row) &&
          (typeof row[section.rangeColumns.noun] == 'string' && row[section.rangeColumns.noun].length > 0) &&
          (typeof row[section.rangeColumns.verb] == 'string' && row[section.rangeColumns.verb].length > 0) &&
          (section.allowFillInTheBlanksDates || row[section.rangeColumns.workDate] instanceof Date) &&
@@ -80,7 +80,6 @@ function buildEventFromSpreadsheet(subsheet, section, extractionState, row) {
     startDateTime: startDateTime,
     endDateTime: endDateTime,
     isAllDay: isAllDay,
-    isDone: getIsDone(section, row),
     options: {
       description: generateDescription(subsheet, section, extractionState, row),
       location: extractionState.currentEventCategory,
@@ -120,9 +119,9 @@ function getPulledForward(dateTime) {
   return dateTime;
 }
 
-function getIsDone(section, row) {
+function getIsDoneOrWaiting(section, row) {
   if(section.hasDoneCol) {
-    return row[section.rangeColumns.done] === 'Yes';
+    return row[section.rangeColumns.done] === 'Yes' || row[section.rangeColumns.done] === 'Waiting';
   }
   return false;
 }
