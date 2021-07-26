@@ -7,7 +7,7 @@ function onTimedTrigger() {
 
 function onEditInstalledTrigger(e) {
   init(SpreadsheetApp.getActiveSpreadsheet());
-  customOnEdit();
+  if(typeof customOnEdit !== "undefined") customOnEdit();
   if(!isValidTrigger(e)) return;
   run();
 }
