@@ -28,7 +28,7 @@ function init(spreadsheet) {
   };
 
   preProcessSubsheets();
-  populateSubsheetsFromSpreadsheet();
+  populateRangeValuesFromSubsheets();
   postProcessSubsheets();
 
   setPeople();
@@ -60,7 +60,7 @@ function isValidTrigger(e){
   return found;
 }
 
-function populateSubsheetsFromSpreadsheet() {
+function populateRangeValuesFromSubsheets() {
   state.eventSubsheets.forEach(function(subsheet) {
     state.rangeValues[subsheet.name] = subsheet.getRangeValues();
   });
