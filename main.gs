@@ -41,6 +41,7 @@ function run() {
   }
   try {
     updateCalendars();
+    if(typeof updateSubsheets !== "undefined") updateSubsheets();
     outputLog();
   } catch(e) {
     alertError(e);
