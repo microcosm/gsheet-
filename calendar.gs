@@ -1,5 +1,4 @@
-function getCalendarEvents(calendar) {
-  const fromDate = new Date('January 1, 2000'), toDate = new Date('January 1, 3000');
+function getCalendarEvents(calendar, fromDate=new Date('January 1, 2000'), toDate=new Date('January 1, 3000')) {
   const googleCalendarEvents = calendar.getEvents(fromDate, toDate);
   var calendarEvents = [];
   googleCalendarEvents.forEach(function(googleCalendarEvent) {
