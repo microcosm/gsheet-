@@ -12,6 +12,10 @@ function onEditInstalledTrigger(e) {
   run();
 }
 
+function onOpen() {
+  if(typeof customOnOpen !== "undefined") customOnOpen();
+}
+
 function init(spreadsheet) {
   state = {
     spreadsheet: spreadsheet,
