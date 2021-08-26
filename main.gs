@@ -40,8 +40,8 @@ function run() {
     return;
   }
   try {
+    if(typeof customUpdates !== "undefined") customUpdates();
     updateCalendars();
-    if(typeof updateSubsheets !== "undefined") updateSubsheets();
   } catch(e) {
     alertError(e);
   } finally {
