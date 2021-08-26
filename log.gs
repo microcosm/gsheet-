@@ -44,3 +44,7 @@ function alertError(reason){
   console.log(output);
   if(config.toggles.showLogAlert) SpreadsheetApp.getUi().alert(output);
 }
+
+function alert(text){
+  SpreadsheetApp.getUi().alert(text);
+}
