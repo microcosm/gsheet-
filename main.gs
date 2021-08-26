@@ -13,7 +13,11 @@ function onEditInstalledTrigger(e) {
 }
 
 function onOpen() {
-  if(typeof customOnOpen !== "undefined") customOnOpen();
+  if(typeof customOnOpen !== "undefined") {
+    init(SpreadsheetApp.openById(config.gsheet.id));
+    customOnOpen();
+    run();
+  }
 }
 
 function init(spreadsheet) {
