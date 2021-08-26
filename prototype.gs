@@ -1,3 +1,9 @@
+const dayShortStrings = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+Date.prototype.getDayStr = function() {
+  return dayShortStrings[this.getDay()];
+};
+
 Date.prototype.addDays = function(days) {
   var date = new Date(this.valueOf());
   date.setDate(date.getDate() + days);
