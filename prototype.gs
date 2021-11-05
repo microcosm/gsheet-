@@ -1,7 +1,12 @@
-const dayShortStrings = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 Date.prototype.getDayStr = function() {
-  return dayShortStrings[this.getDay()];
+  return dayNames[this.getDay()];
+};
+
+Date.prototype.getMonthStr = function() {
+  return monthNames[this.getMonth()];
 };
 
 Date.prototype.addDays = function(days) {
