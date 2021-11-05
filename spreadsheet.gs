@@ -7,7 +7,7 @@ function getSpreadsheetEvents(person) {
     fillInTheBlanksDate: state.today
   }
 
-  state.eventSubsheets.forEach(function(subsheet) {
+  state.eventSheets.forEach(function(subsheet) {
     for(var sectionName in subsheet.sections) {
       var section = subsheet.sections[sectionName];
       if(section.hasEvents) {

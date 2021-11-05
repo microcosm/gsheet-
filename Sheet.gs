@@ -1,4 +1,4 @@
-class Subsheet {
+class Sheet {
   constructor(spreadsheet, name, id, range) {
     this.spreadsheet = spreadsheet;
     this.range = range;
@@ -15,14 +15,14 @@ class Subsheet {
   }
 }
 
-class ValuesSubsheet extends Subsheet {
+class ValuesSheet extends Sheet {
   constructor(spreadsheet, name, range) {
     super(spreadsheet, name, false, range);
     this.numValuesPerPerson = 3;
   }
 }
 
-class EventSubsheet extends Subsheet {
+class EventSheet extends Sheet {
   constructor(spreadsheet, name, id, range, sections, triggerCols) {
     super(spreadsheet, name, id, range);
     this.sections = sections;

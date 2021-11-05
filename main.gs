@@ -31,13 +31,13 @@ function init(spreadsheet) {
     errorText: 'Calendar update failed: ',
     workDateLabelText: 'Work date',
     today: getTodaysDate(),
-    valuesSubsheet: null,
-    eventSubsheets: []
+    valuesSheet: null,
+    eventSheets: []
   };
 
-  preProcessSubsheets();
-  populateRangeValuesFromSubsheets();
-  postProcessSubsheets();
+  preProcessSheets();
+  populateRangeValuesFromSheets();
+  postProcessSheets();
 
   setPeople();
 }
@@ -61,7 +61,7 @@ function run() {
 function isValidTrigger(e){
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   var found = false;
-  state.eventSubsheets.forEach(function(subsheet) {
+  state.eventSheets.forEach(function(subsheet) {
     if(activeSheetName === subsheet.name && subsheet.triggerCols.includes(e.range.columnStart)) {
       found = true;
     }
@@ -69,18 +69,18 @@ function isValidTrigger(e){
   return found;
 }
 
-function populateRangeValuesFromSubsheets() {
-  state.eventSubsheets.forEach(function(subsheet) {
+function populateRangeValuesFromSheets() {
+  state.eventSheets.forEach(function(subsheet) {
     state.rangeValues[subsheet.name] = subsheet.getRangeValues();
   });
 }
 
 function setPeople() {
-  const values = state.valuesSubsheet.tab.getRange(state.valuesSubsheet.range.start + ':' + state.valuesSubsheet.range.end).getValues();
-  for(var i = 0; i < values.length; i += state.valuesSubsheet.numValuesPerPerson) {
+  const values = state.valuesSheet.tab.getRange(state.valuesSheet.range.start + ':' + state.valuesSheet.range.end).getValues();
+  for(var i = 0; i < values.length; i += state.valuesSheet.numValuesPerPerson) {
     if(values[i][0] && values[i + 1][0]){
       const name = values[i][0];
-      const inviteEmail = values.length >= i + state.valuesSubsheet.numValuesPerPerson ? values[i + 2][0] : '';
+      const inviteEmail = values.length >= i + state.valuesSheet.numValuesPerPerson ? values[i + 2][0] : '';
       const calendar = CalendarApp.getCalendarById(values[i + 1][0]);
       state.people.push({
         name: name,
