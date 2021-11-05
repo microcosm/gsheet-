@@ -8,7 +8,7 @@ class Subsheet {
   }
 }
 
-class PersonValuesSubsheet extends Subsheet {
+class ValuesSubsheet extends Subsheet {
   constructor(spreadsheet, name, range) {
     super(spreadsheet, name, false, range);
     this.numValuesPerPerson = 3;

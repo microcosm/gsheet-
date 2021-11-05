@@ -31,7 +31,7 @@ function init(spreadsheet) {
     errorText: 'Calendar update failed: ',
     workDateLabelText: 'Work date',
     today: getTodaysDate(),
-    personValuesSubsheet: null,
+    valuesSubsheet: null,
     eventSubsheets: []
   };
 
@@ -76,11 +76,11 @@ function populateRangeValuesFromSubsheets() {
 }
 
 function setPeople() {
-  const values = state.personValuesSubsheet.tab.getRange(state.personValuesSubsheet.range.start + ':' + state.personValuesSubsheet.range.end).getValues();
-  for(var i = 0; i < values.length; i += state.personValuesSubsheet.numValuesPerPerson) {
+  const values = state.valuesSubsheet.tab.getRange(state.valuesSubsheet.range.start + ':' + state.valuesSubsheet.range.end).getValues();
+  for(var i = 0; i < values.length; i += state.valuesSubsheet.numValuesPerPerson) {
     if(values[i][0] && values[i + 1][0]){
       const name = values[i][0];
-      const inviteEmail = values.length >= i + state.personValuesSubsheet.numValuesPerPerson ? values[i + 2][0] : '';
+      const inviteEmail = values.length >= i + state.valuesSubsheet.numValuesPerPerson ? values[i + 2][0] : '';
       const calendar = CalendarApp.getCalendarById(values[i + 1][0]);
       state.people.push({
         name: name,
