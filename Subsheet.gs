@@ -5,6 +5,13 @@ class Subsheet {
     this.name = name;
     this.id = id;
     this.tab = this.spreadsheet.getSheetByName(this.name);
+    this.validate();
+  }
+
+  validate() {
+    if(this.tab == null) {
+      throw 'Cannot establish access to "' + this.name + '" subsheet - check config values.';
+    }
   }
 }
 
