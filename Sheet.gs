@@ -4,12 +4,12 @@ class Sheet {
     this.range = range;
     this.name = name;
     this.id = id;
-    this.tab = this.spreadsheet.getSheetByName(this.name);
+    this.sheetRef = this.spreadsheet.getSheetByName(this.name);
     this.validate();
   }
 
   validate() {
-    if(this.tab == null) {
+    if(this.sheetRef == null) {
       throw 'Cannot establish access to "' + this.name + '" subsheet - check config values.';
     }
   }
@@ -43,7 +43,7 @@ class EventSheet extends Sheet {
   }
 
   getRangeValues() {
-    return this.tab.getRange (
+    return this.sheetRef.getRange (
         this.range.offsets.row, this.range.offsets.col,
         this.range.maxRows, this.range.maxCols
       ).getValues();

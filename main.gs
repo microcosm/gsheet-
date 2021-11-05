@@ -76,7 +76,7 @@ function populateRangeValuesFromSheets() {
 }
 
 function setPeople() {
-  const values = state.valuesSheet.tab.getRange(state.valuesSheet.range.start + ':' + state.valuesSheet.range.end).getValues();
+  const values = state.valuesSheet.sheetRef.getRange(state.valuesSheet.range.start + ':' + state.valuesSheet.range.end).getValues();
   for(var i = 0; i < values.length; i += state.valuesSheet.numValuesPerPerson) {
     if(values[i][0] && values[i + 1][0]){
       const name = values[i][0];
