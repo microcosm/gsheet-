@@ -36,9 +36,7 @@ function init(spreadsheet) {
   };
 
   preProcessSheets();
-  populateRangeValuesFromSheets();
-  postProcessSheets();
-
+  setValidEventCategories();
   setPeople();
 }
 
@@ -67,12 +65,6 @@ function isValidTrigger(e){
     }
   });
   return found;
-}
-
-function populateRangeValuesFromSheets() {
-  state.eventSheets.forEach(function(sheet) {
-    state.rangeValues[sheet.name] = sheet.getRangeValues();
-  });
 }
 
 function setPeople() {

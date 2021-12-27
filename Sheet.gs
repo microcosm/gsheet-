@@ -31,6 +31,7 @@ class EventSheet extends Sheet {
     this.seasonCol = null;
     this.seasonRow = null;
     this.generateRangeColumns();
+    this.generateRangeValues();
   }
 
   generateRangeColumns() {
@@ -42,19 +43,19 @@ class EventSheet extends Sheet {
     }
   }
 
-  getRangeValues() {
-    return this.sheetRef.getRange (
+  generateRangeValues() {
+    this.rangeValues = this.sheetRef.getRange (
         this.range.offsets.row, this.range.offsets.col,
         this.range.maxRows, this.range.maxCols
       ).getValues();
   }
 
-  getSeasonRangeCol() {
-    return this.seasonCol - this.range.offsets.col;
+  getRangeValues() {
+    return this.rangeValues;
   }
 
-  getSeasonRangeRow() {
-    return this.seasonRow - this.range.offsets.row;
+  getSeasonStr() {
+    return this.rangeValues[this.seasonRow - this.range.offsets.row][this.seasonCol - this.range.offsets.col];
   }
 
   setSeasonCell(col, row) {

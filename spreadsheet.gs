@@ -20,7 +20,7 @@ function getSpreadsheetEvents(person) {
 }
 
 function extractEvents(sheet, section, extractionState) {
-  const rangeValues = state.rangeValues[sheet.name];
+  const rangeValues = sheet.getRangeValues();
 
   for(var i = 0; i < rangeValues.length; i++) {
     const row = rangeValues[i];
