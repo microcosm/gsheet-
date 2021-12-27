@@ -61,8 +61,8 @@ function run() {
 function isValidTrigger(e){
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   var found = false;
-  state.eventSheets.forEach(function(subsheet) {
-    if(activeSheetName === subsheet.name && subsheet.triggerCols.includes(e.range.columnStart)) {
+  state.eventSheets.forEach(function(sheet) {
+    if(sheet.name === activeSheetName && sheet.triggerCols.includes(e.range.columnStart)) {
       found = true;
     }
   });
@@ -70,8 +70,8 @@ function isValidTrigger(e){
 }
 
 function populateRangeValuesFromSheets() {
-  state.eventSheets.forEach(function(subsheet) {
-    state.rangeValues[subsheet.name] = subsheet.getRangeValues();
+  state.eventSheets.forEach(function(sheet) {
+    state.rangeValues[sheet.name] = sheet.getRangeValues();
   });
 }
 

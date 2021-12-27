@@ -7,11 +7,11 @@ function getSpreadsheetEvents(person) {
     fillInTheBlanksDate: state.today
   }
 
-  state.eventSheets.forEach(function(subsheet) {
-    for(var sectionName in subsheet.sections) {
-      var section = subsheet.sections[sectionName];
+  state.eventSheets.forEach(function(sheet) {
+    for(var sectionName in sheet.sections) {
+      var section = sheet.sections[sectionName];
       if(section.hasEvents) {
-        extractEvents(subsheet, section, extractionState);
+        extractEvents(sheet, section, extractionState);
       }
     }
   });
@@ -19,8 +19,8 @@ function getSpreadsheetEvents(person) {
   return extractionState.events;
 }
 
-function extractEvents(subsheet, section, extractionState) {
-  const rangeValues = state.rangeValues[subsheet.name];
+function extractEvents(sheet, section, extractionState) {
+  const rangeValues = state.rangeValues[sheet.name];
 
   for(var i = 0; i < rangeValues.length; i++) {
     const row = rangeValues[i];
@@ -28,7 +28,7 @@ function extractEvents(subsheet, section, extractionState) {
     if(isWorkDateLabel(row[section.rangeColumns.workDate])) {
       extractionState.currentEventCategory = rangeValues[i - 1][section.rangeColumns.label];
     } else if(isValidEventData(row, section, extractionState)) {
-      var eventFromSpreadsheet = buildEventFromSpreadsheet(subsheet, section, extractionState, row);
+      var eventFromSpreadsheet = buildEventFromSheet(sheet, section, extractionState, row);
       extractionState.events.push(eventFromSpreadsheet);
     }
   }
@@ -44,7 +44,7 @@ function isValidEventData(row, section, extractionState) {
          isSpecificValidEventData(row, section)
 }
 
-function buildEventFromSpreadsheet(subsheet, section, extractionState, row) {
+function buildEventFromSheet(sheet, section, extractionState, row) {
   var startDateTime, endDateTime, isAllDay;
 
   if(isFillInTheBlanks(row, section)) {
@@ -81,7 +81,7 @@ function buildEventFromSpreadsheet(subsheet, section, extractionState, row) {
     endDateTime: endDateTime,
     isAllDay: isAllDay,
     options: {
-      description: generateDescription(subsheet, section, extractionState, row),
+      description: generateDescription(sheet, section, extractionState, row),
       location: extractionState.currentEventCategory,
       guests: extractionState.person.inviteEmail
     },
@@ -140,13 +140,13 @@ function isWorkDateLabel(str) {
   return typeof str == 'string' && str.substring(0, state.workDateLabelText.length) === state.workDateLabelText;
 }
 
-function generateDescription(subsheet, section, extractionState, row) {
+function generateDescription(sheet, section, extractionState, row) {
   const name = getNameSubstitution(row[section.rangeColumns.name]);
 
   return 'This event is from the "' + extractionState.currentEventCategory +
     '" section' + (name ? ' for ' + name : '') +
     '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + config.gsheet.id +
     '/edit?usp=sharing' +
-    (subsheet.hasOwnProperty('id') ? '#gid=' + subsheet.id : '') +
+    (sheet.hasOwnProperty('id') ? '#gid=' + sheet.id : '') +
     '">' + config.gsheet.name + '</a>&nbsp;&larr; Click here for more';
 }

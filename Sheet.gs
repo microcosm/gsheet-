@@ -10,7 +10,7 @@ class Sheet {
 
   validate() {
     if(this.sheetRef == null) {
-      throw 'Cannot establish access to "' + this.name + '" subsheet - check config values.';
+      throw 'Cannot establish access to sheet "' + this.name + '" - check config values.';
     }
   }
 }
