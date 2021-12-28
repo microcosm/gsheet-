@@ -23,7 +23,7 @@ function onOpen() {
 function init(spreadsheet) {
   state = {
     spreadsheet: spreadsheet,
-    validEventCategories: [],
+    scriptResponsiveWidgets: [],
     people: [],
     scriptRangeValues: {},
     log: '',
@@ -36,7 +36,6 @@ function init(spreadsheet) {
   };
 
   preProcessSheets();
-  setValidEventCategories();
   setPeople();
 }
 

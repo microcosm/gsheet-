@@ -1,6 +1,6 @@
 function getSpreadsheetEvents(person) {
   var extractionState = {
-    currentEventCategory: '',
+    currentWidget: '',
     events: [],
     person: person,
     exclusionListNames: getOtherPeopleNames(person),
@@ -26,7 +26,7 @@ function extractEvents(sheet, widget, extractionState) {
     const row = scriptRangeValues[i];
 
     if(isWorkDateLabel(row[widget.scriptRangeColumns.workDate])) {
-      extractionState.currentEventCategory = scriptRangeValues[i - 1][widget.scriptRangeColumns.label];
+      extractionState.currentWidget = scriptRangeValues[i - 1][widget.scriptRangeColumns.label];
     } else if(isValidEventData(row, widget, extractionState)) {
       var eventFromSpreadsheet = buildEventFromSheet(sheet, widget, extractionState, row);
       extractionState.events.push(eventFromSpreadsheet);
@@ -35,7 +35,7 @@ function extractEvents(sheet, widget, extractionState) {
 }
 
 function isValidEventData(row, widget, extractionState) {
-  return state.validEventCategories.includes(extractionState.currentEventCategory) &&
+  return state.scriptResponsiveWidgets.includes(extractionState.currentWidget) &&
          !getIsDoneOrWaiting(widget, row) &&
          (typeof row[widget.scriptRangeColumns.noun] == 'string' && row[widget.scriptRangeColumns.noun].length > 0) &&
          (typeof row[widget.scriptRangeColumns.verb] == 'string' && row[widget.scriptRangeColumns.verb].length > 0) &&
@@ -82,7 +82,7 @@ function buildEventFromSheet(sheet, widget, extractionState, row) {
     isAllDay: isAllDay,
     options: {
       description: generateDescription(sheet, widget, extractionState, row),
-      location: extractionState.currentEventCategory,
+      location: extractionState.currentWidget,
       guests: extractionState.person.inviteEmail
     },
     isAlreadyInCalendar: false
@@ -143,7 +143,7 @@ function isWorkDateLabel(str) {
 function generateDescription(sheet, widget, extractionState, row) {
   const name = getNameSubstitution(row[widget.scriptRangeColumns.name]);
 
-  return 'This event is from the "' + extractionState.currentEventCategory +
+  return 'This event is from the "' + extractionState.currentWidget +
     '" widget' + (name ? ' for ' + name : '') +
     '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + config.gsheet.id +
     '/edit?usp=sharing' +
