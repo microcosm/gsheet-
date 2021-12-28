@@ -1,7 +1,7 @@
 function getSpreadsheetEvents(person) {
   var extractionState = {
     currentWidget: '',
-    events: [],
+    calendarEvents: [],
     person: person,
     exclusionListNames: getOtherPeopleNames(person),
     fillInTheBlanksDate: state.today
@@ -10,16 +10,16 @@ function getSpreadsheetEvents(person) {
   state.scriptSheets.forEach(function(sheet) {
     for(var widgetName in sheet.widgets) {
       var widget = sheet.widgets[widgetName];
-      if(widget.hasEvents) {
-        extractEvents(sheet, widget, extractionState);
+      if(widget.hasCalendarEvents) {
+        extractCalendarEvents(sheet, widget, extractionState);
       }
     }
   });
 
-  return extractionState.events;
+  return extractionState.calendarEvents;
 }
 
-function extractEvents(sheet, widget, extractionState) {
+function extractCalendarEvents(sheet, widget, extractionState) {
   const scriptRangeValues = sheet.getScriptRangeValues();
 
   for(var i = 0; i < scriptRangeValues.length; i++) {
@@ -27,21 +27,21 @@ function extractEvents(sheet, widget, extractionState) {
 
     if(isWorkDateLabel(row[widget.scriptRangeColumns.workDate])) {
       extractionState.currentWidget = scriptRangeValues[i - 1][widget.scriptRangeColumns.label];
-    } else if(isValidEventData(row, widget, extractionState)) {
+    } else if(isValidCalendarEvent(row, widget, extractionState)) {
       var eventFromSpreadsheet = buildEventFromSheet(sheet, widget, extractionState, row);
-      extractionState.events.push(eventFromSpreadsheet);
+      extractionState.calendarEvents.push(eventFromSpreadsheet);
     }
   }
 }
 
-function isValidEventData(row, widget, extractionState) {
+function isValidCalendarEvent(row, widget, extractionState) {
   return state.scriptResponsiveWidgets.includes(extractionState.currentWidget) &&
          !getIsDoneOrWaiting(widget, row) &&
          (typeof row[widget.scriptRangeColumns.noun] == 'string' && row[widget.scriptRangeColumns.noun].length > 0) &&
          (typeof row[widget.scriptRangeColumns.verb] == 'string' && row[widget.scriptRangeColumns.verb].length > 0) &&
          (widget.allowFillInTheBlanksDates || row[widget.scriptRangeColumns.workDate] instanceof Date) &&
          !extractionState.exclusionListNames.includes(row[widget.scriptRangeColumns.name]) &&
-         isSpecificValidEventData(row, widget)
+         isSpecificValidCalendarEvent(row, widget)
 }
 
 function buildEventFromSheet(sheet, widget, extractionState, row) {
