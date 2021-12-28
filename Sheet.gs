@@ -22,10 +22,10 @@ class ValuesSheet extends Sheet {
   }
 }
 
-class EventSheet extends Sheet {
-  constructor(spreadsheet, name, id, range, sections, triggerCols) {
+class ScriptSheet extends Sheet {
+  constructor(spreadsheet, name, id, range, widgets, triggerCols) {
     super(spreadsheet, name, id, range);
-    this.sections = sections;
+    this.widgets = widgets;
     this.triggerCols = triggerCols;
     this.hasSeasonCell = false;
     this.seasonCol = null;
@@ -35,10 +35,10 @@ class EventSheet extends Sheet {
   }
 
   generateRangeColumns() {
-    for(var sectionName in this.sections) {
-      var section = this.sections[sectionName];
-      for(var columnName in section.columns) {
-        section.rangeColumns[columnName] = section.columns[columnName] - this.range.offsets.col;
+    for(var widgetName in this.widgets) {
+      var widget = this.widgets[widgetName];
+      for(var columnName in widget.columns) {
+        widget.rangeColumns[columnName] = widget.columns[columnName] - this.range.offsets.col;
       }
     }
   }

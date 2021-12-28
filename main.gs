@@ -32,7 +32,7 @@ function init(spreadsheet) {
     workDateLabelText: 'Work date',
     today: getTodaysDate(),
     valuesSheet: null,
-    eventSheets: []
+    scriptSheets: []
   };
 
   preProcessSheets();
@@ -59,7 +59,7 @@ function run() {
 function isValidTrigger(e){
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   var found = false;
-  state.eventSheets.forEach(function(sheet) {
+  state.scriptSheets.forEach(function(sheet) {
     if(sheet.name === activeSheetName && sheet.triggerCols.includes(e.range.columnStart)) {
       found = true;
     }
