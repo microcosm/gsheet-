@@ -66,7 +66,7 @@ class ScriptSheet extends GoogleSheet {
 }
 
 class EventSheet extends ScriptSheet {
-  extractCalendarEvents(sheet, widget, extractionState) {
+  extractEvents(sheet, widget, extractionState) {
     const scriptRangeValues = sheet.getScriptRangeValues();
 
     for(var i = 0; i < scriptRangeValues.length; i++) {
@@ -74,21 +74,21 @@ class EventSheet extends ScriptSheet {
 
       if(this.isWorkDateLabel(row[widget.scriptRangeColumns.workDate])) {
         extractionState.currentWidget = scriptRangeValues[i - 1][widget.scriptRangeColumns.label];
-      } else if(this.isValidCalendarEvent(row, widget, extractionState)) {
+      } else if(this.isValidEvent(row, widget, extractionState)) {
         var eventFromSpreadsheet = this.buildEventFromSheet(sheet, widget, extractionState, row);
-        extractionState.calendarEvents.push(eventFromSpreadsheet);
+        extractionState.events.push(eventFromSpreadsheet);
       }
     }
   }
 
-  isValidCalendarEvent(row, widget, extractionState) {
+  isValidEvent(row, widget, extractionState) {
     return state.scriptResponsiveWidgets.includes(extractionState.currentWidget) &&
            !this.getIsDoneOrWaiting(widget, row) &&
            (typeof row[widget.scriptRangeColumns.noun] == 'string' && row[widget.scriptRangeColumns.noun].length > 0) &&
            (typeof row[widget.scriptRangeColumns.verb] == 'string' && row[widget.scriptRangeColumns.verb].length > 0) &&
            (widget.allowFillInTheBlanksDates || row[widget.scriptRangeColumns.workDate] instanceof Date) &&
            !extractionState.exclusionListNames.includes(row[widget.scriptRangeColumns.name]) &&
-           isSpecificValidCalendarEvent(row, widget)
+           isSpecificValidEvent(row, widget)
   }
 
   buildEventFromSheet(sheet, widget, extractionState, row) {

@@ -1,5 +1,3 @@
-var state;
-
 function onTimedTrigger() {
   init(SpreadsheetApp.openById(config.gsheet.id));
   run();
@@ -21,23 +19,8 @@ function onOpen() {
 }
 
 function init(spreadsheet) {
-  state = {
-    spreadsheet: spreadsheet,
-    scriptResponsiveWidgets: [],
-    people: [],
-    scriptRangeValues: {},
-    log: '',
-    lock: null,
-    errorText: 'Calendar update failed: ',
-    workDateLabelText: 'Work date',
-    today: getTodaysDate(),
-    valuesSheet: null,
-    scriptSheets: [],
-    googleCalendar: new GoogleCalendar()
-  };
-
-  preProcessSheets();
-  setPeople();
+  var stateAssembler = new DashStateAssembler(spreadsheet);
+  stateAssembler.assemble();
 }
 
 function run() {
@@ -84,71 +67,11 @@ function isValidTrigger(e){
   return found;
 }
 
-function setPeople() {
-  const values = state.valuesSheet.sheetRef.getRange(state.valuesSheet.scriptRange.start + ':' + state.valuesSheet.scriptRange.end).getValues();
-  for(var i = 0; i < values.length; i += state.valuesSheet.numValuesPerPerson) {
-    if(values[i][0] && values[i + 1][0]){
-      const name = values[i][0];
-      const inviteEmail = values.length >= i + state.valuesSheet.numValuesPerPerson ? values[i + 2][0] : '';
-      const calendar = CalendarApp.getCalendarById(values[i + 1][0]);
-      state.people.push({
-        name: name,
-        calendar: calendar,
-        inviteEmail: inviteEmail,
-        calendarEvents: state.googleCalendar.getCalendarEvents(calendar),
-        spreadsheetEvents: null });
-    }
-  }
-  state.people.forEach(function(person) {
-    person.spreadsheetEvents = getSpreadsheetEvents(person);
-  });
-}
-
-function getSpreadsheetEvents(person) {
-  var extractionState = {
-    currentWidget: '',
-    calendarEvents: [],
-    person: person,
-    exclusionListNames: getOtherPeopleNames(person),
-    fillInTheBlanksDate: state.today
-  }
-
-  state.scriptSheets.forEach(function(sheet) {
-    for(var widgetName in sheet.widgets) {
-      var widget = sheet.widgets[widgetName];
-      if(widget.hasCalendarEvents) {
-        sheet.extractCalendarEvents(sheet, widget, extractionState);
-      }
-    }
-  });
-
-  return extractionState.calendarEvents;
-}
-
-function getOtherPeopleNames(person) {
-  var otherPeopleNames = [];
-  state.people.forEach(function(possibleOther) {
-    if(possibleOther.name != person.name) {
-      otherPeopleNames.push(possibleOther.name);
-    }
-  });
-  return otherPeopleNames;
-}
-
 function updateCalendars() {
   state.people.forEach(function(person) {
     linkMatchingEvents(person);
     updateChangedEvents(person);
   });
-}
-
-function getTodaysDate() {
-  var date = new Date();
-  date.setHours(0);
-  date.setMinutes(0);
-  date.setSeconds(0);
-  date.setMilliseconds(0);
-  return date;
 }
 
 function linkMatchingEvents(person) {
