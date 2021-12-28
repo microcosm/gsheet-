@@ -32,7 +32,8 @@ function init(spreadsheet) {
     workDateLabelText: 'Work date',
     today: getTodaysDate(),
     valuesSheet: null,
-    scriptSheets: []
+    scriptSheets: [],
+    googleCalendar: new GoogleCalendar()
   };
 
   preProcessSheets();
@@ -94,13 +95,44 @@ function setPeople() {
         name: name,
         calendar: calendar,
         inviteEmail: inviteEmail,
-        calendarEvents: getCalendarEvents(calendar),
+        calendarEvents: state.googleCalendar.getCalendarEvents(calendar),
         spreadsheetEvents: null });
     }
   }
   state.people.forEach(function(person) {
     person.spreadsheetEvents = getSpreadsheetEvents(person);
   });
+}
+
+function getSpreadsheetEvents(person) {
+  var extractionState = {
+    currentWidget: '',
+    calendarEvents: [],
+    person: person,
+    exclusionListNames: getOtherPeopleNames(person),
+    fillInTheBlanksDate: state.today
+  }
+
+  state.scriptSheets.forEach(function(sheet) {
+    for(var widgetName in sheet.widgets) {
+      var widget = sheet.widgets[widgetName];
+      if(widget.hasCalendarEvents) {
+        sheet.extractCalendarEvents(sheet, widget, extractionState);
+      }
+    }
+  });
+
+  return extractionState.calendarEvents;
+}
+
+function getOtherPeopleNames(person) {
+  var otherPeopleNames = [];
+  state.people.forEach(function(possibleOther) {
+    if(possibleOther.name != person.name) {
+      otherPeopleNames.push(possibleOther.name);
+    }
+  });
+  return otherPeopleNames;
 }
 
 function updateCalendars() {
@@ -132,8 +164,8 @@ function linkMatchingEvents(person) {
 }
 
 function updateChangedEvents(person) {
-  deleteOrphanedCalendarEvents(person);
-  createNewCalendarEvents(person);
+  state.googleCalendar.deleteOrphanedCalendarEvents(person);
+  state.googleCalendar.createNewCalendarEvents(person);
   logNewline();
 }
 
