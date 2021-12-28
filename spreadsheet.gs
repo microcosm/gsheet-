@@ -20,13 +20,13 @@ function getSpreadsheetEvents(person) {
 }
 
 function extractEvents(sheet, widget, extractionState) {
-  const rangeValues = sheet.getRangeValues();
+  const scriptRangeValues = sheet.getScriptRangeValues();
 
-  for(var i = 0; i < rangeValues.length; i++) {
-    const row = rangeValues[i];
+  for(var i = 0; i < scriptRangeValues.length; i++) {
+    const row = scriptRangeValues[i];
 
-    if(isWorkDateLabel(row[widget.rangeColumns.workDate])) {
-      extractionState.currentEventCategory = rangeValues[i - 1][widget.rangeColumns.label];
+    if(isWorkDateLabel(row[widget.scriptRangeColumns.workDate])) {
+      extractionState.currentEventCategory = scriptRangeValues[i - 1][widget.scriptRangeColumns.label];
     } else if(isValidEventData(row, widget, extractionState)) {
       var eventFromSpreadsheet = buildEventFromSheet(sheet, widget, extractionState, row);
       extractionState.events.push(eventFromSpreadsheet);
@@ -37,10 +37,10 @@ function extractEvents(sheet, widget, extractionState) {
 function isValidEventData(row, widget, extractionState) {
   return state.validEventCategories.includes(extractionState.currentEventCategory) &&
          !getIsDoneOrWaiting(widget, row) &&
-         (typeof row[widget.rangeColumns.noun] == 'string' && row[widget.rangeColumns.noun].length > 0) &&
-         (typeof row[widget.rangeColumns.verb] == 'string' && row[widget.rangeColumns.verb].length > 0) &&
-         (widget.allowFillInTheBlanksDates || row[widget.rangeColumns.workDate] instanceof Date) &&
-         !extractionState.exclusionListNames.includes(row[widget.rangeColumns.name]) &&
+         (typeof row[widget.scriptRangeColumns.noun] == 'string' && row[widget.scriptRangeColumns.noun].length > 0) &&
+         (typeof row[widget.scriptRangeColumns.verb] == 'string' && row[widget.scriptRangeColumns.verb].length > 0) &&
+         (widget.allowFillInTheBlanksDates || row[widget.scriptRangeColumns.workDate] instanceof Date) &&
+         !extractionState.exclusionListNames.includes(row[widget.scriptRangeColumns.name]) &&
          isSpecificValidEventData(row, widget)
 }
 
@@ -52,12 +52,12 @@ function buildEventFromSheet(sheet, widget, extractionState, row) {
     startDateTime = new Date(extractionState.fillInTheBlanksDate);
     endDateTime = null;
   } else {
-    const startTime = row[widget.rangeColumns.startTime];
+    const startTime = row[widget.scriptRangeColumns.startTime];
     const startTimeHours = getStartTimeHours(startTime);
     const startTimeMinutes = getStartTimeMinutes(startTime);
-    const durationHours = row[widget.rangeColumns.durationHours];
+    const durationHours = row[widget.scriptRangeColumns.durationHours];
     isAllDay = getIsAllDay(startTimeHours, startTimeMinutes, durationHours);
-    startDateTime = new Date(row[widget.rangeColumns.workDate]);
+    startDateTime = new Date(row[widget.scriptRangeColumns.workDate]);
     startDateTime = getPulledForward(startDateTime);
 
     if(isAllDay) {
@@ -76,7 +76,7 @@ function buildEventFromSheet(sheet, widget, extractionState, row) {
   }
 
   return {
-    title: row[widget.rangeColumns.noun] + ': ' + row[widget.rangeColumns.verb],
+    title: row[widget.scriptRangeColumns.noun] + ': ' + row[widget.scriptRangeColumns.verb],
     startDateTime: startDateTime,
     endDateTime: endDateTime,
     isAllDay: isAllDay,
@@ -105,7 +105,7 @@ function getStartTimeMinutes(startTime) {
 }
 
 function isFillInTheBlanks(row, widget) {
-  return widget.allowFillInTheBlanksDates && (!(row[widget.rangeColumns.workDate] instanceof Date));
+  return widget.allowFillInTheBlanksDates && (!(row[widget.scriptRangeColumns.workDate] instanceof Date));
 }
 
 function getPulledForward(dateTime) {
@@ -121,7 +121,7 @@ function getPulledForward(dateTime) {
 
 function getIsDoneOrWaiting(widget, row) {
   if(widget.hasDoneCol) {
-    return row[widget.rangeColumns.done] === 'Yes' || row[widget.rangeColumns.done] === 'Waiting';
+    return row[widget.scriptRangeColumns.done] === 'Yes' || row[widget.scriptRangeColumns.done] === 'Waiting';
   }
   return false;
 }
@@ -141,7 +141,7 @@ function isWorkDateLabel(str) {
 }
 
 function generateDescription(sheet, widget, extractionState, row) {
-  const name = getNameSubstitution(row[widget.rangeColumns.name]);
+  const name = getNameSubstitution(row[widget.scriptRangeColumns.name]);
 
   return 'This event is from the "' + extractionState.currentEventCategory +
     '" widget' + (name ? ' for ' + name : '') +

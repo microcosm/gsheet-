@@ -1,7 +1,7 @@
 class Sheet {
-  constructor(spreadsheet, name, id, range) {
+  constructor(spreadsheet, name, id, scriptRange) {
     this.spreadsheet = spreadsheet;
-    this.range = range;
+    this.scriptRange = scriptRange;
     this.name = name;
     this.id = id;
     this.sheetRef = this.spreadsheet.getSheetByName(this.name);
@@ -16,46 +16,46 @@ class Sheet {
 }
 
 class ValuesSheet extends Sheet {
-  constructor(spreadsheet, name, range) {
-    super(spreadsheet, name, false, range);
+  constructor(spreadsheet, name, scriptRange) {
+    super(spreadsheet, name, false, scriptRange);
     this.numValuesPerPerson = 3;
   }
 }
 
 class ScriptSheet extends Sheet {
-  constructor(spreadsheet, name, id, range, widgets, triggerCols) {
-    super(spreadsheet, name, id, range);
+  constructor(spreadsheet, name, id, scriptRange, widgets, triggerCols) {
+    super(spreadsheet, name, id, scriptRange);
     this.widgets = widgets;
     this.triggerCols = triggerCols;
     this.hasSeasonCell = false;
     this.seasonCol = null;
     this.seasonRow = null;
-    this.generateRangeColumns();
-    this.generateRangeValues();
+    this.generateScriptRangeColumns();
+    this.generateScriptRangeValues();
   }
 
-  generateRangeColumns() {
+  generateScriptRangeColumns() {
     for(var widgetName in this.widgets) {
       var widget = this.widgets[widgetName];
       for(var columnName in widget.columns) {
-        widget.rangeColumns[columnName] = widget.columns[columnName] - this.range.offsets.col;
+        widget.scriptRangeColumns[columnName] = widget.columns[columnName] - this.scriptRange.offsets.col;
       }
     }
   }
 
-  generateRangeValues() {
-    this.rangeValues = this.sheetRef.getRange (
-        this.range.offsets.row, this.range.offsets.col,
-        this.range.maxRows, this.range.maxCols
+  generateScriptRangeValues() {
+    this.scriptRangeValues = this.sheetRef.getRange (
+        this.scriptRange.offsets.row, this.scriptRange.offsets.col,
+        this.scriptRange.maxRows, this.scriptRange.maxCols
       ).getValues();
   }
 
-  getRangeValues() {
-    return this.rangeValues;
+  getScriptRangeValues() {
+    return this.scriptRangeValues;
   }
 
   getSeasonStr() {
-    return this.rangeValues[this.seasonRow - this.range.offsets.row][this.seasonCol - this.range.offsets.col];
+    return this.scriptRangeValues[this.seasonRow - this.scriptRange.offsets.row][this.seasonCol - this.scriptRange.offsets.col];
   }
 
   setSeasonCell(col, row) {

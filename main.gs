@@ -25,7 +25,7 @@ function init(spreadsheet) {
     spreadsheet: spreadsheet,
     validEventCategories: [],
     people: [],
-    rangeValues: {},
+    scriptRangeValues: {},
     log: '',
     lock: null,
     errorText: 'Calendar update failed: ',
@@ -68,7 +68,7 @@ function isValidTrigger(e){
 }
 
 function setPeople() {
-  const values = state.valuesSheet.sheetRef.getRange(state.valuesSheet.range.start + ':' + state.valuesSheet.range.end).getValues();
+  const values = state.valuesSheet.sheetRef.getRange(state.valuesSheet.scriptRange.start + ':' + state.valuesSheet.scriptRange.end).getValues();
   for(var i = 0; i < values.length; i += state.valuesSheet.numValuesPerPerson) {
     if(values[i][0] && values[i + 1][0]){
       const name = values[i][0];
