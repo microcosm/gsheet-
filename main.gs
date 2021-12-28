@@ -55,6 +55,23 @@ function run() {
   }
 }
 
+function waitForLocks(){
+  state.lock = LockService.getScriptLock();
+  try {
+    state.lock.waitLock(60000);
+    logLockObtained();
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function releaseLock() {
+  SpreadsheetApp.flush();
+  state.lock.releaseLock();
+  logLockReleased();
+}
+
 function isValidTrigger(e){
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   var found = false;
