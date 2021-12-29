@@ -24,36 +24,20 @@ function init(spreadsheet) {
 }
 
 function run() {
-  if(!waitForLocks()){
+  var executor = new DashExecutor();
+  if(!executor.waitForLocks()){
     alertError("couldn't lock script");
     return;
   }
   try {
     if(typeof customUpdates !== "undefined") customUpdates();
-    updateCalendars();
+    executor.updateGoogleCalendarsFromSpreadsheet();
   } catch(e) {
     alertError(e);
   } finally {
-    releaseLock();
+    executor.releaseLock();
     outputLog();
   }
-}
-
-function waitForLocks(){
-  state.lock = LockService.getScriptLock();
-  try {
-    state.lock.waitLock(60000);
-    logLockObtained();
-    return true;
-  } catch(e) {
-    return false;
-  }
-}
-
-function releaseLock() {
-  SpreadsheetApp.flush();
-  state.lock.releaseLock();
-  logLockReleased();
 }
 
 function isValidTrigger(e){
@@ -65,45 +49,4 @@ function isValidTrigger(e){
     }
   });
   return found;
-}
-
-function updateCalendars() {
-  state.people.forEach(function(person) {
-    linkMatchingEvents(person);
-    updateChangedEvents(person);
-  });
-}
-
-function linkMatchingEvents(person) {
-  person.spreadsheetEvents.forEach(function(spreadsheetEvent) {
-    var matchingCalendarEvent = findInCalendarEvents(spreadsheetEvent, person.calendarEvents);
-    if(matchingCalendarEvent) {
-      matchingCalendarEvent.existsInSpreadsheet = true;
-      spreadsheetEvent.existsInCalendar = true;
-    }
-    logEventFound(spreadsheetEvent, matchingCalendarEvent);
-  });
-  logNewline();
-}
-
-function updateChangedEvents(person) {
-  state.googleCalendar.deleteOrphanedCalendarEvents(person);
-  state.googleCalendar.createNewCalendarEvents(person);
-  logNewline();
-}
-
-function findInCalendarEvents(spreadsheetEvent, calendarEvents) {
-  var match = false;
-  calendarEvents.forEach(function(calendarEvent) {
-    var isEqual =
-      calendarEvent.title === spreadsheetEvent.title &&
-      calendarEvent.startDateTime.getTime() === spreadsheetEvent.startDateTime.getTime() &&
-      calendarEvent.isAllDay === spreadsheetEvent.isAllDay &&
-      (calendarEvent.isAllDay ? true : calendarEvent.endDateTime.getTime() === spreadsheetEvent.endDateTime.getTime()) &&
-      calendarEvent.options.location === spreadsheetEvent.options.location;
-    if(isEqual) {
-      match = calendarEvent;
-    }
-  });
-  return match;
 }
