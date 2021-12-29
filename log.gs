@@ -40,7 +40,7 @@ function outputLog() {
 }
 
 function alertError(reason){
-  var output = state.errorText + reason;
+  var output = state.texts.errorLabel + reason;
   console.log(output);
   if(config.toggles.showLogAlert) SpreadsheetApp.getUi().alert(output);
 }

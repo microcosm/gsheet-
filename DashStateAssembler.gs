@@ -4,17 +4,19 @@ class DashStateAssembler {
   constructor(spreadsheet) {
     state = {
       spreadsheet: spreadsheet,
-      scriptResponsiveWidgets: [],
       people: [],
+      scriptResponsiveWidgets: [],
       scriptRangeValues: {},
-      log: '',
-      execution: { lock: null, timeout: 60000 },
-      errorText: 'Calendar update failed: ',
-      workDateLabelText: 'Work date',
-      today: this.getTodaysDate(),
+      texts: {
+        errorLabel: 'Custom script failed: ',
+        workDateLabel: 'Work date'
+      },
       valuesSheet: null,
       scriptSheets: [],
-      googleCalendar: new GoogleCalendar()
+      googleCalendar: new GoogleCalendar(),
+      today: this.getTodaysDate(),
+      execution: { lock: null, timeout: 60000 },
+      log: '',
     };
   }
 

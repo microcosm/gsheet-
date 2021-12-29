@@ -174,7 +174,7 @@ class EventSheet extends ScriptSheet {
   }
 
   isWorkDateLabel(str) {
-    return typeof str == 'string' && str.substring(0, state.workDateLabelText.length) === state.workDateLabelText;
+    return typeof str == 'string' && str.substring(0, state.texts.workDateLabel.length) === state.texts.workDateLabel;
   }
 
   generateDescription(sheet, widget, extractionState, row) {
