@@ -43,7 +43,7 @@ class DashExecutor {
 
   findInCalendarEvents(spreadsheetEvent, calendarEvents) {
     var match = false;
-    calendarEvents.forEach(function(calendarEvent) {
+    calendarEvents.forEach((calendarEvent) => {
       var isEqual =
         calendarEvent.title === spreadsheetEvent.title &&
         calendarEvent.startDateTime.getTime() === spreadsheetEvent.startDateTime.getTime() &&

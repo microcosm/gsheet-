@@ -43,7 +43,7 @@ function run() {
 function isValidTrigger(e){
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   var found = false;
-  state.scriptSheets.forEach(function(sheet) {
+  state.scriptSheets.forEach((sheet) => {
     if(sheet.name === activeSheetName && sheet.triggerCols.includes(e.range.columnStart)) {
       found = true;
     }

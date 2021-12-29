@@ -41,7 +41,7 @@ class DashStateAssembler {
   }
 
   assemblePeopleCalendarStates() {
-    state.people.forEach(function(person) {
+    state.people.forEach((person) => {
       person.calendarEvents = state.googleCalendar.getCalendarEvents(person.calendar);
     });
   }
@@ -56,7 +56,7 @@ class DashStateAssembler {
         fillInTheBlanksDate: state.today
       }
 
-      state.scriptSheets.forEach(function(sheet) {
+      state.scriptSheets.forEach((sheet) => {
         for(var widgetName in sheet.widgets) {
           var widget = sheet.widgets[widgetName];
           if(widget.hasEvents) {
@@ -71,7 +71,7 @@ class DashStateAssembler {
 
   getOtherPeopleNames(person) {
     var otherPeopleNames = [];
-    state.people.forEach(function(possibleOther) {
+    state.people.forEach((possibleOther) => {
       if(possibleOther.name != person.name) {
         otherPeopleNames.push(possibleOther.name);
       }
