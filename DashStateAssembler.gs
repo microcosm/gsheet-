@@ -8,7 +8,7 @@ class DashStateAssembler {
       people: [],
       scriptRangeValues: {},
       log: '',
-      lock: null,
+      execution: { lock: null, timeout: 60000 },
       errorText: 'Calendar update failed: ',
       workDateLabelText: 'Work date',
       today: this.getTodaysDate(),

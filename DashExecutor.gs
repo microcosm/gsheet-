@@ -7,9 +7,9 @@ class DashExecutor {
   }
 
   waitForLocks() {
-    state.lock = LockService.getScriptLock();
+    state.execution.lock = LockService.getScriptLock();
     try {
-      state.lock.waitLock(60000);
+      state.execution.lock.waitLock(state.execution.timeout);
       logLockObtained();
       return true;
     } catch(e) {
@@ -19,7 +19,7 @@ class DashExecutor {
 
   releaseLock() {
     SpreadsheetApp.flush();
-    state.lock.releaseLock();
+    state.execution.lock.releaseLock();
     logLockReleased();
   }
 
