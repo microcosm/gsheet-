@@ -3,16 +3,19 @@ function init(spreadsheet) {
   stateAssembler.assemble();
 }
 
-function onOvernightTimedTrigger() {
+function onOvernightTimer() {
   init(SpreadsheetApp.openById(config.gsheet.id));
   state.executionList.push(state.features.updateCalendarFromSpreadsheet);
   executeFeatures();
 }
 
-function onEditInstalledTrigger(e) {
-  init(SpreadsheetApp.getActiveSpreadsheet());
+function onCalendarEdit() {
+  init(SpreadsheetApp.openById(config.gsheet.id));
   if(typeof customOnEdit !== "undefined") customOnEdit();
+}
 
+function onSpreadsheetEdit(e) {
+  init(SpreadsheetApp.getActiveSpreadsheet());
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   const activeColumn = e.range.columnStart;
 
@@ -26,7 +29,7 @@ function onEditInstalledTrigger(e) {
   executeFeatures();
 }
 
-function onOpen() {
+function onSpreadsheetOpen() {
   if(typeof customOnOpen !== "undefined") {
     init(SpreadsheetApp.openById(config.gsheet.id));
     customOnOpen();
