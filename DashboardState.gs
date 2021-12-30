@@ -9,6 +9,7 @@ class DashboardState {
       features: {
         updateCalendarFromSpreadsheet: new Feature_UpdateCalendarFromSpreadsheet()
       },
+      executionList: [],
       texts: {
         errorLabel: 'Custom script failed: ',
         workDateLabel: 'Work date'

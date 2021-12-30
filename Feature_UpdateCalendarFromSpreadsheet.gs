@@ -16,6 +16,16 @@ class Feature_UpdateCalendarFromSpreadsheet {
     this.sheets.push(sheet);
   }
 
+  isRegisteredFor(sheetName, column) {
+    var found = false;
+    this.sheets.forEach((sheet) => {
+      if(sheet.name === sheetName && sheet.triggerCols.includes(column)) {
+        found = true;
+      }
+    });
+    return found;
+  }
+
   discoverMatchingEvents(person) {
     person.spreadsheetEvents.forEach((spreadsheetEvent) => {
       var matchingCalendarEvent = this.findInCalendarEvents(spreadsheetEvent, person.calendarEvents);
