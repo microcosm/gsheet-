@@ -23,7 +23,7 @@ class Feature_UpdateCalendarFromSpreadsheet extends Feature {
   deleteUnmatchedCalendarEvents(person) {
     person.calendarEvents.forEach((calendarEvent) => {
       if(!calendarEvent.existsInSpreadsheet){
-        state.googleCalendar.deleteEvent(calendarEvent);
+        this.deleteCalendarEvent(calendarEvent);
       }
     });
   }
@@ -31,7 +31,7 @@ class Feature_UpdateCalendarFromSpreadsheet extends Feature {
   createUnmatchedSpreadsheetEvents(person) {
     person.spreadsheetEvents.forEach((spreadsheetEvent) => {
       if(!spreadsheetEvent.existsInCalendar) {
-        state.googleCalendar.createEvent(spreadsheetEvent, person.calendar);
+        this.createCalendarEvent(spreadsheetEvent, person.calendar);
       }
     });
   }
@@ -50,5 +50,21 @@ class Feature_UpdateCalendarFromSpreadsheet extends Feature {
       }
     });
     return match;
+  }
+
+  deleteCalendarEvent(calendarEvent) {
+    logEventDeleted(calendarEvent);
+    if(config.toggles.performDataUpdates) {
+      calendarEvent.gcal.deleteEvent();
+    }
+  }
+
+  createCalendarEvent(spreadsheetEvent, calendar) {
+    logEventCreated(spreadsheetEvent);
+    if(config.toggles.performDataUpdates) {
+      spreadsheetEvent.isAllDay ?
+        calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
+        calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
+    }
   }
 }

@@ -1,6 +1,6 @@
 function init(spreadsheet) {
-  var stateAssembler = new DashboardState(spreadsheet);
-  stateAssembler.assemble();
+  var stateBuilder = new DashboardStateBuilder(spreadsheet);
+  stateBuilder.build();
 }
 
 function onOvernightTimer() {
