@@ -1,7 +1,7 @@
 class GoogleSheet {
-  constructor(name, sheetConfig) {
+  constructor(sheetConfig) {
+    this.name = sheetConfig.name;
     this.scriptRange = sheetConfig.scriptRange;
-    this.name = name;
     this.sheetRef = state.spreadsheet.getSheetByName(this.name);
     this.validate();
   }
@@ -14,16 +14,16 @@ class GoogleSheet {
 }
 
 class ValuesSheet extends GoogleSheet {
-  constructor(name, sheetConfig) {
-    super(name, sheetConfig);
+  constructor(sheetConfig) {
+    super(sheetConfig);
     this.numValuesPerPerson = 3;
   }
 }
 
 class ScriptSheet extends GoogleSheet {
-  constructor(name, id, sheetConfig) {
-    super(name, sheetConfig);
-    this.id = id;
+  constructor(sheetConfig) {
+    super(sheetConfig);
+    this.id = sheetConfig.id;
     this.widgets = sheetConfig.widgets;
     this.triggerCols = sheetConfig.triggerCols;
     this.scriptResponsiveWidgetNames = sheetConfig.scriptResponsiveWidgetNames;
