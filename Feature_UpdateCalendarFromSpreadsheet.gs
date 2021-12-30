@@ -1,8 +1,4 @@
-class Feature_UpdateCalendarFromSpreadsheet {
-  constructor() {
-    this.sheets = [];
-  }
-
+class Feature_UpdateCalendarFromSpreadsheet extends Feature {
   execute() {
     state.people.forEach((person) => {
       this.discoverMatchingEvents(person);
@@ -10,20 +6,6 @@ class Feature_UpdateCalendarFromSpreadsheet {
       this.createUnmatchedSpreadsheetEvents(person);
       logNewline();
     });
-  }
-
-  registerSheet(sheet) {
-    this.sheets.push(sheet);
-  }
-
-  isRegisteredFor(sheetName, column) {
-    var found = false;
-    this.sheets.forEach((sheet) => {
-      if(sheet.name === sheetName && sheet.triggerCols.includes(column)) {
-        found = true;
-      }
-    });
-    return found;
   }
 
   discoverMatchingEvents(person) {
