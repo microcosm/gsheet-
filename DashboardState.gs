@@ -6,8 +6,6 @@ class DashboardState {
       spreadsheet: spreadsheet,
       people: [],
       scriptSheets: [],
-      scriptResponsiveWidgets: [],
-      scriptRangeValues: {},
       features: {
         updateCalendarFromSpreadsheet: new Feature_UpdateCalendarFromSpreadsheet()
       },
