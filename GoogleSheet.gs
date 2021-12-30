@@ -34,6 +34,7 @@ class ScriptSheet extends GoogleSheet {
   generateScriptRangeColumns() {
     for(var widgetName in this.widgets) {
       var widget = this.widgets[widgetName];
+      widget.scriptRangeColumns = {};
       for(var columnName in widget.columns) {
         widget.scriptRangeColumns[columnName] = widget.columns[columnName] - this.scriptRange.offsets.col;
       }
