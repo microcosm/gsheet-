@@ -5,14 +5,17 @@ class DashboardState {
     state = {
       spreadsheet: spreadsheet,
       people: [],
+      scriptSheets: [],
       scriptResponsiveWidgets: [],
       scriptRangeValues: {},
+      features: {
+        updateCalendarFromSpreadsheet: new Feature_UpdateCalendarFromSpreadsheet()
+      },
       texts: {
         errorLabel: 'Custom script failed: ',
         workDateLabel: 'Work date'
       },
       valuesSheet: null,
-      scriptSheets: [],
       googleCalendar: new GoogleCalendar(),
       today: this.getTodaysDate(),
       execution: { lock: null, timeout: 60000 },

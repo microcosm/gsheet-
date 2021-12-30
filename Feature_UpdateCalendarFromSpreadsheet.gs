@@ -1,4 +1,8 @@
 class Feature_UpdateCalendarFromSpreadsheet {
+  constructor() {
+    this.sheets = [];
+  }
+
   execute() {
     state.people.forEach((person) => {
       this.discoverMatchingEvents(person);
@@ -6,6 +10,10 @@ class Feature_UpdateCalendarFromSpreadsheet {
       this.createUnmatchedSpreadsheetEvents(person);
       logNewline();
     });
+  }
+
+  registerSheet(sheet) {
+    this.sheets.push(sheet);
   }
 
   discoverMatchingEvents(person) {
