@@ -1,10 +1,8 @@
 class GoogleSheet {
-  constructor(spreadsheet, name, id, scriptRange) {
-    this.spreadsheet = spreadsheet;
-    this.scriptRange = scriptRange;
+  constructor(name, sheetConfig) {
+    this.scriptRange = sheetConfig.scriptRange;
     this.name = name;
-    this.id = id;
-    this.sheetRef = this.spreadsheet.getSheetByName(this.name);
+    this.sheetRef = state.spreadsheet.getSheetByName(this.name);
     this.validate();
   }
 
@@ -16,17 +14,19 @@ class GoogleSheet {
 }
 
 class ValuesSheet extends GoogleSheet {
-  constructor(spreadsheet, name, scriptRange) {
-    super(spreadsheet, name, false, scriptRange);
+  constructor(name, sheetConfig) {
+    super(name, sheetConfig);
     this.numValuesPerPerson = 3;
   }
 }
 
 class ScriptSheet extends GoogleSheet {
-  constructor(spreadsheet, name, id, scriptRange, widgets, triggerCols) {
-    super(spreadsheet, name, id, scriptRange);
-    this.widgets = widgets;
-    this.triggerCols = triggerCols;
+  constructor(name, id, sheetConfig) {
+    super(name, sheetConfig);
+    this.id = id;
+    this.widgets = sheetConfig.widgets;
+    this.triggerCols = sheetConfig.triggerCols;
+    this.scriptResponsiveWidgetNames = sheetConfig.scriptResponsiveWidgetNames;
     this.hasSeasonCell = false;
     this.seasonCol = null;
     this.seasonRow = null;
@@ -82,7 +82,7 @@ class EventSheet extends ScriptSheet {
   }
 
   isValidEvent(row, widget, extractionState) {
-    return state.scriptResponsiveWidgets.includes(extractionState.currentWidget) &&
+    return this.scriptResponsiveWidgetNames.includes(extractionState.currentWidget) &&
            !this.getIsDoneOrWaiting(widget, row) &&
            (typeof row[widget.scriptRangeColumns.noun] == 'string' && row[widget.scriptRangeColumns.noun].length > 0) &&
            (typeof row[widget.scriptRangeColumns.verb] == 'string' && row[widget.scriptRangeColumns.verb].length > 0) &&

@@ -50,10 +50,9 @@ function isValidTrigger(e){
   return found;
 }
 
-function registerSheetForFeature(sheet, widgets, feature) {
+function registerSheetForFeature(sheet, feature) {
   state.scriptSheets.push(sheet);
   feature.registerSheet(sheet);
-  state.scriptResponsiveWidgets = state.scriptResponsiveWidgets.concat(widgets);
 }
 
 function waitForLocks() {
