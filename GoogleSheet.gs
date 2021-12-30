@@ -27,9 +27,6 @@ class ScriptSheet extends GoogleSheet {
     this.widgets = sheetConfig.widgets;
     this.triggerCols = sheetConfig.triggerCols;
     this.scriptResponsiveWidgetNames = sheetConfig.scriptResponsiveWidgetNames;
-    this.hasSeasonCell = false;
-    this.seasonCol = null;
-    this.seasonRow = null;
     this.generateScriptRangeColumns();
     this.generateScriptRangeValues();
   }
@@ -52,19 +49,5 @@ class ScriptSheet extends GoogleSheet {
 
   getScriptRangeValues() {
     return this.scriptRangeValues;
-  }
-}
-
-class EventSheet extends ScriptSheet {
-
-
-  getSeasonStr() {
-    return this.scriptRangeValues[this.seasonRow - this.scriptRange.offsets.row][this.seasonCol - this.scriptRange.offsets.col];
-  }
-
-  setSeasonCell(col, row) {
-    this.hasSeasonCell = true;
-    this.seasonCol = col;
-    this.seasonRow = row;
   }
 }
