@@ -1,27 +1,21 @@
 class GoogleCalendar {
-  deleteOrphanedCalendarEvents(person) {
-    person.calendarEvents.forEach((calendarEvent) => {
-      if(!calendarEvent.existsInSpreadsheet){
-        logEventDeleted(calendarEvent);
-        if(config.toggles.performDataUpdates) calendarEvent.gcal.deleteEvent();
-      }
-    });
+  deleteEvent(calendarEvent) {
+    logEventDeleted(calendarEvent);
+    if(config.toggles.performDataUpdates) {
+      calendarEvent.gcal.deleteEvent();
+    }
   }
 
-  createNewCalendarEvents(person) {
-    person.spreadsheetEvents.forEach((spreadsheetEvent) => {
-      if(!spreadsheetEvent.existsInCalendar) {
-        logEventCreated(spreadsheetEvent);
-        if(config.toggles.performDataUpdates) {
-          spreadsheetEvent.isAllDay ?
-            person.calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
-            person.calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
-        }
-      }
-    });
+  createEvent(spreadsheetEvent, calendar) {
+    logEventCreated(spreadsheetEvent);
+    if(config.toggles.performDataUpdates) {
+      spreadsheetEvent.isAllDay ?
+        calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
+        calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
+    }
   }
 
-  getCalendarEvents(calendar, fromDate=new Date('January 1, 2000'), toDate=new Date('January 1, 3000')) {
+  getEvents(calendar, fromDate=new Date('January 1, 2000'), toDate=new Date('January 1, 3000')) {
     const googleCalendarEvents = calendar.getEvents(fromDate, toDate);
     var calendarEvents = [];
     googleCalendarEvents.forEach((googleCalendarEvent) => {

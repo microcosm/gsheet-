@@ -1,6 +1,6 @@
 var state;
 
-class DashStateAssembler {
+class DashboardState {
   constructor(spreadsheet) {
     state = {
       spreadsheet: spreadsheet,
@@ -44,7 +44,7 @@ class DashStateAssembler {
 
   assemblePeopleCalendarStates() {
     state.people.forEach((person) => {
-      person.calendarEvents = state.googleCalendar.getCalendarEvents(person.calendar);
+      person.calendarEvents = state.googleCalendar.getEvents(person.calendar);
     });
   }
 

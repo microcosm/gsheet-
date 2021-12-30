@@ -1,29 +1,14 @@
-class DashExecutor {
-  updateGoogleCalendarsFromSpreadsheet() {
+class Feature_UpdateCalendarFromSpreadsheet {
+  execute() {
     state.people.forEach((person) => {
-      this.linkMatchingEvents(person);
-      this.updateChangedEvents(person);
+      this.discoverMatchingEvents(person);
+      this.deleteUnmatchedCalendarEvents(person);
+      this.createUnmatchedSpreadsheetEvents(person);
+      logNewline();
     });
   }
 
-  waitForLocks() {
-    state.execution.lock = LockService.getScriptLock();
-    try {
-      state.execution.lock.waitLock(state.execution.timeout);
-      logLockObtained();
-      return true;
-    } catch(e) {
-      return false;
-    }
-  }
-
-  releaseLock() {
-    SpreadsheetApp.flush();
-    state.execution.lock.releaseLock();
-    logLockReleased();
-  }
-
-  linkMatchingEvents(person) {
+  discoverMatchingEvents(person) {
     person.spreadsheetEvents.forEach((spreadsheetEvent) => {
       var matchingCalendarEvent = this.findInCalendarEvents(spreadsheetEvent, person.calendarEvents);
       if(matchingCalendarEvent) {
@@ -35,10 +20,20 @@ class DashExecutor {
     logNewline();
   }
 
-  updateChangedEvents(person) {
-    state.googleCalendar.deleteOrphanedCalendarEvents(person);
-    state.googleCalendar.createNewCalendarEvents(person);
-    logNewline();
+  deleteUnmatchedCalendarEvents(person) {
+    person.calendarEvents.forEach((calendarEvent) => {
+      if(!calendarEvent.existsInSpreadsheet){
+        state.googleCalendar.deleteEvent(calendarEvent);
+      }
+    });
+  }
+
+  createUnmatchedSpreadsheetEvents(person) {
+    person.spreadsheetEvents.forEach((spreadsheetEvent) => {
+      if(!spreadsheetEvent.existsInCalendar) {
+        state.googleCalendar.createEvent(spreadsheetEvent, person.calendar);
+      }
+    });
   }
 
   findInCalendarEvents(spreadsheetEvent, calendarEvents) {

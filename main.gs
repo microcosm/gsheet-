@@ -19,23 +19,23 @@ function onOpen() {
 }
 
 function init(spreadsheet) {
-  var stateAssembler = new DashStateAssembler(spreadsheet);
+  var stateAssembler = new DashboardState(spreadsheet);
   stateAssembler.assemble();
 }
 
 function run() {
-  var executor = new DashExecutor();
-  if(!executor.waitForLocks()){
+  if(!waitForLocks()){
     alertError("couldn't lock script");
     return;
   }
   try {
     if(typeof customUpdates !== "undefined") customUpdates();
-    executor.updateGoogleCalendarsFromSpreadsheet();
+    var feature_updateCalendarFromSpreadsheet = new Feature_UpdateCalendarFromSpreadsheet();
+    feature_updateCalendarFromSpreadsheet.execute();
   } catch(e) {
     alertError(e);
   } finally {
-    executor.releaseLock();
+    releaseLock();
     outputLog();
   }
 }
@@ -49,4 +49,21 @@ function isValidTrigger(e){
     }
   });
   return found;
+}
+
+function waitForLocks() {
+  state.execution.lock = LockService.getScriptLock();
+  try {
+    state.execution.lock.waitLock(state.execution.timeout);
+    logLockObtained();
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function releaseLock() {
+  SpreadsheetApp.flush();
+  state.execution.lock.releaseLock();
+  logLockReleased();
 }
