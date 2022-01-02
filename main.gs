@@ -1,7 +1,8 @@
 var state;
 
 function init(spreadsheet) {
-  var useless = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
+  var applicationStateBuilder = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
+  applicationStateBuilder.build();
   preProcessSheets();//build twa mega sheets etc
   state.buildList.push(state.builders.peopleFromSpreadsheetValues);
   state.buildList.push(state.builders.eventsFromPersonCalendar);
