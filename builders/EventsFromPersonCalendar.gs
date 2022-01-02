@@ -1,12 +1,12 @@
-class Builder_EventsFromPersonCalendar {
+class Builder_EventsFromUserCalendar {
   build() {
-    state.people.forEach((person) => {
-      person.calendarEvents = this.getCalendarEventsForPerson(person);
+    state.users.forEach((user) => {
+      user.calendarEvents = this.getCalendarEventsForUser(user);
     });
   }
 
-  getCalendarEventsForPerson(person, fromDate=new Date('January 1, 2000'), toDate=new Date('January 1, 3000')) {
-    const googleCalendarEvents = person.calendar.getEvents(fromDate, toDate);
+  getCalendarEventsForUser(user, fromDate=new Date('January 1, 2000'), toDate=new Date('January 1, 3000')) {
+    const googleCalendarEvents = user.calendar.getEvents(fromDate, toDate);
     var calendarEvents = [];
     googleCalendarEvents.forEach((googleCalendarEvent) => {
       calendarEvents.push({

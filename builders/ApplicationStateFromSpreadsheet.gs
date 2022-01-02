@@ -6,11 +6,11 @@ class Builder_ApplicationStateFromSpreadsheet {
   build() {
     state = {
       spreadsheet: this.spreadsheet,
-      people: [],
+      users: [],
       scriptSheets: [],
       builders: {
-        peopleFromSpreadsheetValues: new Builder_PeopleFromSpreadsheetValues(),
-        eventsFromPersonCalendar: new Builder_EventsFromPersonCalendar(),
+        usersFromSpreadsheetValues: new Builder_UsersFromSpreadsheetValues(),
+        eventsFromUserCalendar: new Builder_EventsFromUserCalendar(),
         eventsFromSpreadsheet: new Builder_EventsFromSpreadsheet()
       },
       buildList: [],

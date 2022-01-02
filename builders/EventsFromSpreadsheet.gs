@@ -1,16 +1,16 @@
 class Builder_EventsFromSpreadsheet {
   build() {
-    state.people.forEach((person) => {
-      person.spreadsheetEvents = this.getSpreadsheetEventsForPerson(person);
+    state.users.forEach((user) => {
+      user.spreadsheetEvents = this.getSpreadsheetEventsForUser(user);
     });
   }
 
-  getSpreadsheetEventsForPerson(person) {
+  getSpreadsheetEventsForUser(user) {
     var extractionState = {
       currentWidget: '',
       events: [],
-      person: person,
-      exclusionListNames: this.getOtherPeopleNames(person),
+      user: user,
+      exclusionListNames: this.getOtherUsersNames(user),
       fillInTheBlanksDate: state.today
     }
 
@@ -26,14 +26,14 @@ class Builder_EventsFromSpreadsheet {
     return extractionState.events;
   }
 
-  getOtherPeopleNames(person) {
-    var otherPeopleNames = [];
-    state.people.forEach((possibleOther) => {
-      if(possibleOther.name != person.name) {
-        otherPeopleNames.push(possibleOther.name);
+  getOtherUsersNames(user) {
+    var otherNames = [];
+    state.users.forEach((possibleOther) => {
+      if(possibleOther.name != user.name) {
+        otherNames.push(possibleOther.name);
       }
     });
-    return otherPeopleNames;
+    return otherNames;
   }
 
   buildEventsFromWidget(sheet, widget, extractionState) {
@@ -104,7 +104,7 @@ class Builder_EventsFromSpreadsheet {
       options: {
         description: this.generateDescription(sheet, widget, extractionState, row),
         location: extractionState.currentWidget,
-        guests: extractionState.person.inviteEmail
+        guests: extractionState.user.inviteEmail
       },
       isAlreadyInCalendar: false
     };

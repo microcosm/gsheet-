@@ -4,8 +4,8 @@ function init(spreadsheet) {
   var applicationStateBuilder = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
   applicationStateBuilder.build();
   preProcessSheets();//build twa mega sheets etc
-  state.buildList.push(state.builders.peopleFromSpreadsheetValues);
-  state.buildList.push(state.builders.eventsFromPersonCalendar);
+  state.buildList.push(state.builders.usersFromSpreadsheetValues);
+  state.buildList.push(state.builders.eventsFromUserCalendar);
   state.buildList.push(state.builders.eventsFromSpreadsheet);
   state.buildList.forEach((builder) => { builder.build() });
 }

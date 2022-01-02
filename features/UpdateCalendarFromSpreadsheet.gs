@@ -6,17 +6,17 @@ class Feature_UpdateCalendarFromSpreadsheet extends Feature {
 
   execute() {
     logFeatureExecution(this.featureName);
-    state.people.forEach((person) => {
-      this.discoverMatchingEvents(person);
-      this.deleteUnmatchedCalendarEvents(person);
-      this.createUnmatchedSpreadsheetEvents(person);
+    state.users.forEach((user) => {
+      this.discoverMatchingEvents(user);
+      this.deleteUnmatchedCalendarEvents(user);
+      this.createUnmatchedSpreadsheetEvents(user);
       logNewline();
     });
   }
 
-  discoverMatchingEvents(person) {
-    person.spreadsheetEvents.forEach((spreadsheetEvent) => {
-      var matchingCalendarEvent = this.findInCalendarEvents(spreadsheetEvent, person.calendarEvents);
+  discoverMatchingEvents(user) {
+    user.spreadsheetEvents.forEach((spreadsheetEvent) => {
+      var matchingCalendarEvent = this.findInCalendarEvents(spreadsheetEvent, user.calendarEvents);
       if(matchingCalendarEvent) {
         matchingCalendarEvent.existsInSpreadsheet = true;
         spreadsheetEvent.existsInCalendar = true;
@@ -26,18 +26,18 @@ class Feature_UpdateCalendarFromSpreadsheet extends Feature {
     logNewline();
   }
 
-  deleteUnmatchedCalendarEvents(person) {
-    person.calendarEvents.forEach((calendarEvent) => {
+  deleteUnmatchedCalendarEvents(user) {
+    user.calendarEvents.forEach((calendarEvent) => {
       if(!calendarEvent.existsInSpreadsheet){
         this.deleteCalendarEvent(calendarEvent);
       }
     });
   }
 
-  createUnmatchedSpreadsheetEvents(person) {
-    person.spreadsheetEvents.forEach((spreadsheetEvent) => {
+  createUnmatchedSpreadsheetEvents(user) {
+    user.spreadsheetEvents.forEach((spreadsheetEvent) => {
       if(!spreadsheetEvent.existsInCalendar) {
-        this.createCalendarEvent(spreadsheetEvent, person.calendar);
+        this.createCalendarEvent(spreadsheetEvent, user.calendar);
       }
     });
   }
