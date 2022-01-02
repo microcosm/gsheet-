@@ -52,6 +52,3 @@ A custom Sheet accessor containing data which should be processed by a custom sc
 
 *Widget*
 A range within a Sheet representing a uniform set of labeled user interface elements, like a table or a set of controls. Many ScriptSheets have only one Widget, some have two or more which are grouped because they are conceptually related.
-
-*ScriptRange*
-The single range in a ScriptSheet containing all data which should be processed by a custom script, which may be the exact same range as a single Widget or maybe a larger range covering several Widgets.

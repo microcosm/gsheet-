@@ -37,13 +37,11 @@ class Builder_EventsFromSpreadsheet {
   }
 
   buildEventsFromWidget(sheet, widget, extractionState) {
-    const scriptRangeValues = sheet.getScriptRangeValues();
+    for(var i = 0; i < sheet.values.length; i++) {
+      const row = sheet.values[i];
 
-    for(var i = 0; i < scriptRangeValues.length; i++) {
-      const row = scriptRangeValues[i];
-
-      if(this.isWorkDateLabel(row[widget.scriptRangeColumns.workDate])) {
-        extractionState.currentWidget = scriptRangeValues[i - 1][widget.scriptRangeColumns.label];
+      if(this.isWorkDateLabel(row[widget.columns.workDate])) {
+        extractionState.currentWidget = sheet.values[i - 1][widget.columns.label];
       } else if(this.isValidEvent(sheet, row, widget, extractionState)) {
         var eventFromSpreadsheet = this.buildEventFromSheet(sheet, widget, extractionState, row);
         extractionState.events.push(eventFromSpreadsheet);
@@ -58,10 +56,10 @@ class Builder_EventsFromSpreadsheet {
   isValidEvent(sheet, row, widget, extractionState) {
     return sheet.scriptResponsiveWidgetNames.includes(extractionState.currentWidget) &&
            !this.getIsDoneOrWaiting(widget, row) &&
-           (typeof row[widget.scriptRangeColumns.noun] == 'string' && row[widget.scriptRangeColumns.noun].length > 0) &&
-           (typeof row[widget.scriptRangeColumns.verb] == 'string' && row[widget.scriptRangeColumns.verb].length > 0) &&
-           (widget.allowFillInTheBlanksDates || row[widget.scriptRangeColumns.workDate] instanceof Date) &&
-           !extractionState.exclusionListNames.includes(row[widget.scriptRangeColumns.name]) &&
+           (typeof row[widget.columns.noun] == 'string' && row[widget.columns.noun].length > 0) &&
+           (typeof row[widget.columns.verb] == 'string' && row[widget.columns.verb].length > 0) &&
+           (widget.allowFillInTheBlanksDates || row[widget.columns.workDate] instanceof Date) &&
+           !extractionState.exclusionListNames.includes(row[widget.columns.name]) &&
            (typeof customEventWidgetValidation === "undefined" || customEventWidgetValidation(row, widget))
   }
 
@@ -73,12 +71,12 @@ class Builder_EventsFromSpreadsheet {
       startDateTime = new Date(extractionState.fillInTheBlanksDate);
       endDateTime = null;
     } else {
-      const startTime = row[widget.scriptRangeColumns.startTime];
+      const startTime = row[widget.columns.startTime];
       const startTimeHours = this.getStartTimeHours(startTime);
       const startTimeMinutes = this.getStartTimeMinutes(startTime);
-      const durationHours = row[widget.scriptRangeColumns.durationHours];
+      const durationHours = row[widget.columns.durationHours];
       isAllDay = this.getIsAllDay(startTimeHours, startTimeMinutes, durationHours);
-      startDateTime = new Date(row[widget.scriptRangeColumns.workDate]);
+      startDateTime = new Date(row[widget.columns.workDate]);
       startDateTime = this.getPulledForward(startDateTime);
 
       if(isAllDay) {
@@ -97,7 +95,7 @@ class Builder_EventsFromSpreadsheet {
     }
 
     return {
-      title: row[widget.scriptRangeColumns.noun] + ': ' + row[widget.scriptRangeColumns.verb],
+      title: row[widget.columns.noun] + ': ' + row[widget.columns.verb],
       startDateTime: startDateTime,
       endDateTime: endDateTime,
       isAllDay: isAllDay,
@@ -126,7 +124,7 @@ class Builder_EventsFromSpreadsheet {
   }
 
   isFillInTheBlanks(row, widget) {
-    return widget.allowFillInTheBlanksDates && (!(row[widget.scriptRangeColumns.workDate] instanceof Date));
+    return widget.allowFillInTheBlanksDates && (!(row[widget.columns.workDate] instanceof Date));
   }
 
   getPulledForward(dateTime) {
@@ -142,13 +140,13 @@ class Builder_EventsFromSpreadsheet {
 
   getIsDoneOrWaiting(widget, row) {
     if(widget.hasDoneCol) {
-      return row[widget.scriptRangeColumns.done] === 'Yes' || row[widget.scriptRangeColumns.done] === 'Waiting';
+      return row[widget.columns.done] === 'Yes' || row[widget.columns.done] === 'Waiting';
     }
     return false;
   }
 
   generateDescription(sheet, widget, extractionState, row) {
-    const name = getNameSubstitution(row[widget.scriptRangeColumns.name]);
+    const name = getNameSubstitution(row[widget.columns.name]);
 
     return 'This event is from the "' + extractionState.currentWidget +
       '" widget' + (name ? ' for ' + name : '') +

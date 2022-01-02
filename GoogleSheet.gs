@@ -2,7 +2,6 @@ class GoogleSheet {
   constructor(sheetConfig) {
     this.config = sheetConfig;
     this.name = sheetConfig.name;
-    this.scriptRange = sheetConfig.scriptRange;//to go
     this.range = sheetConfig.range || 'A:Z';
     this.sheetRef = state.spreadsheet.getSheetByName(this.name);
     this.validate();
@@ -33,28 +32,10 @@ class ScriptSheet extends GoogleSheet {
     this.widgets = sheetConfig.widgets;
     this.triggerCols = sheetConfig.triggerCols;
     this.scriptResponsiveWidgetNames = sheetConfig.scriptResponsiveWidgetNames;
-    this.generateScriptRangeColumns();
-    this.generateScriptRangeValues();
+    this.assignValues();
   }
 
-  generateScriptRangeColumns() {
-    for(var widgetName in this.widgets) {
-      var widget = this.widgets[widgetName];
-      widget.scriptRangeColumns = {};
-      for(var columnName in widget.columns) {
-        widget.scriptRangeColumns[columnName] = widget.columns[columnName] - this.scriptRange.offsets.col;
-      }
-    }
-  }
-
-  generateScriptRangeValues() {
-    this.scriptRangeValues = this.sheetRef.getRange (
-        this.scriptRange.offsets.row, this.scriptRange.offsets.col,
-        this.scriptRange.maxRows, this.scriptRange.maxCols
-      ).getValues();
-  }
-
-  getScriptRangeValues() {
-    return this.scriptRangeValues;
+  assignValues() {
+    this.values = this.sheetRef.getDataRange().getValues();
   }
 }
