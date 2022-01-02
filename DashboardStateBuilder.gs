@@ -15,7 +15,7 @@ class DashboardStateBuilder {
         workDateLabel: 'Work date'
       },
       valuesSheet: null,
-      today: this.getTodaysDate(),
+      today: getTodaysDate(),
       execution: { lock: null, timeout: 60000 },
       log: '',
     };
@@ -26,15 +26,6 @@ class DashboardStateBuilder {
     this.buildPeople();
     this.buildCalendarEvents();
     this.buildSpreadsheetEvents();
-  }
-
-  getTodaysDate() {
-    var date = new Date();
-    date.setHours(0);
-    date.setMinutes(0);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    return date;
   }
 
   buildPeople() {

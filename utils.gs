@@ -1,12 +1,14 @@
-const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const dateNames = {
+  days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+}
 
 Date.prototype.getDayStr = function() {
-  return dayNames[this.getDay()];
+  return dateNames.days[this.getDay()];
 };
 
 Date.prototype.getMonthStr = function() {
-  return monthNames[this.getMonth()];
+  return dateNames.months[this.getMonth()];
 };
 
 Date.prototype.addDays = function(days) {
@@ -22,4 +24,13 @@ function isValidNumber(candidate) {
 
 function isValidTimeString(candidate) {
   return typeof candidate == 'string' && candidate.includes(':');
+}
+
+function getTodaysDate() {
+  var date = new Date();
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
 }
