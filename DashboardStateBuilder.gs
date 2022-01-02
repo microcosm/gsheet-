@@ -145,7 +145,7 @@ class SpreadsheetEventBuilder {
            (typeof row[widget.scriptRangeColumns.verb] == 'string' && row[widget.scriptRangeColumns.verb].length > 0) &&
            (widget.allowFillInTheBlanksDates || row[widget.scriptRangeColumns.workDate] instanceof Date) &&
            !extractionState.exclusionListNames.includes(row[widget.scriptRangeColumns.name]) &&
-           (typeof customEventWidgetValidation !== "undefined" && customEventWidgetValidation(row, widget))
+           (typeof customEventWidgetValidation === "undefined" || customEventWidgetValidation(row, widget))
   }
 
   buildEventFromSheet(sheet, widget, extractionState, row) {
