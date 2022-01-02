@@ -23,7 +23,7 @@ class ValuesSheet extends GoogleSheet {
 class ScriptSheet extends GoogleSheet {
   constructor(sheetConfig) {
     super(sheetConfig);
-    this.id = sheetConfig.id;
+    if(sheetConfig.hasOwnProperty('id')) this.id = sheetConfig.id;
     this.widgets = sheetConfig.widgets;
     this.triggerCols = sheetConfig.triggerCols;
     this.scriptResponsiveWidgetNames = sheetConfig.scriptResponsiveWidgetNames;
