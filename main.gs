@@ -3,7 +3,7 @@ var state;
 function init(spreadsheet) {
   var applicationStateBuilder = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
   applicationStateBuilder.build();
-  preProcessSheets();//build twa mega sheets etc
+  setUpSheets();
   state.buildList.push(state.builders.usersFromSpreadsheetValues);
   state.buildList.push(state.builders.eventsFromUserCalendar);
   state.buildList.push(state.builders.eventsFromSpreadsheet);
@@ -59,9 +59,14 @@ function executeFeatures() {
   }
 }
 
-function registerSheetForFeature(sheet, feature) {
-  state.scriptSheets.push(sheet);
-  feature.registerSheet(sheet);
+function registerValuesSheet(valuesSheetConfig) {
+  state.valuesSheet = new ValuesSheet(valuesSheetConfig);
+}
+
+function registerFeatureSheet(sheetConfig, feature) {
+  var scriptSheet = new ScriptSheet(sheetConfig);
+  state.scriptSheets.push(scriptSheet);
+  feature.registerSheet(scriptSheet);
 }
 
 function waitForLocks() {
