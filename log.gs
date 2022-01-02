@@ -30,6 +30,10 @@ function logLockReleased() {
   state.log += "Lock released.\n";
 }
 
+function logFeatureExecution(featureName) {
+  state.log += "Executing feature \'" + featureName + "\'\n";
+}
+
 function logNewline() {
   state.log += "\n";
 }

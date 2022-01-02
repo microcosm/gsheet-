@@ -1,5 +1,11 @@
 class Feature_UpdateCalendarFromSpreadsheet extends Feature {
+  constructor() {
+    super();
+    this.featureName = 'Update Calendar From Spreadsheet';
+  }
+
   execute() {
+    logFeatureExecution(this.featureName);
     state.people.forEach((person) => {
       this.discoverMatchingEvents(person);
       this.deleteUnmatchedCalendarEvents(person);
