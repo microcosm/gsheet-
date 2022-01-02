@@ -59,11 +59,11 @@ function executeFeatures() {
   }
 }
 
-function registerValuesSheet(valuesSheetConfig) {
-  state.valuesSheet = new ValuesSheet(valuesSheetConfig);
+function registerValuesSheet(sheetConfig) {
+  state.valuesSheet = new ValuesSheet(sheetConfig);
 }
 
-function registerFeatureSheet(sheetConfig, feature) {
+function registerFeatureSheet(feature, sheetConfig) {
   var scriptSheet = new ScriptSheet(sheetConfig);
   state.scriptSheets.push(scriptSheet);
   feature.registerSheet(scriptSheet);

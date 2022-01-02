@@ -15,7 +15,8 @@ class Builder_ApplicationStateFromSpreadsheet {
       },
       buildList: [],
       features: {
-        updateCalendarFromSpreadsheet: new Feature_UpdateCalendarFromSpreadsheet()
+        updateCalendarFromSpreadsheet: new Feature_UpdateCalendarFromSpreadsheet(),
+        replicateSheetInExternalSpreadsheet: new Feature_ReplicateSheetInExternalSpreadsheet()
       },
       executionList: [],
       texts: {

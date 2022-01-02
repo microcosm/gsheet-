@@ -30,12 +30,20 @@ class ScriptSheet extends GoogleSheet {
     super(sheetConfig);
     if(sheetConfig.hasOwnProperty('id')) this.id = sheetConfig.id;
     this.widgets = sheetConfig.widgets;
-    this.triggerCols = sheetConfig.triggerCols;
     this.scriptResponsiveWidgetNames = sheetConfig.scriptResponsiveWidgetNames;
     this.assignValues();
+    this.assignTriggerCols(sheetConfig);
   }
 
   assignValues() {
     this.values = this.sheetRef.getDataRange().getValues();
+  }
+
+  assignTriggerCols(sheetConfig) {
+    this.hasTriggerCols = false;
+    if(sheetConfig.hasOwnProperty('triggerCols')) {
+      this.triggerCols = sheetConfig.triggerCols;
+      this.hasTriggerCols = true;
+    }
   }
 }
