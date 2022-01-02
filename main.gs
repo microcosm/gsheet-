@@ -1,6 +1,12 @@
+var state;
+
 function init(spreadsheet) {
-  var stateBuilder = new DashboardStateBuilder(spreadsheet);
-  stateBuilder.build();
+  var useless = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
+  preProcessSheets();//build twa mega sheets etc
+  state.buildList.push(state.builders.peopleFromSpreadsheetValues);
+  state.buildList.push(state.builders.eventsFromPersonCalendar);
+  state.buildList.push(state.builders.eventsFromSpreadsheet);
+  state.buildList.forEach((builder) => { builder.build() });
 }
 
 function onOvernightTimer() {

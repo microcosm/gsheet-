@@ -1,11 +1,15 @@
-var state;
-
-class DashboardStateBuilder {
+class Builder_ApplicationStateFromSpreadsheet {
   constructor(spreadsheet) {
     state = {
       spreadsheet: spreadsheet,
       people: [],
       scriptSheets: [],
+      builders: {
+        peopleFromSpreadsheetValues: new Builder_PeopleFromSpreadsheetValues(),
+        eventsFromPersonCalendar: new Builder_EventsFromPersonCalendar(),
+        eventsFromSpreadsheet: new Builder_EventsFromSpreadsheet()
+      },
+      buildList: [],
       features: {
         updateCalendarFromSpreadsheet: new Feature_UpdateCalendarFromSpreadsheet()
       },
@@ -20,15 +24,10 @@ class DashboardStateBuilder {
       log: '',
     };
   }
+}
 
+class Builder_PeopleFromSpreadsheetValues {
   build() {
-    preProcessSheets();
-    this.buildPeople();
-    this.buildCalendarEvents();
-    this.buildSpreadsheetEvents();
-  }
-
-  buildPeople() {
     const peopleColumnIndex = state.valuesSheet.config.columns.people;
     const values = state.valuesSheet.getValuesOf(peopleColumnIndex);
 
@@ -46,8 +45,10 @@ class DashboardStateBuilder {
       }
     }
   }
+}
 
-  buildCalendarEvents() {
+class Builder_EventsFromPersonCalendar {
+  build() {
     state.people.forEach((person) => {
       person.calendarEvents = this.getCalendarEventsForPerson(person);
     });
@@ -73,16 +74,15 @@ class DashboardStateBuilder {
     });
     return calendarEvents;
   }
-
-  buildSpreadsheetEvents() {
-    state.people.forEach((person) => {
-      const spreadsheetEventBuilder = new SpreadsheetEventBuilder();
-      person.spreadsheetEvents = spreadsheetEventBuilder.getSpreadsheetEventsForPerson(person);
-    });
-  }
 }
 
-class SpreadsheetEventBuilder {
+class Builder_EventsFromSpreadsheet {
+  build() {
+    state.people.forEach((person) => {
+      person.spreadsheetEvents = this.getSpreadsheetEventsForPerson(person);
+    });
+  }
+
   getSpreadsheetEventsForPerson(person) {
     var extractionState = {
       currentWidget: '',
