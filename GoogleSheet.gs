@@ -1,9 +1,12 @@
 class GoogleSheet {
   constructor(sheetConfig) {
+    this.config = sheetConfig;
     this.name = sheetConfig.name;
-    this.scriptRange = sheetConfig.scriptRange;
+    this.scriptRange = sheetConfig.scriptRange;//to go
+    this.range = sheetConfig.range || 'A:Z';
     this.sheetRef = state.spreadsheet.getSheetByName(this.name);
     this.validate();
+    this.values = this.sheetRef.getRange(this.range).getValues();
   }
 
   validate() {
@@ -16,7 +19,10 @@ class GoogleSheet {
 class ValuesSheet extends GoogleSheet {
   constructor(sheetConfig) {
     super(sheetConfig);
-    this.numValuesPerPerson = 3;
+  }
+
+  getValuesOf(columnID) {
+    return this.values.map((value, index) => { return value[columnID]; });
   }
 }
 
