@@ -7,7 +7,8 @@ class Builder_ApplicationStateFromSpreadsheet {
     state = {
       spreadsheet: this.spreadsheet,
       users: [],
-      scriptSheets: [],
+      featureSheets: [],
+      valuesSheet: null,
       builders: {
         usersFromSpreadsheetValues: new Builder_UsersFromSpreadsheetValues(),
         eventsFromUserCalendar: new Builder_EventsFromUserCalendar(),
@@ -23,7 +24,6 @@ class Builder_ApplicationStateFromSpreadsheet {
         errorLabel: 'Custom script failed: ',
         workDateLabel: 'Work date'
       },
-      valuesSheet: null,
       today: getTodaysDate(),
       execution: { lock: null, timeout: 60000 },
       log: '',

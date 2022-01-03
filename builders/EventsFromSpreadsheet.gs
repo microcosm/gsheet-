@@ -14,7 +14,7 @@ class Builder_EventsFromSpreadsheet {
       fillInTheBlanksDate: state.today
     }
 
-    state.scriptSheets.forEach((sheet) => {
+    state.featureSheets.forEach((sheet) => {
       for(var widgetName in sheet.widgets) {
         var widget = sheet.widgets[widgetName];
         if(widget.hasEvents) {

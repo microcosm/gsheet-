@@ -21,7 +21,7 @@ TODO:
 
 Glossary
 --------
-The terminology used in this repo matches and extends the [standard terminology](https://developers.google.com/sheets/api/guides/concepts) used in Google Sheets, including.
+The terminology used in this repo matches and extends the [standard terminology](https://developers.google.com/sheets/api/guides/concepts) used in Google Sheets, including:
 
 *Spreadsheet*
 A Google Sheets file. The primary object in Google Sheets that can contain multiple sheets, each with structured information contained in cells.
@@ -39,16 +39,13 @@ An individual field of text or data within a sheet.
 *Row*, *Column* and *Range*
 Cells are arranged in rows and columns, and can be grouped together as a range of cells.
 
-To help shape the spreadsheet into a dashboard-like interface, the standard terms are extended with combinations and more specific terms.
+To help shape the spreadsheet into a dashboard-like interface, the standard terms are extended with combinations and more specific terms:
 
-*GoogleSheet*
-An integration class representing a Sheet within a Google Spreadsheet by wrapping access to the Google Apps Script API.
+*ValuesSheet*
+The single sheet containing user-configurable configuration values.
 
-*GoogleCalendar*
-An integration class representing a Google Calendar by wrapping access to the Google Apps Script API.
-
-*ScriptSheet*
-A custom Sheet accessor containing data which should be processed by a custom script.
+*FeatureSheet*
+A sheet to which a registered feature should be applied.
 
 *Widget*
-A range within a Sheet representing a uniform set of labeled user interface elements, like a table or a set of controls. Many ScriptSheets have only one Widget, some have two or more which are grouped because they are conceptually related.
+A range within a Sheet representing a uniform set of labeled user interface elements, like a table or a set of controls. Many sheets have only one Widget, some have two or more which are grouped because they are conceptually related and easier for users to see in one place.

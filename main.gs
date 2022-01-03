@@ -66,8 +66,8 @@ function registerValuesSheet(sheetConfig) {
 }
 
 function registerFeatureSheet(feature, sheetConfig) {
-  var sheet = new ScriptSheet(sheetConfig);
-  state.scriptSheets.push(sheet);
+  var sheet = new FeatureSheet(sheetConfig);
+  state.featureSheets.push(sheet);
   feature.registerSheet(sheet);
   return sheet;
 }

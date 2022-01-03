@@ -1,4 +1,4 @@
-class GoogleSheet {
+class Sheet {
   constructor(sheetConfig) {
     this.config = sheetConfig;
     this.name = sheetConfig.name;
@@ -15,7 +15,7 @@ class GoogleSheet {
   }
 }
 
-class ValuesSheet extends GoogleSheet {
+class ValuesSheet extends Sheet {
   constructor(sheetConfig) {
     super(sheetConfig);
   }
@@ -25,7 +25,7 @@ class ValuesSheet extends GoogleSheet {
   }
 }
 
-class ScriptSheet extends GoogleSheet {
+class FeatureSheet extends Sheet {
   constructor(sheetConfig) {
     super(sheetConfig);
     this.ensureAccessExpectations();
