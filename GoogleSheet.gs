@@ -29,21 +29,41 @@ class ScriptSheet extends GoogleSheet {
   constructor(sheetConfig) {
     super(sheetConfig);
     if(sheetConfig.hasOwnProperty('id')) this.id = sheetConfig.id;
-    this.widgets = sheetConfig.widgets;
     this.scriptResponsiveWidgetNames = sheetConfig.scriptResponsiveWidgetNames;
-    this.assignValues();
-    this.assignTriggerCols(sheetConfig);
+    this.assignWidgets();
+    this.assignTriggerCols();
+    this.getValues();
   }
 
-  assignValues() {
-    this.values = this.sheetRef.getDataRange().getValues();
-  }
+  assignWidgets() {
+    if(this.config.hasOwnProperty('widgets')) {
 
-  assignTriggerCols(sheetConfig) {
+      this.widgets = this.config.widgets;
+
+      Object.keys(this.widgets).forEach((key) => {
+        const widget = this.widgets[key];
+        if(widget.hasOwnProperty('name') && widget.name.hasOwnProperty('column')) {
+          widget.name.column = spreadsheetColumnLettersToIndex(widget.name.column);
+        }
+        if(widget.hasOwnProperty('columns')) {
+          Object.keys(widget.columns).forEach((key) => {
+            const val = widget.columns[key];
+            widget.columns[key] = spreadsheetColumnLettersToIndex(val);
+          });
+        }
+      });
+    }
+  }//need hasWidgets... and standardized access approach...
+
+  assignTriggerCols() {
     this.hasTriggerCols = false;
-    if(sheetConfig.hasOwnProperty('triggerCols')) {
-      this.triggerCols = sheetConfig.triggerCols;
+    if(this.config.hasOwnProperty('triggerCols')) {
+      this.triggerCols = this.config.triggerCols;
       this.hasTriggerCols = true;
     }
+  }
+
+  getValues() {
+    this.values = this.sheetRef.getDataRange().getValues();
   }
 }
