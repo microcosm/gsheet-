@@ -43,12 +43,11 @@ class ScriptSheet extends GoogleSheet {
       Object.keys(this.widgets).forEach((key) => {
         const widget = this.widgets[key];
         if(widget.hasOwnProperty('name') && widget.name.hasOwnProperty('column')) {
-          widget.name.column = spreadsheetColumnLettersToIndex(widget.name.column);
+          this.getArrayIndex(widget.name.column);
         }
         if(widget.hasOwnProperty('columns')) {
           Object.keys(widget.columns).forEach((key) => {
-            const val = widget.columns[key];
-            widget.columns[key] = spreadsheetColumnLettersToIndex(val);
+            this.getArrayIndex(widget.columns[key]);
           });
         }
       });
@@ -65,5 +64,15 @@ class ScriptSheet extends GoogleSheet {
 
   getValues() {
     this.values = this.sheetRef.getDataRange().getValues();
+  }
+
+  getArrayIndex(columnIdentifier){
+    if(typeof columnIdentifier === 'string') {
+      return (columnIdentifier.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)) - 1;
+    } else if(typeof columnIdentifier === 'number') {
+      return columnIdentifier;
+    }
+    logString('Unrecognized column identifier from config: ' + columnIdentifier);
+    return -1;
   }
 }

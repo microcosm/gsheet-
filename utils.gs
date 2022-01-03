@@ -38,7 +38,3 @@ function getTodaysDate() {
 function removeNewlines(str) {
   return str.replace(/(\r\n|\n|\r)/gm, ' ');
 }
-
-function spreadsheetColumnLettersToIndex(columnLetters){
-  return (columnLetters.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)) - 1;
-}
