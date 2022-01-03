@@ -6,7 +6,7 @@ function logEventFound(event, hasMatch) {
   state.log +=
     (hasMatch ? '' : '* ') +
     ' [' + event.options.location + '] ' +
-    event.title + ' ' +
+    event.title.replace(/(\r\n|\n|\r)/gm, ' ') + ' ' +
     event.startDateTime + 
     (event.isAllDay ?
       ' ALL DAY' :
