@@ -34,3 +34,7 @@ function getTodaysDate() {
   date.setMilliseconds(0);
   return date;
 }
+
+function removeNewlines(str) {
+  return str.replace(/(\r\n|\n|\r)/gm, ' ');
+}

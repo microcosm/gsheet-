@@ -12,7 +12,7 @@ function logEventFound(event, hasMatch) {
 
 function buildEventLogStr(event) {
   return '[' + event.options.location + '] ' +
-      event.title.replace(/(\r\n|\n|\r)/gm, ' ') + ' ' +
+      removeNewlines(event.title) + ' ' +
       event.startDateTime +
       (event.isAllDay ?
         ' ALL DAY' :
@@ -21,11 +21,11 @@ function buildEventLogStr(event) {
 }
 
 function logEventDeleted(event) {
-  state.log += "Deleting " + event.title + "\n";
+  state.log += "Deleting " + removeNewlines(event.title) + "\n";
 }
 
 function logEventCreated(event) {
-  state.log += "Creating " + event.title + "\n";
+  state.log += "Creating " + removeNewlines(event.title) + "\n";
 }
 
 function logLockObtained() {
