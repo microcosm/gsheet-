@@ -3,15 +3,21 @@ function logString(str) {
 }
 
 function logEventFound(event, hasMatch) {
-  state.log +=
-    (hasMatch ? '' : '* ') +
-    ' [' + event.options.location + '] ' +
-    event.title.replace(/(\r\n|\n|\r)/gm, ' ') + ' ' +
-    event.startDateTime + 
-    (event.isAllDay ?
-      ' ALL DAY' :
-      ' until ' + event.endDateTime.getHours() + ':' + event.endDateTime.getMinutes()
-    ) + '\n';
+  if(config.toggles.logAllEvents) {
+    state.log += (hasMatch ? '' : '* ') + buildEventLogStr(event);
+  } else if(!hasMatch) {
+    state.log += '* ' + buildEventLogStr(event);
+  }
+}
+
+function buildEventLogStr(event) {
+  return '[' + event.options.location + '] ' +
+      event.title.replace(/(\r\n|\n|\r)/gm, ' ') + ' ' +
+      event.startDateTime +
+      (event.isAllDay ?
+        ' ALL DAY' :
+        ' until ' + event.endDateTime.getHours() + ':' + event.endDateTime.getMinutes()
+      ) + '\n';
 }
 
 function logEventDeleted(event) {
