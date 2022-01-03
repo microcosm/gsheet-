@@ -26,8 +26,7 @@ function onSpreadsheetEdit(e) {
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   const activeColumn = e.range.columnStart;
 
-  const features = Object.values(state.features);
-  features.forEach((feature) => {
+  Object.values(state.features).forEach((feature) => {
     if(feature.isRegisteredFor(activeSheetName, activeColumn)) {
       state.executionList.push(feature);
     }
