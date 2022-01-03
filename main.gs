@@ -60,13 +60,16 @@ function executeFeatures() {
 }
 
 function registerValuesSheet(sheetConfig) {
-  state.valuesSheet = new ValuesSheet(sheetConfig);
+  var sheet = new ValuesSheet(sheetConfig);
+  state.valuesSheet = sheet;
+  return sheet;
 }
 
 function registerFeatureSheet(feature, sheetConfig) {
-  var scriptSheet = new ScriptSheet(sheetConfig);
-  state.scriptSheets.push(scriptSheet);
-  feature.registerSheet(scriptSheet);
+  var sheet = new ScriptSheet(sheetConfig);
+  state.scriptSheets.push(sheet);
+  feature.registerSheet(sheet);
+  return sheet;
 }
 
 function waitForLocks() {
