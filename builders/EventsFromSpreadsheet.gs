@@ -157,7 +157,7 @@ class Builder_EventsFromSpreadsheet {
       '" widget' + (name ? ' for ' + name : '') +
       '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + config.gsheet.id +
       '/edit?usp=sharing' +
-      (sheet.hasOwnProperty('id') ? '#gid=' + sheet.id : '') +
+      (sheet.hasId ? '#gid=' + sheet.id : '') +
       '">' + config.gsheet.name + '</a>&nbsp;&larr; Click here for more';
   }
 }
