@@ -54,13 +54,16 @@ class Builder_EventsFromSpreadsheet {
   }
 
   isValidEvent(sheet, row, widget, extractionState) {
-    return sheet.scriptResponsiveWidgetNames.includes(extractionState.currentWidget) &&
-           !this.getIsDoneOrWaiting(widget, row) &&
-           (typeof row[widget.columns.noun] == 'string' && row[widget.columns.noun].length > 0) &&
-           (typeof row[widget.columns.verb] == 'string' && row[widget.columns.verb].length > 0) &&
-           (widget.allowFillInTheBlanksDates || row[widget.columns.workDate] instanceof Date) &&
-           !extractionState.exclusionListNames.includes(row[widget.columns.name]) &&
-           (typeof customEventWidgetValidation === "undefined" || customEventWidgetValidation(row, widget))
+    var validity = {
+      isScriptResponsiveWidget: sheet.scriptResponsiveWidgetNames.includes(extractionState.currentWidget),
+      isNotDoneOrWaiting:       !this.getIsDoneOrWaiting(widget, row),
+      isNounColValidString:     typeof row[widget.columns.noun] == 'string' && row[widget.columns.noun].length > 0,
+      isVerbColValidString:     typeof row[widget.columns.verb] == 'string' && row[widget.columns.verb].length > 0,
+      isValidDate:              widget.allowFillInTheBlanksDates || row[widget.columns.workDate] instanceof Date,
+      isValidUser:              !extractionState.exclusionListNames.includes(row[widget.columns.name]),
+      isCustomValidated:        typeof customEventWidgetValidation === "undefined" || customEventWidgetValidation(row, widget)
+    };
+    return Object.values(validity).every(check => check === true);
   }
 
   buildEventFromSheet(sheet, widget, extractionState, row) {
