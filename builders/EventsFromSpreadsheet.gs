@@ -149,7 +149,8 @@ class Builder_EventsFromSpreadsheet {
   }
 
   generateDescription(sheet, widget, extractionState, row) {
-    const name = getNameSubstitution(row[widget.columns.name]);
+    var name = row[widget.columns.name];
+    name = typeof customNameSubstitution === "undefined" ? name : customNameSubstitution(name);
 
     return 'This event is from the "' + extractionState.currentWidget +
       '" widget' + (name ? ' for ' + name : '') +
