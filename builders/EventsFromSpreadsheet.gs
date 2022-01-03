@@ -17,7 +17,7 @@ class Builder_EventsFromSpreadsheet {
     state.scriptSheets.forEach((sheet) => {
       for(var widgetName in sheet.widgets) {
         var widget = sheet.widgets[widgetName];
-        if(widget.hasOwnProperty('hasEvents') && widget.hasEvents) {
+        if(widget.hasEvents) {
           this.buildEventsFromWidget(sheet, widget, extractionState);
         }
       }
@@ -127,9 +127,7 @@ class Builder_EventsFromSpreadsheet {
   }
 
   isFillInTheBlanks(row, widget) {
-    return widget.hasOwnProperty('allowFillInTheBlanksDates') &&
-      widget.allowFillInTheBlanksDates &&
-      (!(row[widget.columns.workDate] instanceof Date));
+    return widget.allowFillInTheBlanksDates && (!(row[widget.columns.workDate] instanceof Date));
   }
 
   getPulledForward(dateTime) {
@@ -144,7 +142,7 @@ class Builder_EventsFromSpreadsheet {
   }
 
   getIsDoneOrWaiting(widget, row) {
-    if(widget.hasOwnProperty('hasDoneCol') && widget.hasDoneCol) {
+    if(widget.hasDoneCol) {
       return row[widget.columns.done] === 'Yes' || row[widget.columns.done] === 'Waiting';
     }
     return false;

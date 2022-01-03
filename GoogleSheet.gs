@@ -28,9 +28,29 @@ class ValuesSheet extends GoogleSheet {
 class ScriptSheet extends GoogleSheet {
   constructor(sheetConfig) {
     super(sheetConfig);
-    this.assignPropertiesFromConfig(['id', 'triggerCols', 'widgets', 'scriptResponsiveWidgetNames']);
+    this.ensureAccessExpectations();
     this.convertColumnStringIdentifiersToArrayIndices();
     this.getValues();
+  }
+
+  ensureAccessExpectations() {
+    this.assignPropertiesFromConfig(['id', 'triggerCols', 'widgets', 'scriptResponsiveWidgetNames']);
+
+    if(this.hasWidgets) {
+      this.ensureBooleanAccessors(['hasEvents', 'hasDoneCol', 'allowFillInTheBlanksDates']);
+    }
+  }
+
+  ensureBooleanAccessors(expectedBooleanAccessors) {
+    expectedBooleanAccessors.forEach((expectedBooleanAccessor) => {
+      this.ensureBooleanAccessor(expectedBooleanAccessor);
+    });
+  }
+
+  ensureBooleanAccessor(expectedBooleanAccessor) {
+    if(!this.hasOwnProperty(expectedBooleanAccessor)) {
+      this[expectedBooleanAccessor] = false;
+    }
   }
 
   assignPropertiesFromConfig(propertyNames) {
