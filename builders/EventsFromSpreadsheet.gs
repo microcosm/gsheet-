@@ -41,7 +41,7 @@ class Builder_EventsFromSpreadsheet {
       const row = sheet.values[i];
 
       if(this.isWorkDateLabel(row[widget.columns.workDate])) {
-        extractionState.currentWidget = sheet.values[i - 1][widget.columns.label];
+        extractionState.currentWidget = sheet.values[i + widget.name.rowOffset][widget.name.column];
       } else if(this.isValidEvent(sheet, row, widget, extractionState)) {
         var eventFromSpreadsheet = this.buildEventFromSheet(sheet, widget, extractionState, row);
         extractionState.events.push(eventFromSpreadsheet);
