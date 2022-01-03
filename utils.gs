@@ -38,3 +38,7 @@ function getTodaysDate() {
 function removeNewlines(str) {
   return str.replace(/(\r\n|\n|\r)/gm, ' ');
 }
+
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

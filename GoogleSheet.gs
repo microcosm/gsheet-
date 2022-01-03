@@ -28,37 +28,46 @@ class ValuesSheet extends GoogleSheet {
 class ScriptSheet extends GoogleSheet {
   constructor(sheetConfig) {
     super(sheetConfig);
-    if(sheetConfig.hasOwnProperty('id')) this.id = sheetConfig.id;
-    this.scriptResponsiveWidgetNames = sheetConfig.scriptResponsiveWidgetNames;
-    this.assignWidgets();
-    this.assignTriggerCols();
+    this.assignPropertiesFromConfig(['id', 'triggerCols', 'widgets', 'scriptResponsiveWidgetNames']);
+    this.convertColumnStringIdentifiersToArrayIndices();
     this.getValues();
   }
 
-  assignWidgets() {
-    if(this.config.hasOwnProperty('widgets')) {
+  assignPropertiesFromConfig(propertyNames) {
+    propertyNames.forEach((propertyName) => {
+      this.assignPropertyFromConfig(propertyName);
+    });
+  }
 
-      this.widgets = this.config.widgets;
-
-      Object.keys(this.widgets).forEach((key) => {
-        const widget = this.widgets[key];
-        if(widget.hasOwnProperty('name') && widget.name.hasOwnProperty('column')) {
-          this.getArrayIndex(widget.name.column);
-        }
-        if(widget.hasOwnProperty('columns')) {
-          Object.keys(widget.columns).forEach((key) => {
-            this.getArrayIndex(widget.columns[key]);
-          });
-        }
-      });
+  assignPropertyFromConfig(propertyName) {
+    const propertyNameHasVersion = 'has' + capitalizeFirstLetter(propertyName);
+    this[propertyNameHasVersion] = false;
+    if(this.config.hasOwnProperty(propertyName)) {
+      this[propertyName] = this.config[propertyName];
+      this[propertyNameHasVersion] = true;
     }
-  }//need hasWidgets... and standardized access approach...
+  }
 
-  assignTriggerCols() {
-    this.hasTriggerCols = false;
-    if(this.config.hasOwnProperty('triggerCols')) {
-      this.triggerCols = this.config.triggerCols;
-      this.hasTriggerCols = true;
+  convertColumnStringIdentifiersToArrayIndices() {
+    if(this.hasTriggerCols) {
+      this.triggerCols = Array.from(this.triggerCols, triggerCol => this.getArrayIndex(triggerCol));
+    }
+
+    if(this.hasWidgets) {
+      for(var key in this.widgets) {
+        this.convertWidgetColumnStringIdentifiersToArrayIndices(this.widgets[key]);
+      }
+    }
+  }
+
+  convertWidgetColumnStringIdentifiersToArrayIndices(widget) {
+    if(widget.hasOwnProperty('name') && widget.name.hasOwnProperty('column')) {
+      widget.name.column = this.getArrayIndex(widget.name.column);
+    }
+    if(widget.hasOwnProperty('columns')) {
+      for(var key in widget.columns) {
+        widget.columns[key] = this.getArrayIndex(widget.columns[key]);
+      }
     }
   }
 
