@@ -12,7 +12,7 @@ class Feature_ReplicateSheetInExternalSpreadsheet extends Feature {
       var destinationSheet = destinationSpreadsheet.getSheetByName(sheet.config.destinationSheetName);
 
       this.cloneAllWithRichTextValues(sourceSheet, destinationSheet);
-      this.overwriteSingleColumnWithNonRichTextValues(sourceSheet, destinationSheet, sheet.config.nonRichTextColumnOverwrite.startRow, sheet.config.nonRichTextColumnOverwrite.column);
+      this.overwriteSingleColumnWithNonRichTextValues(sourceSheet, destinationSheet, sheet.config.nonRichTextColumnOverwrite.startRow, sheet.config.nonRichTextColumnOverwrite.column + 1);
     });
   }
 

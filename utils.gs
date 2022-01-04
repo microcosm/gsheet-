@@ -42,3 +42,11 @@ function removeNewlines(str) {
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+function isObject(value) {
+  return !!(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function isArray(value) {
+  return !!(value && typeof value === "object" && Array.isArray(value));
+}

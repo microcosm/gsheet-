@@ -10,7 +10,7 @@ class Feature {
   isRegisteredFor(sheetName, column) {
     var found = false;
     this.sheets.forEach((sheet) => {
-      if(sheet.name === sheetName && (!sheet.hasTriggerCols || sheet.triggerCols.includes(column))) {
+      if(sheet.name === sheetName && (!sheet.hasTriggerColumns || sheet.triggerColumns.includes(column))) {
         found = true;
       }
     });

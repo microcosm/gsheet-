@@ -1,10 +1,12 @@
 class Sheet {
   constructor(sheetConfig) {
     this.config = sheetConfig;
-    this.name = sheetConfig.name;
-    this.range = sheetConfig.range || 'A:Z';
+    const configProcessor = new SheetConfigProcessor(this.config);
+    configProcessor.process();
+    this.name = this.config.name;
     this.sheetRef = state.spreadsheet.getSheetByName(this.name);
     this.validate();
+    this.range = this.config.range || 'A:Z';
     this.values = this.sheetRef.getRange(this.range).getValues();
   }
 
@@ -29,12 +31,11 @@ class FeatureSheet extends Sheet {
   constructor(sheetConfig) {
     super(sheetConfig);
     this.ensureAccessExpectations();
-    this.convertColumnStringIdentifiersToArrayIndices();
     this.getValues();
   }
 
   ensureAccessExpectations() {
-    this.assignPropertiesFromConfig(['id', 'triggerCols', 'widgets', 'scriptResponsiveWidgetNames']);
+    this.assignPropertiesFromConfig(['id', 'triggerColumns', 'widgets', 'scriptResponsiveWidgetNames']);
 
     if(this.hasWidgets) {
       this.ensureBooleanAccessors(['hasEvents', 'hasDoneCol', 'allowFillInTheBlanksDates']);
@@ -68,40 +69,7 @@ class FeatureSheet extends Sheet {
     }
   }
 
-  convertColumnStringIdentifiersToArrayIndices() {
-    if(this.hasTriggerCols) {
-      this.triggerCols = Array.from(this.triggerCols, triggerCol => this.getArrayIndex(triggerCol));
-    }
-
-    if(this.hasWidgets) {
-      for(var key in this.widgets) {
-        this.convertWidgetColumnStringIdentifiersToArrayIndices(this.widgets[key]);
-      }
-    }
-  }
-
-  convertWidgetColumnStringIdentifiersToArrayIndices(widget) {
-    if(widget.hasOwnProperty('name') && widget.name.hasOwnProperty('column')) {
-      widget.name.column = this.getArrayIndex(widget.name.column);
-    }
-    if(widget.hasOwnProperty('columns')) {
-      for(var key in widget.columns) {
-        widget.columns[key] = this.getArrayIndex(widget.columns[key]);
-      }
-    }
-  }
-
   getValues() {
     this.values = this.sheetRef.getDataRange().getValues();
-  }
-
-  getArrayIndex(columnIdentifier){
-    if(typeof columnIdentifier === 'string') {
-      return (columnIdentifier.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)) - 1;
-    } else if(typeof columnIdentifier === 'number') {
-      return columnIdentifier;
-    }
-    logString('Unrecognized column identifier from config: ' + columnIdentifier);
-    return -1;
   }
 }
