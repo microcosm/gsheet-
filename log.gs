@@ -49,8 +49,10 @@ function outputLog() {
   if(config.toggles.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
 }
 
-function alertError(reason){
-  var output = state.texts.errorLabel + reason;
+function alertError(cause){
+  var output = state.texts.errorLabel + cause +
+    (cause.hasOwnProperty('stack') ? cause.stack : '');
+
   console.log(output);
   if(config.toggles.showLogAlert) SpreadsheetApp.getUi().alert(output);
 }
