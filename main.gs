@@ -1,16 +1,23 @@
 var state;
 
-function init(spreadsheet) {
+function init(spreadsheet, isRunningViaInstalledTrigger=true) {
   var applicationStateBuilder = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
   applicationStateBuilder.build();
-  setUpSheets();
-  state.buildList.push(state.builders.usersFromSpreadsheet);
-  state.buildList.push(state.builders.eventsFromUserCalendars);
-  state.buildList.push(state.builders.eventsFromSpreadsheet);
-  state.buildList.forEach((builder) => { builder.build() });
+  if(isRunningViaInstalledTrigger) {
+    setUpSheets();
+    state.buildList.push(state.builders.usersFromSpreadsheet);
+    state.buildList.push(state.builders.eventsFromUserCalendars);
+    state.buildList.push(state.builders.eventsFromSpreadsheet);
+    state.buildList.forEach((builder) => { builder.build() });
+  }
+  return applicationStateBuilder;
 }
 
+/* Installed Triggers */
 function onSpreadsheetOpen() {
+  applicationStateBuilder = init(SpreadsheetApp.openById(config.gsheet.id));
+  applicationStateBuilder.buildForUI();
+  state.menu.onSpreadsheetOpen();
   executeFeaturesForEvent(Event.onSpreadsheetOpen);
 }
 
@@ -29,15 +36,23 @@ function onSpreadsheetEdit(e) {
 }
 
 function onCalendarEdit() {
+  init(SpreadsheetApp.openById(config.gsheet.id));
   executeFeaturesForEvent(Event.onCalendarEdit);
 }
 
 function onOvernightTimer() {
+  init(SpreadsheetApp.openById(config.gsheet.id));
   executeFeaturesForEvent(Event.onOvernightTimer);
 }
 
+/* Simple Triggers */
+function onSelectionChange() {
+  applicationStateBuilder = init(SpreadsheetApp.getActiveSpreadsheet(), false);
+  applicationStateBuilder.buildForUI();
+  state.menu.checkForSheetChange();
+}
+
 function executeFeaturesForEvent(event) {
-  init(SpreadsheetApp.openById(config.gsheet.id));
   for(key in state.features) {
     const feature = state.features[key];
     if(feature.respondsTo(event)) {

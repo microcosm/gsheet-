@@ -27,7 +27,12 @@ class Builder_ApplicationStateFromSpreadsheet {
       },
       today: getTodaysDate(),
       execution: { lock: null, timeout: 60000 },
+      userProperties: PropertiesService.getUserProperties(),
       log: '',
     };
+  }
+
+  buildForUI() {
+    state.menu = new Menu();
   }
 }
