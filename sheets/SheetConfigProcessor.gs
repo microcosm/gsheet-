@@ -23,7 +23,7 @@ class SheetConfigProcessor {
   replaceColumnValuesOnSelectedObjectProperties(obj) {
     for(const key in obj) {
       if(this.isColumnKey(key)) {
-        obj[key] = this.getIndexFromColumnStrings(obj[key]);
+        obj[key] = this.getIndexFromColumnString(obj[key]);
       }
       this.replaceColumnStringIdentifiersWithIndices(obj[key], obj, key);
     }
@@ -31,16 +31,21 @@ class SheetConfigProcessor {
 
   replaceColumnValuesOnAllObjectProperties(obj) {
     for(const key in obj) {
-      obj[key] = this.getIndexFromColumnStrings(obj[key]);
+      const val = obj[key];
+      if(isString(val)) {
+        obj[key] = this.getIndexFromColumnString(val);
+      } else {
+        this.replaceColumnStringIdentifiersWithIndices(obj[key], obj, key);
+      }
     }
   }
 
   replaceColumnValuesOnAllArrayElements(obj, arrayProperty) {
-    obj[arrayProperty] = Array.from(obj[arrayProperty], arrayElement => this.getIndexFromColumnStrings(arrayElement));
+    obj[arrayProperty] = Array.from(obj[arrayProperty], arrayElement => this.getIndexFromColumnString(arrayElement));
   }
 
-  getIndexFromColumnStrings(columnIdentifier){
-    if(typeof columnIdentifier === 'string') {
+  getIndexFromColumnString(columnIdentifier){
+    if(isString(columnIdentifier)) {
       return (columnIdentifier.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)) - 1;
     }
     return columnIdentifier;
@@ -74,7 +79,12 @@ class SheetConfigProcessor {
 
   replaceRowValuesOnAllObjectProperties(obj) {
     for(const key in obj) {
-      obj[key] = this.getIndexFromRowNumber(obj[key]);
+      const val = obj[key];
+      if(isNumber(val)) {
+        obj[key] = this.getIndexFromRowNumber(val);
+      } else {
+        this.replaceRowNumberIdentifiersWithIndices(obj[key], obj, key);
+      }
     }
   }
 
@@ -83,7 +93,7 @@ class SheetConfigProcessor {
   }
 
   getIndexFromRowNumber(rowNumber){
-    if(typeof rowNumber === 'number' && rowNumber > 0) {
+    if(isNumber(rowNumber) && rowNumber > 0) {
       return rowNumber - 1;
     }
     return rowNumber;

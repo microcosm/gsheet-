@@ -50,3 +50,11 @@ function isObject(value) {
 function isArray(value) {
   return !!(value && typeof value === "object" && Array.isArray(value));
 }
+
+function isNumber(value) {
+  return !!(value && typeof value === "number" && Number.isInteger(value));
+}
+
+function isString(value) {
+  return !!(value && typeof value === "string");
+}
