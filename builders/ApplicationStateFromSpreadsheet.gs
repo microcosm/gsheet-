@@ -7,6 +7,7 @@ class Builder_ApplicationStateFromSpreadsheet {
     state = {
       spreadsheet: this.spreadsheet,
       users: [],
+      sheets: [],
       featureSheets: [],
       valuesSheet: null,
       builders: {

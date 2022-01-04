@@ -77,16 +77,24 @@ function executeFeatures() {
   }
 }
 
-function registerValuesSheet(sheetConfig) {
-  var sheet = new ValuesSheet(sheetConfig);
+function registerValuesSheet(config) {
+  var sheet = new ValuesSheet(config);
   state.valuesSheet = sheet;
   return sheet;
 }
 
-function registerFeatureSheet(feature, sheetConfig) {
-  var sheet = new FeatureSheet(sheetConfig);
+function registerFeatureSheet(config, features) {
+  var sheet = new FeatureSheet(config);
   state.featureSheets.push(sheet);
-  feature.registerSheet(sheet);
+  features.forEach((feature) => {
+    feature.registerSheet(sheet);
+  });
+  return sheet;
+}
+
+function registerSheet(config) {
+  var sheet = new Sheet(config);
+  state.sheets.push(sheet);
   return sheet;
 }
 
