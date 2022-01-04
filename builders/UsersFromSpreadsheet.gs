@@ -1,4 +1,4 @@
-class Builder_UsersFromSpreadsheetValues {
+class Builder_UsersFromSpreadsheet {
   build() {
     const usersColumnIndex = state.valuesSheet.config.columnIndices.users;
     const values = state.valuesSheet.getValuesOf(usersColumnIndex);

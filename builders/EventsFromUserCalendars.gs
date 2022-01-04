@@ -1,4 +1,4 @@
-class Builder_EventsFromUserCalendar {
+class Builder_EventsFromUserCalendars {
   build() {
     state.users.forEach((user) => {
       user.calendarEvents = this.getCalendarEventsForUser(user);

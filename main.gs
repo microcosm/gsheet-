@@ -4,8 +4,8 @@ function init(spreadsheet) {
   var applicationStateBuilder = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
   applicationStateBuilder.build();
   setUpSheets();
-  state.buildList.push(state.builders.usersFromSpreadsheetValues);
-  state.buildList.push(state.builders.eventsFromUserCalendar);
+  state.buildList.push(state.builders.usersFromSpreadsheet);
+  state.buildList.push(state.builders.eventsFromUserCalendars);
   state.buildList.push(state.builders.eventsFromSpreadsheet);
   state.buildList.forEach((builder) => { builder.build() });
 }

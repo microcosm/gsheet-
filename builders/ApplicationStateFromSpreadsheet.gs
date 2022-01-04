@@ -10,14 +10,15 @@ class Builder_ApplicationStateFromSpreadsheet {
       featureSheets: [],
       valuesSheet: null,
       builders: {
-        usersFromSpreadsheetValues: new Builder_UsersFromSpreadsheetValues(),
-        eventsFromUserCalendar: new Builder_EventsFromUserCalendar(),
-        eventsFromSpreadsheet: new Builder_EventsFromSpreadsheet()
+        eventsFromSpreadsheet: new Builder_EventsFromSpreadsheet(),
+        eventsFromUserCalendars: new Builder_EventsFromUserCalendars(),
+        usersFromSpreadsheet: new Builder_UsersFromSpreadsheet()
       },
       buildList: [],
       features: {
+        replicateSheetInExternalSpreadsheet: new Feature_ReplicateSheetInExternalSpreadsheet(),
         updateCalendarFromSpreadsheet: new Feature_UpdateCalendarFromSpreadsheet(),
-        replicateSheetInExternalSpreadsheet: new Feature_ReplicateSheetInExternalSpreadsheet()
+        updateSpreadsheetFromCalendar: new Feature_UpdateSpreadsheetFromCalendar()
       },
       executionList: [],
       texts: {
