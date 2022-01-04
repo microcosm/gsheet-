@@ -1,6 +1,6 @@
 class Builder_UsersFromSpreadsheet {
   build() {
-    const usersColumnIndex = state.valuesSheet.config.columnIndices.users;
+    const usersColumnIndex = state.valuesSheet.config.usersColumnIndex;
     const values = state.valuesSheet.getValuesOf(usersColumnIndex);
 
     const numValuesPerUser = 3;

@@ -23,7 +23,11 @@ class ValuesSheet extends Sheet {
   }
 
   getValuesOf(columnID) {
-    return this.values.map((value, index) => { return value[columnID]; });
+    return this.values.map((value) => { return value[columnID]; });
+  }
+
+  getValueOf(rowId, columnID) {
+    return this.values[rowId][columnID];
   }
 }
 

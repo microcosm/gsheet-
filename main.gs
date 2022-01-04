@@ -18,7 +18,8 @@ function onOvernightTimer() {
 
 function onCalendarEdit() {
   init(SpreadsheetApp.openById(config.gsheet.id));
-  if(typeof customOnEdit !== "undefined") customOnEdit();
+  state.executionList.push(state.features.updateSpreadsheetFromCalendar);
+  executeFeatures();
 }
 
 function onSpreadsheetEdit(e) {

@@ -28,10 +28,20 @@ function isValidTimeString(candidate) {
 
 function getTodaysDate() {
   var date = new Date();
+  return setToMidnight(date);
+}
+
+function setToMidnight(date) {
   date.setHours(0);
   date.setMinutes(0);
   date.setSeconds(0);
   date.setMilliseconds(0);
+  return date;
+}
+
+function getNYearsFromTodaysDate(n) {
+  const date = getTodaysDate();
+  date.setFullYear(date.getFullYear() + n);
   return date;
 }
 
@@ -57,4 +67,8 @@ function isNumber(value) {
 
 function isString(value) {
   return !!(value && typeof value === "string");
+}
+
+function isDate(value) {
+  return !!(value && value instanceof Date);
 }
