@@ -1,9 +1,9 @@
 var state;
 
-function init(spreadsheet, isRunningViaInstalledTrigger=true) {
+function init(spreadsheet, setUpFeatures=true) {
   var applicationStateBuilder = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
   applicationStateBuilder.build();
-  if(isRunningViaInstalledTrigger) {
+  if(setUpFeatures) {
     setUpSheets();
     state.buildList.push(state.builders.usersFromSpreadsheet);
     state.buildList.push(state.builders.eventsFromUserCalendars);
@@ -15,7 +15,7 @@ function init(spreadsheet, isRunningViaInstalledTrigger=true) {
 
 /* Installed Triggers */
 function onSpreadsheetOpen() {
-  applicationStateBuilder = init(SpreadsheetApp.openById(config.gsheet.id));
+  applicationStateBuilder = init(SpreadsheetApp.openById(config.gsheet.id), false);
   applicationStateBuilder.buildForUI();
   state.menu.onSpreadsheetOpen();
   executeFeaturesForEvent(Event.onSpreadsheetOpen);

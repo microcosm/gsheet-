@@ -20,7 +20,7 @@ class Menu {
   }
 
   onSpreadsheetOpen() {
-    saveActiveSheet();
+    this.saveActiveSheet();
   }
 
   onSheetChange() {
