@@ -8,7 +8,6 @@ class Builder_ApplicationStateFromSpreadsheet {
       spreadsheet: this.spreadsheet,
       users: [],
       sheets: [],
-      featureSheets: [],
       valuesSheet: null,
       builders: {
         eventsFromSpreadsheet: new Builder_EventsFromSpreadsheet(),

@@ -85,7 +85,7 @@ function registerValuesSheet(config) {
 
 function registerFeatureSheet(config, features) {
   var sheet = new FeatureSheet(config);
-  state.featureSheets.push(sheet);
+  state.sheets.push(sheet);
   features.forEach((feature) => {
     feature.registerSheet(sheet);
   });
@@ -93,7 +93,7 @@ function registerFeatureSheet(config, features) {
 }
 
 function registerSheet(config) {
-  var sheet = new Sheet(config);
+  var sheet = new FeatureSheet(config, []);
   state.sheets.push(sheet);
   return sheet;
 }
