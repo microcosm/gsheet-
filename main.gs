@@ -10,16 +10,8 @@ function init(spreadsheet) {
   state.buildList.forEach((builder) => { builder.build() });
 }
 
-function onOvernightTimer() {
-  init(SpreadsheetApp.openById(config.gsheet.id));
-  state.executionList.push(state.features.updateCalendarFromSpreadsheet);
-  executeFeatures();
-}
-
-function onCalendarEdit() {
-  init(SpreadsheetApp.openById(config.gsheet.id));
-  state.executionList.push(state.features.updateSpreadsheetFromCalendar);
-  executeFeatures();
+function onSpreadsheetOpen() {
+  executeFeaturesForEvent(Event.onSpreadsheetOpen);
 }
 
 function onSpreadsheetEdit(e) {
@@ -27,21 +19,32 @@ function onSpreadsheetEdit(e) {
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   const activeColumn = e.range.columnStart;
 
-  Object.values(state.features).forEach((feature) => {
-    if(feature.isRegisteredFor(activeSheetName, activeColumn)) {
+  for(key in state.features) {
+    const feature = state.features[key];
+    if(feature.respondsTo(Event.onSpreadsheetEdit) && feature.isRegisteredFor(activeSheetName, activeColumn)) {
       state.executionList.push(feature);
     }
-  });
-
+  }
   executeFeatures();
 }
 
-function onSpreadsheetOpen() {
-  if(typeof customOnOpen !== "undefined") {
-    init(SpreadsheetApp.openById(config.gsheet.id));
-    customOnOpen();
-    executeFeatures();
+function onCalendarEdit() {
+  executeFeaturesForEvent(Event.onCalendarEdit);
+}
+
+function onOvernightTimer() {
+  executeFeaturesForEvent(Event.onOvernightTimer);
+}
+
+function executeFeaturesForEvent(event) {
+  init(SpreadsheetApp.openById(config.gsheet.id));
+  for(key in state.features) {
+    const feature = state.features[key];
+    if(feature.respondsTo(event)) {
+      state.executionList.push(feature);
+    }
   }
+  executeFeatures();
 }
 
 function executeFeatures() {

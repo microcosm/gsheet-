@@ -1,6 +1,14 @@
+const Event = {
+  onSpreadsheetOpen: 'onSpreadsheetOpen',
+  onSpreadsheetEdit: 'onSpreadsheetEdit',
+  onCalendarEdit:    'onCalendarEdit',
+  onOvernightTimer:  'onOvernightTimer'
+};
+
 class Feature {
   constructor() {
     this.sheets = [];
+    this.responseCapabilities = [];
   }
 
   registerSheet(sheet) {
@@ -15,5 +23,15 @@ class Feature {
       }
     });
     return found;
+  }
+
+  addResponseCapability(event) {
+    if(!this.respondsTo(event)) {
+      this.responseCapabilities.push(event);
+    }
+  }
+
+  respondsTo(event) {
+    return this.responseCapabilities.includes(event);
   }
 }

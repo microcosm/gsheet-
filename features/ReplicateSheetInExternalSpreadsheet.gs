@@ -2,6 +2,7 @@ class Feature_ReplicateSheetInExternalSpreadsheet extends Feature {
   constructor() {
     super();
     this.featureName = 'Replicate Sheet In External Spreadsheet';
+    this.addResponseCapability(Event.onSpreadsheetEdit);
   }
 
   execute() {
