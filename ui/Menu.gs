@@ -1,29 +1,23 @@
 class Menu {
-  constructor() {
-  	this.userPropertyKey = 'MenuUpdater_activeSheet';
-    this.menu = SpreadsheetApp.getUi().createMenu(config.gsheet.name);
-  }
-
-  saveActiveSheet(sheetName=false) {
-    const currentActiveSheet = sheetName ? sheetName : state.spreadsheet.getActiveSheet().getName();
-    state.userProperties.setProperty(this.userPropertyKey, currentActiveSheet);
-  }
-
-  checkForSheetChange() {
-    var currentActiveSheetName = state.spreadsheet.getActiveSheet().getName();
-    var lastKnownActiveSheetName = state.userProperties.getProperty(this.userPropertyKey);
-
-    if (currentActiveSheetName !== lastKnownActiveSheetName) {
-      this.saveActiveSheet(currentActiveSheetName);
-      this.onSheetChange();
-    }
+  constructor(uiRef) {
+    this.menuName = '⚙️' + config.gsheet.name;
+    this.uiRef = uiRef;
   }
 
   onSpreadsheetOpen() {
-    this.saveActiveSheet();
+    this.uiRef
+      .createMenu(this.menuName)
+      .addItem('Guidance', 'onShowGuidanceDialog')
+      .addToUi();
   }
 
-  onSheetChange() {
-    console.log('SHEET CHANGED TO ' + state.userProperties.getProperty(this.userPropertyKey));
+  onSheetChange(activeSheetName) {
+    this.activeSheetName = activeSheetName;
+    //Keeping this method here for testing, but so far it's not always reliably called
+    //This bug is *also* getting per-sheet dynamic menus: https://issuetracker.google.com/issues/202989059
+  }
+
+  onShowGuidanceDialog() {
+    this.uiRef.alert(state.defaultAlertMessage);
   }
 }

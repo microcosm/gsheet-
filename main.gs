@@ -1,8 +1,9 @@
 /* Installed Triggers */
-function onSpreadsheetOpen() {
+function onSpreadsheetOpen(e) {
   const stateManager = new ApplicationStateManager(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildUserInterfaceState();
-  state.menu.onSpreadsheetOpen();
+  state.ui.onSpreadsheetOpen();
+  endEventResponse();
 }
 
 function onSpreadsheetEdit(e) {
@@ -19,25 +20,29 @@ function onSpreadsheetEdit(e) {
     }
   }
   executeFeatures();
+  endEventResponse();
 }
 
 function onCalendarEdit() {
   const stateManager = new ApplicationStateManager(SpreadsheetApp.openById(config.gsheet.id));
   stateManager.buildSheetState().buildFeatureState();
   executeFeaturesForEvent(Event.onCalendarEdit);
+  endEventResponse();
 }
 
 function onOvernightTimer() {
   const stateManager = new ApplicationStateManager(SpreadsheetApp.openById(config.gsheet.id));
   stateManager.buildSheetState().buildFeatureState();
   executeFeaturesForEvent(Event.onOvernightTimer);
+  endEventResponse();
 }
 
 /* Simple Triggers */
 function onSelectionChange() {
   const stateManager = new ApplicationStateManager(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildUserInterfaceState();
-  state.menu.checkForSheetChange();
+  state.ui.onSelectionChange();
+  endEventResponse();
 }
 
 function executeFeaturesForEvent(event) {
@@ -48,6 +53,14 @@ function executeFeaturesForEvent(event) {
     }
   }
   executeFeatures();
+}
+
+/* Application Callbacks */
+function onShowGuidanceDialog() {
+  const stateManager = new ApplicationStateManager(SpreadsheetApp.getActiveSpreadsheet());
+  stateManager.buildUserInterfaceState();
+  state.ui.menu.onShowGuidanceDialog();
+  endEventResponse();
 }
 
 function executeFeatures() {
@@ -61,7 +74,6 @@ function executeFeatures() {
     alertError(exception);
   } finally {
     releaseLock();
-    outputLog();
   }
 }
 
@@ -101,4 +113,8 @@ function releaseLock() {
   SpreadsheetApp.flush();
   state.execution.lock.releaseLock();
   logLockReleased();
+}
+
+function endEventResponse() {
+  outputLog();
 }

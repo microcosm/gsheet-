@@ -52,7 +52,8 @@ class ApplicationStateManager {
 
   buildUserInterfaceState() {
     this.appendState({
-      menu: new Menu()
+      ui: new UserInterface(),
+      defaultAlertMessage: 'This menu option can\'t be used on this sheet'
     });
     return this;
   }
