@@ -1,28 +1,14 @@
-var state;
-
-function init(spreadsheet, setUpFeatures=true) {
-  var applicationStateBuilder = new Builder_ApplicationStateFromSpreadsheet(spreadsheet);
-  applicationStateBuilder.build();
-  if(setUpFeatures) {
-    setUpSheets();
-    state.buildList.push(state.builders.usersFromSpreadsheet);
-    state.buildList.push(state.builders.eventsFromUserCalendars);
-    state.buildList.push(state.builders.eventsFromSpreadsheet);
-    state.buildList.forEach((builder) => { builder.build() });
-  }
-  return applicationStateBuilder;
-}
-
 /* Installed Triggers */
 function onSpreadsheetOpen() {
-  applicationStateBuilder = init(SpreadsheetApp.openById(config.gsheet.id), false);
-  applicationStateBuilder.buildForUI();
+  const stateManager = new ApplicationStateManager(SpreadsheetApp.getActiveSpreadsheet());
+  stateManager.buildUserInterfaceState();
   state.menu.onSpreadsheetOpen();
-  executeFeaturesForEvent(Event.onSpreadsheetOpen);
 }
 
 function onSpreadsheetEdit(e) {
-  init(SpreadsheetApp.getActiveSpreadsheet());
+  const stateManager = new ApplicationStateManager(SpreadsheetApp.getActiveSpreadsheet());
+  stateManager.buildSheetState().buildFeatureState();
+
   const activeSheetName = state.spreadsheet.getActiveSheet().getName();
   const activeColumn = e.range.columnStart;
 
@@ -36,19 +22,21 @@ function onSpreadsheetEdit(e) {
 }
 
 function onCalendarEdit() {
-  init(SpreadsheetApp.openById(config.gsheet.id));
+  const stateManager = new ApplicationStateManager(SpreadsheetApp.openById(config.gsheet.id));
+  stateManager.buildSheetState().buildFeatureState();
   executeFeaturesForEvent(Event.onCalendarEdit);
 }
 
 function onOvernightTimer() {
-  init(SpreadsheetApp.openById(config.gsheet.id));
+  const stateManager = new ApplicationStateManager(SpreadsheetApp.openById(config.gsheet.id));
+  stateManager.buildSheetState().buildFeatureState();
   executeFeaturesForEvent(Event.onOvernightTimer);
 }
 
 /* Simple Triggers */
 function onSelectionChange() {
-  applicationStateBuilder = init(SpreadsheetApp.getActiveSpreadsheet(), false);
-  applicationStateBuilder.buildForUI();
+  const stateManager = new ApplicationStateManager(SpreadsheetApp.getActiveSpreadsheet());
+  stateManager.buildUserInterfaceState();
   state.menu.checkForSheetChange();
 }
 

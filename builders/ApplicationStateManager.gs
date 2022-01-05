@@ -1,10 +1,14 @@
-class Builder_ApplicationStateFromSpreadsheet {
+var state;
+
+class ApplicationStateManager {
   constructor(spreadsheet) {
     this.spreadsheet = spreadsheet;
+    state = {};
+    this.buildInitialState();
   }
 
-  build() {
-    state = {
+  buildInitialState() {
+    this.appendState({
       spreadsheet: this.spreadsheet,
       users: [],
       sheets: [],
@@ -28,11 +32,32 @@ class Builder_ApplicationStateFromSpreadsheet {
       today: getTodaysDate(),
       execution: { lock: null, timeout: 60000 },
       userProperties: PropertiesService.getUserProperties(),
-      log: '',
-    };
+      log: ''
+    });
+    return this;
   }
 
-  buildForUI() {
-    state.menu = new Menu();
+  buildSheetState() {
+    buildSheets();
+    return this;
+  }
+
+  buildFeatureState() {
+    state.buildList.push(state.builders.usersFromSpreadsheet);
+    state.buildList.push(state.builders.eventsFromUserCalendars);
+    state.buildList.push(state.builders.eventsFromSpreadsheet);
+    state.buildList.forEach((builder) => { builder.build() });
+    return this;
+  }
+
+  buildUserInterfaceState() {
+    this.appendState({
+      menu: new Menu()
+    });
+    return this;
+  }
+
+  appendState(moreState) {
+    state = Object.assign(state, moreState);
   }
 }
