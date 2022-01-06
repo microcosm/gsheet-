@@ -48,22 +48,6 @@ class FeatureSheet extends Sheet {
 
   ensureAccessExpectations() {
     this.assignPropertiesFromConfig(['id', 'triggerColumns', 'widgets', 'scriptResponsiveWidgetNames']);
-
-    if(this.hasWidgets) {
-      this.ensureBooleanAccessors(['hasEvents', 'hasDoneCol', 'allowFillInTheBlanksDates']);
-    }
-  }
-
-  ensureBooleanAccessors(expectedBooleanAccessors) {
-    expectedBooleanAccessors.forEach((expectedBooleanAccessor) => {
-      this.ensureBooleanAccessor(expectedBooleanAccessor);
-    });
-  }
-
-  ensureBooleanAccessor(expectedBooleanAccessor) {
-    if(!this.hasOwnProperty(expectedBooleanAccessor)) {
-      this[expectedBooleanAccessor] = false;
-    }
   }
 
   assignPropertiesFromConfig(propertyNames) {
