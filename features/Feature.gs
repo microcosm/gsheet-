@@ -6,23 +6,13 @@ const Event = {
 };
 
 class Feature {
-  constructor() {
-    this.sheets = [];
+  constructor(sheet) {
+    this.sheet = sheet;
     this.responseCapabilities = [];
   }
 
-  registerSheet(sheet) {
-    this.sheets.push(sheet);
-  }
-
   isRegisteredFor(sheetName, column) {
-    var found = false;
-    this.sheets.forEach((sheet) => {
-      if(sheet.name === sheetName && (!sheet.hasTriggerColumns || sheet.triggerColumns.includes(column))) {
-        found = true;
-      }
-    });
-    return found;
+    return this.sheet.name === sheetName && (!this.sheet.hasTriggerColumns || this.sheet.triggerColumns.includes(column));
   }
 
   addResponseCapability(event) {

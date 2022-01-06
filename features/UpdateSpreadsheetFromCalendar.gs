@@ -1,16 +1,14 @@
-class Feature_UpdateSpreadsheetFromCalendar extends Feature {
-  constructor() {
-    super();
+class UpdateSpreadsheetFromCalendar extends Feature {
+  constructor(sheet) {
+    super(sheet);
     this.featureName = 'Update Spreadsheet From Calendar';
     this.addResponseCapability(Event.onCalendarEdit);
   }
 
   execute() {
     logFeatureExecution(this.featureName);
-    this.sheets.forEach((sheet) => {
-      this.buildCalendarEvents(sheet.config.fromDate, sheet.config.eventsToNumYearsFromNow);
-      this.updateSheet(sheet);
-    });
+    this.buildCalendarEvents(this.sheet.config.fromDate, this.sheet.config.eventsToNumYearsFromNow);
+    this.updateSheet(this.sheet);
   }
 
   getCalendar() {

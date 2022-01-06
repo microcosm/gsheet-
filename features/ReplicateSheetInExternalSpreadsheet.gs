@@ -1,19 +1,17 @@
-class Feature_ReplicateSheetInExternalSpreadsheet extends Feature {
-  constructor() {
-    super();
+class ReplicateSheetInExternalSpreadsheet extends Feature {
+  constructor(sheet) {
+    super(sheet);
     this.featureName = 'Replicate Sheet In External Spreadsheet';
     this.addResponseCapability(Event.onSpreadsheetEdit);
   }
 
   execute() {
     logFeatureExecution(this.featureName);
-    this.sheets.forEach((sheet) => {
-      const sourceSheet = sheet.sheetRef;
-      const destinationSpreadsheet = SpreadsheetApp.openById(sheet.config.destinationSpreadsheetID);
-      const destinationSheet = destinationSpreadsheet.getSheetByName(sheet.config.destinationSheetName);
-      this.cloneAllWithRichTextValues(sourceSheet, destinationSheet);
-      this.overwriteSingleColumnWithNonRichTextValues(sourceSheet, destinationSheet, sheet.config.nonRichTextColumnOverwrite);
-    });
+    const sourceSheet = this.sheet.sheetRef;
+    const destinationSpreadsheet = SpreadsheetApp.openById(this.sheet.config.destinationSpreadsheetID);
+    const destinationSheet = destinationSpreadsheet.getSheetByName(this.sheet.config.destinationSheetName);
+    this.cloneAllWithRichTextValues(sourceSheet, destinationSheet);
+    this.overwriteSingleColumnWithNonRichTextValues(sourceSheet, destinationSheet, this.sheet.config.nonRichTextColumnOverwrite);
   }
 
   cloneAllWithRichTextValues(sourceSheet, destinationSheet) {

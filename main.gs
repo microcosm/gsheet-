@@ -9,17 +9,7 @@ function onSpreadsheetOpen(e) {
 function onSpreadsheetEdit(e) {
   const stateManager = new ApplicationStateManager(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildSheetState().buildFeatureState();
-
-  const activeSheetName = state.spreadsheet.getActiveSheet().getName();
-  const activeColumn = e.range.columnStart;
-
-  for(key in state.features) {
-    const feature = state.features[key];
-    if(feature.respondsTo(Event.onSpreadsheetEdit) && feature.isRegisteredFor(activeSheetName, activeColumn)) {
-      state.executionList.push(feature);
-    }
-  }
-  executeFeatures();
+  executeFeaturesForEvent(Event.onSpreadsheetEdit, e.source.getActiveSheet().getName(), e.range.columnStart);
   endEventResponse();
 }
 
@@ -45,11 +35,11 @@ function onSelectionChange() {
   endEventResponse();
 }
 
-function executeFeaturesForEvent(event) {
-  for(key in state.features) {
-    const feature = state.features[key];
-    if(feature.respondsTo(event)) {
-      state.executionList.push(feature);
+function executeFeaturesForEvent(event, sheetName=false, column=false) {
+  for(key in state.features.registered) {
+    const feature = state.features.registered[key];
+    if(feature.respondsTo(event) && (!sheetName || !column || feature.isRegisteredFor(sheetName, column))) {
+      state.features.executions.push(feature);
     }
   }
   executeFeatures();
@@ -69,7 +59,7 @@ function executeFeatures() {
     return;
   }
   try {
-    state.executionList.forEach((feature) => { feature.execute() });
+    state.features.executions.forEach((feature) => { feature.execute() });
   } catch(exception) {
     alertError(exception);
   } finally {
@@ -83,17 +73,8 @@ function registerValuesSheet(config) {
   return sheet;
 }
 
-function registerFeatureSheet(config, features) {
-  var sheet = new FeatureSheet(config);
-  state.sheets.push(sheet);
-  features.forEach((feature) => {
-    feature.registerSheet(sheet);
-  });
-  return sheet;
-}
-
-function registerSheet(config) {
-  var sheet = new FeatureSheet(config, []);
+function registerFeatureSheet(config) {
+  const sheet = new FeatureSheet(config);
   state.sheets.push(sheet);
   return sheet;
 }

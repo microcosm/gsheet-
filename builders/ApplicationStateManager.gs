@@ -14,17 +14,13 @@ class ApplicationStateManager {
       sheets: [],
       valuesSheet: null,
       builders: {
-        eventsFromSpreadsheet: new Builder_EventsFromSpreadsheet(),
-        eventsFromUserCalendars: new Builder_EventsFromUserCalendars(),
         usersFromSpreadsheet: new Builder_UsersFromSpreadsheet()
       },
       buildList: [],
       features: {
-        replicateSheetInExternalSpreadsheet: new Feature_ReplicateSheetInExternalSpreadsheet(),
-        updateCalendarFromSpreadsheet: new Feature_UpdateCalendarFromSpreadsheet(),
-        updateSpreadsheetFromCalendar: new Feature_UpdateSpreadsheetFromCalendar()
+        registered: [],
+        executions: []
       },
-      executionList: [],
       texts: {
         errorLabel: 'Custom script failed: ',
         workDateLabel: 'Work date'
@@ -44,8 +40,6 @@ class ApplicationStateManager {
 
   buildFeatureState() {
     state.buildList.push(state.builders.usersFromSpreadsheet);
-    state.buildList.push(state.builders.eventsFromUserCalendars);
-    state.buildList.push(state.builders.eventsFromSpreadsheet);
     state.buildList.forEach((builder) => { builder.build() });
     return this;
   }

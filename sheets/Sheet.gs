@@ -1,6 +1,6 @@
 class Sheet {
-  constructor(sheetConfig) {
-    this.config = sheetConfig;
+  constructor(config) {
+    this.config = config;
     const configProcessor = new SheetConfigProcessor(this.config);
     configProcessor.process();
     this.name = this.config.name;
@@ -17,8 +17,8 @@ class Sheet {
 }
 
 class ValuesSheet extends Sheet {
-  constructor(sheetConfig) {
-    super(sheetConfig);
+  constructor(config) {
+    super(config);
     this.buildValues();
   }
 
@@ -36,8 +36,12 @@ class ValuesSheet extends Sheet {
 }
 
 class FeatureSheet extends Sheet {
-  constructor(sheetConfig) {
-    super(sheetConfig);
+  constructor(config) {
+    super(config);
+    state.features.registered = state.features.registered.concat(
+      config.features.map((featureClass) => { return new featureClass(this) })
+    );
+
     this.ensureAccessExpectations();
     this.buildValues();
   }
