@@ -8,21 +8,21 @@ function onSpreadsheetOpen(e) {
 
 function onSpreadsheetEdit(e) {
   const stateManager = new ApplicationStateManager(SpreadsheetApp.getActiveSpreadsheet());
-  stateManager.buildSheetState().buildFeatureState();
+  stateManager.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onSpreadsheetEdit, e.source.getActiveSheet().getName(), e.range.columnStart);
   endEventResponse();
 }
 
 function onCalendarEdit() {
   const stateManager = new ApplicationStateManager(SpreadsheetApp.openById(config.gsheet.id));
-  stateManager.buildSheetState().buildFeatureState();
+  stateManager.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onCalendarEdit);
   endEventResponse();
 }
 
 function onOvernightTimer() {
   const stateManager = new ApplicationStateManager(SpreadsheetApp.openById(config.gsheet.id));
-  stateManager.buildSheetState().buildFeatureState();
+  stateManager.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onOvernightTimer);
   endEventResponse();
 }

@@ -13,10 +13,6 @@ class ApplicationStateManager {
       users: [],
       sheets: [],
       valuesSheet: null,
-      builders: {
-        usersFromSpreadsheet: new Builder_UsersFromSpreadsheet()
-      },
-      buildList: [],
       features: {
         registered: [],
         executions: []
@@ -38,9 +34,23 @@ class ApplicationStateManager {
     return this;
   }
 
-  buildFeatureState() {
-    state.buildList.push(state.builders.usersFromSpreadsheet);
-    state.buildList.forEach((builder) => { builder.build() });
+  buildUsersState() {
+    const usersColumnIndex = state.valuesSheet.config.usersColumnIndex;
+    const values = state.valuesSheet.getValuesOf(usersColumnIndex);
+
+    const numValuesPerUser = 3;
+
+    for(var i = 0; i < values.length; i += numValuesPerUser) {
+      if(values[i] && values[i + 1]){
+        state.users.push({
+          name: values[i],
+          calendar: CalendarApp.getCalendarById(values[i + 1]),
+          inviteEmail: values.length >= i + numValuesPerUser ? values[i + 2] : '',
+          calendarEvents: null,
+          spreadsheetEvents: null
+        });
+      }
+    }
     return this;
   }
 
