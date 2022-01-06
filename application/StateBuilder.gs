@@ -1,6 +1,6 @@
 var state;
 
-class ApplicationStateManager {
+class StateBuilder {
   constructor(spreadsheet) {
     this.spreadsheet = spreadsheet;
     state = {};
