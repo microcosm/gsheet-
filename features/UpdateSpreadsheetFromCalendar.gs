@@ -47,11 +47,15 @@ class UpdateSpreadsheetFromCalendar extends Feature {
   }
 
   setupSheetState(sheet) {
-    const numRows = sheet.sheetRef.getMaxRows() - sheet.config.beginRow + 1;
-    this.eventRangeForUpdate = sheet.sheetRef.getRange(sheet.config.beginRow + 1, sheet.config.eventColumn + 1, numRows, 1);
+    const beginRow = sheet.config.beginRow.cardinalIndex;
+    const filterRow = sheet.config.filterRow.cardinalIndex;
+    const dateColumn = sheet.config.dateColumn.cardinalIndex;
+    const eventColumn = sheet.config.eventColumn.cardinalIndex;
+    const numRows = sheet.sheetRef.getMaxRows() - beginRow;
+    this.eventRangeForUpdate = sheet.sheetRef.getRange(beginRow, eventColumn, numRows, 1);
     this.eventValuesForUpdate = this.eventRangeForUpdate.getValues();
-    this.dateValuesForReference = sheet.sheetRef.getRange(sheet.config.beginRow + 1, sheet.config.dateColumn + 1, numRows, 1).getValues();
-    this.eventFiltersForReference = sheet.sheetRef.getRange(sheet.config.filterRow + 1, sheet.config.eventColumn + 1, 1, 1).getValue().split('\n');
+    this.dateValuesForReference = sheet.sheetRef.getRange(beginRow, dateColumn, numRows, 1).getValues();
+    this.eventFiltersForReference = sheet.sheetRef.getRange(filterRow, eventColumn, 1, 1).getValue().split('\n');
   }
 
   findCalendarEventsThisWeek(weekCommenceDate) {

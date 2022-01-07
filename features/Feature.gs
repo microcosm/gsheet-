@@ -12,7 +12,7 @@ class Feature {
   }
 
   isRegisteredFor(sheetName, column) {
-    return this.sheet.name === sheetName && (!this.sheet.hasTriggerColumns || this.sheet.triggerColumns.includes(column));
+    return this.sheet.name === sheetName && (!this.sheet.hasTriggerColumns || this.sheet.triggerColumns.cardinalIndices.includes(column));
   }
 
   addResponseCapability(event) {

@@ -108,48 +108,43 @@ class EventsFromUserCalendarsStateBuilder {
 
 class EventsFromSpreadsheetStateBuilder {
   build(user) {
-    var extractionState = {
-      currentWidget: '',
-      events: [],
-      user: user,
-      exclusionListNames: this.getOtherUsersNames(user),
-      fillInTheBlanksDate: state.today
-    }
+    this.currentWidget = '',
+    this.events = [],
+    this.user = user,
+    this.exclusionListNames = this.getOtherUsersNames(user),
+    this.fillInTheBlanksDate = state.today
 
     state.sheets.forEach((sheet) => {
       if(sheet.hasWidgets) {
-        for(var widgetName in sheet.widgets) {
-          var widget = sheet.widgets[widgetName];
-          if(widget.hasEvents) {
-            this.buildEventsFromWidget(sheet, widget, extractionState);
-          }
-        }
+        this.sheet = sheet;
+        this.buildEventsFromWidgets();
       }
     });
 
-    return extractionState.events;
+    return this.events;
   }
 
-  getOtherUsersNames(user) {
-    var otherNames = [];
-    state.users.forEach((possibleOther) => {
-      if(possibleOther.name != user.name) {
-        otherNames.push(possibleOther.name);
+  buildEventsFromWidgets() {
+    for(var widgetName in this.sheet.widgets) {
+      var widget = this.sheet.widgets[widgetName];
+      if(widget.hasEvents) {
+        this.widget = widget;
+        this.columns = widget.columns.zeroBasedIndices;
+        this.buildEventsFromWidget();
       }
-    });
-    return otherNames;
+    }
   }
 
-  buildEventsFromWidget(sheet, widget, extractionState) {
-    const sheetValues = sheet.sheetRef.getDataRange().getValues();
+  buildEventsFromWidget() {
+    const sheetValues = this.sheet.sheetRef.getDataRange().getValues();
     for(var i = 0; i < sheetValues.length; i++) {
       const row = sheetValues[i];
 
-      if(this.isWorkDateLabel(row[widget.columns.workDate])) {
-        extractionState.currentWidget = sheetValues[i + widget.name.rowOffset][widget.name.column];
-      } else if(this.isValidEvent(sheet, row, widget, extractionState)) {
-        var eventFromSpreadsheet = this.buildEventFromSheet(sheet, widget, extractionState, row);
-        extractionState.events.push(eventFromSpreadsheet);
+      if(this.isWorkDateLabel(row[this.columns.workDate])) {
+        this.currentWidget = sheetValues[i + this.widget.name.rowOffset][this.widget.name.column.zeroBasedIndex];
+      } else if(this.isValidEvent(row)) {
+        var eventFromSpreadsheet = this.buildEventFromRow(row);
+        this.events.push(eventFromSpreadsheet);
       }
     }
   }
@@ -158,33 +153,33 @@ class EventsFromSpreadsheetStateBuilder {
     return typeof str == 'string' && str.substring(0, state.texts.workDateLabel.length) === state.texts.workDateLabel;
   }
 
-  isValidEvent(sheet, row, widget, extractionState) {
+  isValidEvent(row) {
     var validity = {
-      isScriptResponsiveWidget: sheet.scriptResponsiveWidgetNames.includes(extractionState.currentWidget),
-      isNotDoneOrWaiting:       !this.getIsDoneOrWaiting(widget, row),
-      isNounColValidString:     typeof row[widget.columns.noun] == 'string' && row[widget.columns.noun].length > 0,
-      isVerbColValidString:     typeof row[widget.columns.verb] == 'string' && row[widget.columns.verb].length > 0,
-      isValidDate:              widget.allowFillInTheBlanksDates || row[widget.columns.workDate] instanceof Date,
-      isValidUser:              !extractionState.exclusionListNames.includes(row[widget.columns.name]),
-      isCustomValidated:        typeof customEventWidgetValidation === "undefined" || customEventWidgetValidation(row, widget)
+      isScriptResponsiveWidget: this.sheet.scriptResponsiveWidgetNames.includes(this.currentWidget),
+      isNotDoneOrWaiting:       !this.getIsDoneOrWaiting(this.widget, row),
+      isNounColValidString:     typeof row[this.columns.noun] == 'string' && row[this.columns.noun].length > 0,
+      isVerbColValidString:     typeof row[this.columns.verb] == 'string' && row[this.columns.verb].length > 0,
+      isValidDate:              this.widget.allowFillInTheBlanksDates || row[this.columns.workDate] instanceof Date,
+      isValidUser:              !this.exclusionListNames.includes(row[this.columns.name]),
+      isCustomValidated:        typeof customEventWidgetValidation === "undefined" || customEventWidgetValidation(row, this.widget.columns)
     };
     return Object.values(validity).every(check => check === true);
   }
 
-  buildEventFromSheet(sheet, widget, extractionState, row) {
+  buildEventFromRow(row) {
     var startDateTime, endDateTime, isAllDay;
 
-    if(this.isFillInTheBlanks(row, widget)) {
+    if(this.isFillInTheBlanks(row, this.widget)) {
       isAllDay = true;
-      startDateTime = new Date(extractionState.fillInTheBlanksDate);
+      startDateTime = new Date(this.fillInTheBlanksDate);
       endDateTime = null;
     } else {
-      const startTime = row[widget.columns.startTime];
+      const startTime = row[this.columns.startTime];
       const startTimeHours = this.getStartTimeHours(startTime);
       const startTimeMinutes = this.getStartTimeMinutes(startTime);
-      const durationHours = row[widget.columns.durationHours];
+      const durationHours = row[this.columns.durationHours];
       isAllDay = this.getIsAllDay(startTimeHours, startTimeMinutes, durationHours);
-      startDateTime = new Date(row[widget.columns.workDate]);
+      startDateTime = new Date(row[this.columns.workDate]);
       startDateTime = this.getPulledForward(startDateTime);
 
       if(isAllDay) {
@@ -203,14 +198,14 @@ class EventsFromSpreadsheetStateBuilder {
     }
 
     return {
-      title: row[widget.columns.noun] + ': ' + row[widget.columns.verb],
+      title: row[this.columns.noun] + ': ' + row[this.columns.verb],
       startDateTime: startDateTime,
       endDateTime: endDateTime,
       isAllDay: isAllDay,
       options: {
-        description: this.generateDescription(sheet, widget, extractionState, row),
-        location: extractionState.currentWidget,
-        guests: extractionState.user.inviteEmail
+        description: this.generateDescription(row),
+        location: this.currentWidget,
+        guests: this.user.inviteEmail
       },
       isAlreadyInCalendar: false
     };
@@ -233,7 +228,7 @@ class EventsFromSpreadsheetStateBuilder {
   }
 
   isFillInTheBlanks(row, widget) {
-    return widget.allowFillInTheBlanksDates && (!(row[widget.columns.workDate] instanceof Date));
+    return widget.allowFillInTheBlanksDates && (!(row[this.columns.workDate] instanceof Date));
   }
 
   getPulledForward(dateTime) {
@@ -249,20 +244,30 @@ class EventsFromSpreadsheetStateBuilder {
 
   getIsDoneOrWaiting(widget, row) {
     if(widget.hasDoneCol) {
-      return row[widget.columns.done] === 'Yes' || row[widget.columns.done] === 'Waiting';
+      return row[this.columns.done] === 'Yes' || row[this.columns.done] === 'Waiting';
     }
     return false;
   }
 
-  generateDescription(sheet, widget, extractionState, row) {
-    var name = row[widget.columns.name];
+  getOtherUsersNames(user) {
+    var otherNames = [];
+    state.users.forEach((possibleOther) => {
+      if(possibleOther.name != user.name) {
+        otherNames.push(possibleOther.name);
+      }
+    });
+    return otherNames;
+  }
+
+  generateDescription(row) {
+    var name = row[this.columns.name];
     name = typeof customNameSubstitution === "undefined" ? name : customNameSubstitution(name);
 
-    return 'This event is from the "' + extractionState.currentWidget +
+    return 'This event is from the "' + this.currentWidget +
       '" widget' + (name ? ' for ' + name : '') +
       '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + config.gsheet.id +
       '/edit?usp=sharing' +
-      (sheet.hasId ? '#gid=' + sheet.id : '') +
+      (this.sheet.hasId ? '#gid=' + this.sheet.id : '') +
       '">' + config.gsheet.name + '</a>&nbsp;&larr; Click here for more';
   }
 }

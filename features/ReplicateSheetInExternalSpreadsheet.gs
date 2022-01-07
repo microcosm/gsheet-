@@ -21,9 +21,9 @@ class ReplicateSheetInExternalSpreadsheet extends Feature {
     destinationRange.setRichTextValues(sourceRange.getRichTextValues());
   }
 
-  overwriteSingleColumnWithNonRichTextValues(sourceSheet, destinationSheet, overwriteConfig) {
-    const startRow = overwriteConfig.startRow + 1;
-    const startCol = overwriteConfig.column + 1;
+  overwriteSingleColumnWithNonRichTextValues(sourceSheet, destinationSheet, config) {
+    const startRow = config.startRow.cardinalIndex;
+    const startCol = config.column.cardinalIndex;
     const numRows = sourceSheet.getMaxRows() - startRow;
     const sourceRange = sourceSheet.getRange(startRow, startCol, numRows, 1);
     const destinationRange = destinationSheet.getRange(startRow, startCol, numRows, 1);
