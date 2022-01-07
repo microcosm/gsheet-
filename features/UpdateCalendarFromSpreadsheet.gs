@@ -141,11 +141,12 @@ class EventsFromSpreadsheetStateBuilder {
   }
 
   buildEventsFromWidget(sheet, widget, extractionState) {
-    for(var i = 0; i < sheet.values.length; i++) {
-      const row = sheet.values[i];
+    const sheetValues = sheet.sheetRef.getDataRange().getValues();
+    for(var i = 0; i < sheetValues.length; i++) {
+      const row = sheetValues[i];
 
       if(this.isWorkDateLabel(row[widget.columns.workDate])) {
-        extractionState.currentWidget = sheet.values[i + widget.name.rowOffset][widget.name.column];
+        extractionState.currentWidget = sheetValues[i + widget.name.rowOffset][widget.name.column];
       } else if(this.isValidEvent(sheet, row, widget, extractionState)) {
         var eventFromSpreadsheet = this.buildEventFromSheet(sheet, widget, extractionState, row);
         extractionState.events.push(eventFromSpreadsheet);

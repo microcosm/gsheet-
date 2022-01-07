@@ -7,6 +7,16 @@ class Sheet {
     this.sheetRef = state.spreadsheet.getSheetByName(this.name);
     this.validate();
     this.range = this.config.range || 'A:Z';
+    this.values = false;
+  }
+
+  retrieveValuesFromSheet() {
+    this.values = this.sheetRef.getDataRange().getValues();
+    return this.values;
+  }
+
+  getValues() {
+    return this.values || this.retrieveValuesFromSheet();
   }
 
   validate() {
@@ -19,19 +29,19 @@ class Sheet {
 class ValuesSheet extends Sheet {
   constructor(config) {
     super(config);
-    this.buildValues();
   }
 
-  buildValues() {
+  retrieveValuesFromSheet() {
     this.values = this.sheetRef.getRange(this.range).getValues();
+    return this.values;
   }
 
   getValuesOf(columnID) {
-    return this.values.map((value) => { return value[columnID]; });
+    return this.getValues().map((value) => { return value[columnID]; });
   }
 
   getValueOf(rowId, columnID) {
-    return this.values[rowId][columnID];
+    return this.getValues()[rowId][columnID];
   }
 }
 
@@ -43,7 +53,6 @@ class FeatureSheet extends Sheet {
     );
 
     this.ensureAccessExpectations();
-    this.buildValues();
   }
 
   ensureAccessExpectations() {
@@ -63,9 +72,5 @@ class FeatureSheet extends Sheet {
       this[propertyName] = this.config[propertyName];
       this[propertyNameHasVersion] = true;
     }
-  }
-
-  buildValues() {
-    this.values = this.sheetRef.getDataRange().getValues();
   }
 }
