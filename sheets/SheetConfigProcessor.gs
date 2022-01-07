@@ -53,7 +53,7 @@ class SheetConfigProcessor {
   createIndicesVersionsOfAllColumns(child, parent=null, parentPropertyName='') {
     if(isObject(child)) {
       if(this.isColumnsPropertyName(parentPropertyName)) {
-        this.createColumnIndicesVersionsOfParent(child, parent, parentPropertyName);
+        this.createColumnIndicesVersionsOfParentObject(child, parent, parentPropertyName);
       } else {
         this.createColumnIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child);
       }
@@ -74,7 +74,7 @@ class SheetConfigProcessor {
 /*   columnCardinalIndices:  { name:  2,  place:  3  },
 /*   columnZeroBasedIndices: { name:  1,  place:  2  }
 /* --------------------------------------------------------- */
-  createColumnIndicesVersionsOfParent(child, parent, parentPropertyName) {
+  createColumnIndicesVersionsOfParentObject(child, parent, parentPropertyName) {
     const parentPropertyNames = this.createCardinalAndZeroBasedIndicesProperties(parent, parentPropertyName);
     for(const childPropertyName in child) {
       const val = child[childPropertyName];
@@ -150,7 +150,7 @@ class SheetConfigProcessor {
   createIndicesVersionsOfAllRows(child, parent=null, parentPropertyName='') {
     if(isObject(child)) {
       if(this.isRowsPropertyName(parentPropertyName)) {
-        this.createRowIndicesVersionsOfParent(child, parent, parentPropertyName);
+        this.createRowIndicesVersionsOfParentObject(child, parent, parentPropertyName);
       } else {
         this.createRowIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child);
       }
@@ -171,7 +171,7 @@ class SheetConfigProcessor {
 /*   rowCardinalIndices:  { name: 2, place: 3 },
 /*   rowZeroBasedIndices: { name: 1, place: 2 }
 /* --------------------------------------------------------- */
-  createRowIndicesVersionsOfParent(child, parent, parentPropertyName) {
+  createRowIndicesVersionsOfParentObject(child, parent, parentPropertyName) {
     const parentPropertyNames = this.createCardinalAndZeroBasedIndicesProperties(parent, parentPropertyName);
     for(const childPropertyName in child) {
       const val = child[childPropertyName];
