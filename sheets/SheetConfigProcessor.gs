@@ -2,9 +2,9 @@
 /*
 /*   NAMING HELP
 /*
-/*   The words parent, child, val, parentPropertyName and
-/*   childPropertyName have specific meaning across this
-/*   file.
+/*   The words parent, child, parentPropertyName,
+/*   childPropertyName and childPropertyValue have specific
+/*   meaning across this file.
 /*
 /*   const config = {
 /*     widgets: {
@@ -20,8 +20,8 @@
 /*             v                         |
 /*       todo: {                         v
 /*         columns:<--parentPropertyName {
-/*           time:<--childPropertyName       'B',  <--val
-/*           start:<--childPropertyName      'C'   <--val
+/*           time:<--childPropertyName       'B',  <--childPropertyValue
+/*           start:<--childPropertyName      'C'   <--childPropertyValue
 /*         }
 /*         ...
 /*
@@ -43,22 +43,22 @@ class SheetConfigProcessor {
   }
 
   process() {
-    this.createIndicesVersionsOfAllColumns(this.config);
-    this.createIndicesVersionsOfAllRows(this.config);
+    this.buildIndexObjectForColumnsIn(this.config);
+    this.buildIndexObjectForRowsIn(this.config);
   }
 
 /* --------------------------------------------------------- */
 /*   COLUMN RECURSION
 /* --------------------------------------------------------- */
-  createIndicesVersionsOfAllColumns(child, parent=null, parentPropertyName='') {
+  buildIndexObjectForColumnsIn(child, parent=null, parentPropertyName='') {
     if(isObject(child)) {
       if(this.isColumnsPropertyName(parentPropertyName)) {
-        this.createColumnIndicesVersionsOfParentObject(child, parent, parentPropertyName);
+        this.replaceColumnsObjectWithIndicesObject(child, parent, parentPropertyName);
       } else {
-        this.createColumnIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child);
+        this.replaceColumnValuePropertiesAndRecurseObjectProperties(child);
       }
     } else if(isArray(child) && this.isColumnsPropertyName(parentPropertyName)) {
-      this.createColumnIndicesVersionsOfParentArray(child, parentPropertyName, parent);
+      this.replaceColumnsArrayWithIndicesObject(child, parent, parentPropertyName);
     }
   }
 
@@ -70,49 +70,57 @@ class SheetConfigProcessor {
 /*
 /*       //becomes:
 /*
-/*   columns:                { name: 'B', place: 'C' },
-/*   columnCardinalIndices:  { name:  2,  place:  3  },
-/*   columnZeroBasedIndices: { name:  1,  place:  2  }
+/*   columns: {
+/*     asConfig:         { name: 'B', place: 'C' },
+/*     cardinalIndices:  { name:  2,  place:  3  },
+/*     zeroBasedIndices: { name:  1,  place:  2  }
+/*   }
 /* --------------------------------------------------------- */
-  createColumnIndicesVersionsOfParentObject(child, parent, parentPropertyName) {
-    const parentPropertyNames = this.createCardinalAndZeroBasedIndicesProperties(parent, parentPropertyName);
+  replaceColumnsObjectWithIndicesObject(child, parent, parentPropertyName) {
+    const replacementChild = this.getNewIndicesReplacementObject(child);
     for(const childPropertyName in child) {
-      const val = child[childPropertyName];
-      if(isString(val)) {
-        const cardinalIndex = this.getCardinalIndexFromColumnString(val);
-        parent[parentPropertyNames.cardinalIndicesPropertyName][childPropertyName] = cardinalIndex;
-        parent[parentPropertyNames.zeroBasedIndicesPropertyName][childPropertyName] = cardinalIndex - 1;
-      }
+      const childPropertyValue = child[childPropertyName];
+      const cardinalIndex = this.getCardinalIndexFromColumnString(childPropertyValue);
+      replacementChild.cardinalIndices[childPropertyName] = cardinalIndex;
+      replacementChild.zeroBasedIndices[childPropertyName] = cardinalIndex - 1;
     }
+    parent[parentPropertyName] = replacementChild;
   }
 
 /* --------------------------------------------------------- */
 /*   person: {
 /*     nameColumn:  'B',
 /*     placeColumn: 'C',
-/*     alertStr: 'OK'
+/*     alertStr:    'OK'
 /*   }
 /*
 /*      //becomes:
 /*
 /*   person: {
-/*     nameColumn:               'B',
-/*     nameColumnCardinalIndex:   2,
-/*     nameColumnZeroBasedIndex:  1,
-/*     placeColumn:              'C',
-/*     placeColumnCardinalIndex:  3,
-/*     placeColumnZeroBasedIndex: 2,
+/*     nameColumn: {
+/*       asConfig:      'B',
+/*       cardinalIndex:  2,
+/*       zeroBasedIndex: 1
+/*     },
+/*     placeColumn: {
+/*       asConfig:      'C',
+/*       cardinalIndex:  3,
+/*       zeroBasedIndex: 2
+/*     },
 /*     alertStr: 'OK' //not processed
 /*   }
 /* --------------------------------------------------------- */
-  createColumnIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child) {
+  replaceColumnValuePropertiesAndRecurseObjectProperties(child) {
     for(const childPropertyName in child) {
+      const childPropertyValue = child[childPropertyName];
       if(this.isColumnPropertyName(childPropertyName)) {
-        const cardinalIndex = this.getCardinalIndexFromColumnString(child[childPropertyName]);
-        child[this.getCardinalIndexPropertyName(childPropertyName)] = cardinalIndex;
-        child[this.getZeroBasedIndexPropertyName(childPropertyName)] = cardinalIndex - 1;
+        const replacementChild = this.getNewIndexReplacementObject(childPropertyValue);
+        const cardinalIndex = this.getCardinalIndexFromColumnString(childPropertyValue);
+        replacementChild.cardinalIndex = cardinalIndex;
+        replacementChild.zeroBasedIndex = cardinalIndex - 1;
+        child[childPropertyName] = replacementChild;
       } else {
-        this.createIndicesVersionsOfAllColumns(child[childPropertyName], child, childPropertyName);
+        this.buildIndexObjectForColumnsIn(childPropertyValue, child, childPropertyName);
       }
     }
   }
@@ -122,14 +130,18 @@ class SheetConfigProcessor {
 /*
 /*      //becomes:
 /*
-/*   personColumns:                ['B', 'C', 'D'],
-/*   personColumnCardinalIndices:  [ 2,   3,   4 ],
-/*   personColumnZeroBasedIndices: [ 1,   2,   3 ]
+/*   personColumns: {
+/*     asConfig:         ['B', 'C', 'D'],
+/*     cardinalIndices:  [ 2,   3,   4 ],
+/*     zeroBasedIndices: [ 1,   2,   3 ]
+/*   }
 /* --------------------------------------------------------- */
-  createColumnIndicesVersionsOfParentArray(child, parentPropertyName, parent) {
-    const cardinalIndices = Array.from(child, arrayElement => this.getCardinalIndexFromColumnString(arrayElement));
-    parent[this.getCardinalIndicesPropertyName(parentPropertyName)] = cardinalIndices;
-    parent[this.getZeroBasedIndicesPropertyName(parentPropertyName)] = Array.from(cardinalIndices, arrayElement => arrayElement - 1);
+  replaceColumnsArrayWithIndicesObject(child, parent, parentPropertyName) {
+    const replacementChild = this.getNewIndicesReplacementObject(child);
+    const cardinalIndices = Array.from(child, element => this.getCardinalIndexFromColumnString(element));
+    replacementChild.cardinalIndices = cardinalIndices;
+    replacementChild.zeroBasedIndices = Array.from(cardinalIndices, element => element - 1);;
+    parent[parentPropertyName] = replacementChild;
   }
 
 /* --------------------------------------------------------- */
@@ -147,15 +159,15 @@ class SheetConfigProcessor {
 /* --------------------------------------------------------- */
 /*   ROW RECURSION
 /* --------------------------------------------------------- */
-  createIndicesVersionsOfAllRows(child, parent=null, parentPropertyName='') {
+  buildIndexObjectForRowsIn(child, parent=null, parentPropertyName='') {
     if(isObject(child)) {
       if(this.isRowsPropertyName(parentPropertyName)) {
-        this.createRowIndicesVersionsOfParentObject(child, parent, parentPropertyName);
+        this.replaceRowsObjectWithIndicesObject(child, parent, parentPropertyName);
       } else {
-        this.createRowIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child);
+        this.replaceRowValuePropertiesAndRecurseObjectProperties(child);
       }
     } else if(isArray(child) && this.isRowsPropertyName(parentPropertyName)) {
-      this.createRowIndicesVersionsOfParentArray(child, parentPropertyName, parent);
+      this.replaceRowsArrayWithIndicesObject(child, parent, parentPropertyName);
     }
   }
 
@@ -167,49 +179,57 @@ class SheetConfigProcessor {
 /*
 /*       //becomes:
 /*
-/*   rows:                { name: 2, place: 3 },
-/*   rowCardinalIndices:  { name: 2, place: 3 },
-/*   rowZeroBasedIndices: { name: 1, place: 2 }
+/*   rows: {
+/*     asConfig:         { name: 2, place: 3 },
+/*     cardinalIndices:  { name: 2, place: 3 },
+/*     zeroBasedIndices: { name: 1, place: 2 }
+/*   }
 /* --------------------------------------------------------- */
-  createRowIndicesVersionsOfParentObject(child, parent, parentPropertyName) {
-    const parentPropertyNames = this.createCardinalAndZeroBasedIndicesProperties(parent, parentPropertyName);
+  replaceRowsObjectWithIndicesObject(child, parent, parentPropertyName) {
+    const replacementChild = this.getNewIndicesReplacementObject(child);
     for(const childPropertyName in child) {
-      const val = child[childPropertyName];
-      if(isNumber(val)) {
-        const cardinalIndex = val;
-        parent[parentPropertyNames.cardinalIndicesPropertyName][childPropertyName] = cardinalIndex;
-        parent[parentPropertyNames.zeroBasedIndicesPropertyName][childPropertyName] = cardinalIndex - 1;
-      }
+      const childPropertyValue = child[childPropertyName];
+      const cardinalIndex = childPropertyValue;
+      replacementChild.cardinalIndices[childPropertyName] = cardinalIndex;
+      replacementChild.zeroBasedIndices[childPropertyName] = cardinalIndex - 1;
     }
+    parent[parentPropertyName] = replacementChild;
   }
 
 /* --------------------------------------------------------- */
 /*   person: {
-/*     nameRow:  2,
-/*     placeRow: 3,
+/*     nameRow:   2,
+/*     placeRow:  3,
 /*     alertStr: 'OK'
 /*   }
 /*
 /*      //becomes:
 /*
 /*   person: {
-/*     nameRow:                2,
-/*     nameRowCardinalIndex:   2,
-/*     nameRowZeroBasedIndex:  1,
-/*     placeRow:               3,
-/*     placeRowCardinalIndex:  3,
-/*     placeRowZeroBasedIndex: 2,
+/*     nameRow: {
+/*       asConfig:       2,
+/*       cardinalIndex:  2,
+/*       zeroBasedIndex: 1
+/*     },
+/*     placeRow: {
+/*       asConfig:       3,
+/*       cardinalIndex:  3,
+/*       zeroBasedIndex: 2
+/*     },
 /*     alertStr: 'OK' //not processed
 /*   }
 /* --------------------------------------------------------- */
-  createRowIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child) {
+  replaceRowValuePropertiesAndRecurseObjectProperties(child) {
     for(const childPropertyName in child) {
+      const childPropertyValue = child[childPropertyName];
       if(this.isRowPropertyName(childPropertyName)) {
-        const cardinalIndex = child[childPropertyName];
-        child[this.getCardinalIndexPropertyName(childPropertyName)] = cardinalIndex;
-        child[this.getZeroBasedIndexPropertyName(childPropertyName)] = cardinalIndex - 1;
+        const replacementChild = this.getNewIndexReplacementObject(childPropertyValue);
+        const cardinalIndex = childPropertyValue;
+        replacementChild.cardinalIndex = cardinalIndex;
+        replacementChild.zeroBasedIndex = cardinalIndex - 1;
+        child[childPropertyName] = replacementChild;
       } else {
-        this.createIndicesVersionsOfAllRows(child[childPropertyName], child, childPropertyName);
+        this.buildIndexObjectForRowsIn(childPropertyValue, child, childPropertyName);
       }
     }
   }
@@ -219,34 +239,23 @@ class SheetConfigProcessor {
 /*
 /*      //becomes:
 /*
-/*   personRows:                [2, 3, 4],
-/*   personRowCardinalIndices:  [2, 3, 4],
-/*   personRowZeroBasedIndices: [1, 2, 3]
+/*   personRows: {
+/*     asConfig:         [2, 3, 4],
+/*     cardinalIndices:  [2, 3, 4],
+/*     zeroBasedIndices: [1, 2, 3]
+/*   }
 /* --------------------------------------------------------- */
-  createRowIndicesVersionsOfParentArray(child, parentPropertyName, parent) {
+  replaceRowsArrayWithIndicesObject(child, parent, parentPropertyName) {
+    const replacementChild = this.getNewIndicesReplacementObject(child);
     const cardinalIndices = child;
-    parent[this.getCardinalIndicesPropertyName(parentPropertyName)] = cardinalIndices;
-    parent[this.getZeroBasedIndicesPropertyName(parentPropertyName)] = Array.from(cardinalIndices, arrayElement => arrayElement - 1);
+    replacementChild.cardinalIndices = cardinalIndices;
+    replacementChild.zeroBasedIndices = Array.from(cardinalIndices, element => element - 1);;
+    parent[parentPropertyName] = replacementChild;
   }
 
 /* --------------------------------------------------------- */
 /*   NON-ROW/COLUMN SPECIFIC
 /* --------------------------------------------------------- */
-  createCardinalAndZeroBasedIndicesProperties(parent, parentPropertyName) {
-    const cardinalIndicesPropertyName = this.getCardinalIndicesPropertyName(parentPropertyName);
-    if(!parent.hasOwnProperty(cardinalIndicesPropertyName)) {
-      parent[cardinalIndicesPropertyName] = {};
-    }
-    const zeroBasedIndicesPropertyName = this.getZeroBasedIndicesPropertyName(parentPropertyName);
-    if(!parent.hasOwnProperty(zeroBasedIndicesPropertyName)) {
-      parent[zeroBasedIndicesPropertyName] = {};
-    }
-    return {
-      cardinalIndicesPropertyName: cardinalIndicesPropertyName,
-      zeroBasedIndicesPropertyName: zeroBasedIndicesPropertyName
-    };
-  }
-
   isColumnPropertyName(str) {
     return str.toLowerCase().endsWith(this.identifiers.column);
   }
@@ -263,19 +272,19 @@ class SheetConfigProcessor {
     return str.toLowerCase().endsWith(this.identifiers.rows);
   }
 
-  getCardinalIndexPropertyName(propertyName) {
-    return propertyName + this.identifiers.cardinal + this.identifiers.index;
+  getNewIndexReplacementObject(asConfig) {
+    return {
+      asConfig: asConfig,
+      cardinalIndex: null,
+      zeroBasedIndex: null
+    };
   }
 
-  getZeroBasedIndexPropertyName(propertyName) {
-    return propertyName + this.identifiers.zeroBased + this.identifiers.index;
-  }
-
-  getCardinalIndicesPropertyName(propertyName) {
-    return propertyName.slice(0, -1) + this.identifiers.cardinal + this.identifiers.indices;
-  }
-
-  getZeroBasedIndicesPropertyName(propertyName) {
-    return propertyName.slice(0, -1) + this.identifiers.zeroBased + this.identifiers.indices;
+  getNewIndicesReplacementObject(asConfig) {
+    return {
+      asConfig: asConfig,
+      cardinalIndices: {},
+      zeroBasedIndices: {}
+    };
   }
 }
