@@ -1,64 +1,142 @@
+/* --------------------------------------------------------- */
+/*
+/*   NAMING HELP
+/*
+/*   The words parent, child, val, parentPropertyName and
+/*   childPropertyName have specific meaning across this
+/*   file.
+/*
+/*   const config = {
+/*     widgets: {
+/*       todo: {
+/*         columns: {
+/*           time: 'B',
+/*           start: 'C'
+/*         }
+/*         ...
+/*
+/*           parent
+/*             |                       child
+/*             v                         |
+/*       todo: {                         v
+/*         columns:<--parentPropertyName {
+/*           time:<--childPropertyName       'B',  <--val
+/*           start:<--childPropertyName      'C'   <--val
+/*         }
+/*         ...
+/*
+/* --------------------------------------------------------- */
+
 class SheetConfigProcessor {
   constructor(config) {
     this.config = config;
     this.identifiers = {
-      index: 'Index',
-      indices: 'Indices',
-      cardinal: 'Cardinal', //1, 2, 3... used by spreadsheet
-      zeroBased: 'ZeroBased', //0, 1, 2... used in programmatic arrays
-      column: 'column',
-      columns: 'columns',
-      row: 'row',
-      rows: 'rows'
+      index:     'Index',
+      indices:   'Indices',
+      cardinal:  'Cardinal',
+      zeroBased: 'ZeroBased',
+      column:    'column',
+      columns:   'columns',
+      row:       'row',
+      rows:      'rows'
     }
   }
 
   process() {
-    this.generateColumnIndicesFromStringIdentifiers(this.config);
-    this.generateRowIndicesFromNumberIdentifiers(this.config);
+    this.createIndicesVersionsOfAllColumns(this.config);
+    this.createIndicesVersionsOfAllRows(this.config);
   }
 
-  generateColumnIndicesFromStringIdentifiers(currentLevel, parentLevel=null, propertyName='') {
-    if(isObject(currentLevel)) {
-      if(this.isColumnsKey(propertyName)) {
-        this.generateColumnIndicesOnAllObjectProperties(currentLevel, parentLevel, propertyName);
+/* --------------------------------------------------------- */
+/*   COLUMN RECURSION
+/* --------------------------------------------------------- */
+  createIndicesVersionsOfAllColumns(child, parent=null, parentPropertyName='') {
+    if(isObject(child)) {
+      if(this.isColumnsPropertyName(parentPropertyName)) {
+        this.createColumnIndicesVersionsOfParent(child, parent, parentPropertyName);
       } else {
-        this.generateColumnIndicesOnSelectedObjectProperties(currentLevel);
+        this.createColumnIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child);
       }
-    } else if(isArray(currentLevel) && this.isColumnsKey(propertyName)) {
-      this.generateColumnIndicesOnAllArrayElements(propertyName, parentLevel);
+    } else if(isArray(child) && this.isColumnsPropertyName(parentPropertyName)) {
+      this.createColumnIndicesVersionsOfParentArray(child, parentPropertyName, parent);
     }
   }
 
-  generateColumnIndicesOnSelectedObjectProperties(obj) {
-    for(const key in obj) {
-      if(this.isColumnKey(key)) {
-        const cardinalIndex = this.getCardinalIndexFromColumnString(obj[key]);
-        obj[this.getCardinalIndexPropertyName(key)] = cardinalIndex;
-        obj[this.getZeroBasedIndexPropertyName(key)] = cardinalIndex - 1;
-      }
-      this.generateColumnIndicesFromStringIdentifiers(obj[key], obj, key);
-    }
-  }
-
-  generateColumnIndicesOnAllObjectProperties(obj, parentLevel, propertyName) {
-    const propertyNames = this.createCardinalAndZeroBasedIndicesProperties(parentLevel, propertyName);
-    for(const key in obj) {
-      const val = obj[key];
+/* --------------------------------------------------------- */
+/*   columns: {
+/*     name:  'B',
+/*     place: 'C'
+/*   }
+/*
+/*       //becomes:
+/*
+/*   columns:                { name: 'B', place: 'C' },
+/*   columnCardinalIndices:  { name:  2,  place:  3  },
+/*   columnZeroBasedIndices: { name:  1,  place:  2  }
+/* --------------------------------------------------------- */
+  createColumnIndicesVersionsOfParent(child, parent, parentPropertyName) {
+    const parentPropertyNames = this.createCardinalAndZeroBasedIndicesProperties(parent, parentPropertyName);
+    for(const childPropertyName in child) {
+      const val = child[childPropertyName];
       if(isString(val)) {
         const cardinalIndex = this.getCardinalIndexFromColumnString(val);
-        parentLevel[propertyNames.cardinalIndicesPropertyName][key] = cardinalIndex;
-        parentLevel[propertyNames.zeroBasedIndicesPropertyName][key] = cardinalIndex - 1;
+        parent[parentPropertyNames.cardinalIndicesPropertyName][childPropertyName] = cardinalIndex;
+        parent[parentPropertyNames.zeroBasedIndicesPropertyName][childPropertyName] = cardinalIndex - 1;
       }
     }
   }
 
-  generateColumnIndicesOnAllArrayElements(propertyName, obj) {
-    const cardinalIndices = Array.from(obj[propertyName], arrayElement => this.getCardinalIndexFromColumnString(arrayElement));
-    obj[this.getCardinalIndicesPropertyName(propertyName)] = cardinalIndices;
-    obj[this.getZeroBasedIndicesPropertyName(propertyName)] = Array.from(cardinalIndices, arrayElement => arrayElement - 1);
+/* --------------------------------------------------------- */
+/*   person: {
+/*     nameColumn:  'B',
+/*     placeColumn: 'C',
+/*     alertStr: 'OK'
+/*   }
+/*
+/*      //becomes:
+/*
+/*   person: {
+/*     nameColumn:               'B',
+/*     nameColumnCardinalIndex:   2,
+/*     nameColumnZeroBasedIndex:  1,
+/*     placeColumn:              'C',
+/*     placeColumnCardinalIndex:  3,
+/*     placeColumnZeroBasedIndex: 2,
+/*     alertStr: 'OK' //not processed
+/*   }
+/* --------------------------------------------------------- */
+  createColumnIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child) {
+    for(const childPropertyName in child) {
+      if(this.isColumnPropertyName(childPropertyName)) {
+        const cardinalIndex = this.getCardinalIndexFromColumnString(child[childPropertyName]);
+        child[this.getCardinalIndexPropertyName(childPropertyName)] = cardinalIndex;
+        child[this.getZeroBasedIndexPropertyName(childPropertyName)] = cardinalIndex - 1;
+      } else {
+        this.createIndicesVersionsOfAllColumns(child[childPropertyName], child, childPropertyName);
+      }
+    }
   }
 
+/* --------------------------------------------------------- */
+/*   personColumns: ['B', 'C', 'D']
+/*
+/*      //becomes:
+/*
+/*   personColumns:                ['B', 'C', 'D'],
+/*   personColumnCardinalIndices:  [ 2,   3,   4 ],
+/*   personColumnZeroBasedIndices: [ 1,   2,   3 ]
+/* --------------------------------------------------------- */
+  createColumnIndicesVersionsOfParentArray(child, parentPropertyName, parent) {
+    const cardinalIndices = Array.from(child, arrayElement => this.getCardinalIndexFromColumnString(arrayElement));
+    parent[this.getCardinalIndicesPropertyName(parentPropertyName)] = cardinalIndices;
+    parent[this.getZeroBasedIndicesPropertyName(parentPropertyName)] = Array.from(cardinalIndices, arrayElement => arrayElement - 1);
+  }
+
+/* --------------------------------------------------------- */
+/*   args like 'A' 'B' 'C' or 'Z' 'AA'
+/*
+/*   return     1   2   3      26  27
+/* --------------------------------------------------------- */
   getCardinalIndexFromColumnString(columnString){
     if(isString(columnString)) {
       return columnString.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0);
@@ -66,76 +144,123 @@ class SheetConfigProcessor {
     return columnString;
   }
 
-  isColumnKey(str) {
-    return str.toLowerCase().endsWith(this.identifiers.column);
-  }
-
-  isColumnsKey(str) {
-    return str.toLowerCase().endsWith(this.identifiers.columns);
-  }
-
-  generateRowIndicesFromNumberIdentifiers(currentLevel, parentLevel=null, propertyName='') {
-    if(isObject(currentLevel)) {
-      if(this.isRowsKey(propertyName)) {
-        this.generateRowIndicesOnAllObjectProperties(currentLevel, parentLevel, propertyName);
+/* --------------------------------------------------------- */
+/*   ROW RECURSION
+/* --------------------------------------------------------- */
+  createIndicesVersionsOfAllRows(child, parent=null, parentPropertyName='') {
+    if(isObject(child)) {
+      if(this.isRowsPropertyName(parentPropertyName)) {
+        this.createRowIndicesVersionsOfParent(child, parent, parentPropertyName);
       } else {
-        this.generateRowIndicesOnSelectedObjectProperties(currentLevel);
+        this.createRowIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child);
       }
-    } else if(isArray(currentLevel) && this.isRowsKey(propertyName)) {
-      this.generateRowIndicesOnAllArrayElements(propertyName, parentLevel);
+    } else if(isArray(child) && this.isRowsPropertyName(parentPropertyName)) {
+      this.createRowIndicesVersionsOfParentArray(child, parentPropertyName, parent);
     }
   }
 
-  generateRowIndicesOnSelectedObjectProperties(obj) {
-    for(const key in obj) {
-      if(this.isRowKey(key)) {
-        const cardinalIndex = obj[key];
-        obj[this.getCardinalIndexPropertyName(key)] = cardinalIndex;
-        obj[this.getZeroBasedIndexPropertyName(key)] = cardinalIndex - 1;
-      }
-      this.generateRowIndicesFromNumberIdentifiers(obj[key], obj, key);
-    }
-  }
-
-  generateRowIndicesOnAllObjectProperties(obj, parentLevel, propertyName) {
-    const propertyNames = this.createCardinalAndZeroBasedIndicesProperties(parentLevel, propertyName);
-    for(const key in obj) {
-      const val = obj[key];
+/* --------------------------------------------------------- */
+/*   rows: {
+/*     name:  2,
+/*     place: 3
+/*   }
+/*
+/*       //becomes:
+/*
+/*   rows:                { name: 2, place: 3 },
+/*   rowCardinalIndices:  { name: 2, place: 3 },
+/*   rowZeroBasedIndices: { name: 1, place: 2 }
+/* --------------------------------------------------------- */
+  createRowIndicesVersionsOfParent(child, parent, parentPropertyName) {
+    const parentPropertyNames = this.createCardinalAndZeroBasedIndicesProperties(parent, parentPropertyName);
+    for(const childPropertyName in child) {
+      const val = child[childPropertyName];
       if(isNumber(val)) {
         const cardinalIndex = val;
-        parentLevel[propertyNames.cardinalIndicesPropertyName][key] = cardinalIndex;
-        parentLevel[propertyNames.zeroBasedIndicesPropertyName][key] = cardinalIndex - 1;
+        parent[parentPropertyNames.cardinalIndicesPropertyName][childPropertyName] = cardinalIndex;
+        parent[parentPropertyNames.zeroBasedIndicesPropertyName][childPropertyName] = cardinalIndex - 1;
       }
     }
   }
 
-  generateRowIndicesOnAllArrayElements(propertyName, obj) {
-    const cardinalIndices = obj[propertyName];
-    obj[this.getCardinalIndicesPropertyName(propertyName)] = cardinalIndices;
-    obj[this.getZeroBasedIndicesPropertyName(propertyName)] = Array.from(cardinalIndices, arrayElement => arrayElement - 1);
-  }
-
-  isRowKey(str) {
-    return str.toLowerCase().endsWith(this.identifiers.row);
-  }
-
-  isRowsKey(str) {
-    return str.toLowerCase().endsWith(this.identifiers.rows);
-  }
-
-  createCardinalAndZeroBasedIndicesProperties(parentLevel, propertyName) {
-    const cardinalIndicesPropertyName = this.getCardinalIndicesPropertyName(propertyName);
-    if(!parentLevel.hasOwnProperty(cardinalIndicesPropertyName)) {
-      parentLevel[cardinalIndicesPropertyName] = {};
+/* --------------------------------------------------------- */
+/*   person: {
+/*     nameRow:  2,
+/*     placeRow: 3,
+/*     alertStr: 'OK'
+/*   }
+/*
+/*      //becomes:
+/*
+/*   person: {
+/*     nameRow:                2,
+/*     nameRowCardinalIndex:   2,
+/*     nameRowZeroBasedIndex:  1,
+/*     placeRow:               3,
+/*     placeRowCardinalIndex:  3,
+/*     placeRowZeroBasedIndex: 2,
+/*     alertStr: 'OK' //not processed
+/*   }
+/* --------------------------------------------------------- */
+  createRowIndicesVersionsOfChildValuePropertiesAndRecurseOthers(child) {
+    for(const childPropertyName in child) {
+      if(this.isRowPropertyName(childPropertyName)) {
+        const cardinalIndex = child[childPropertyName];
+        child[this.getCardinalIndexPropertyName(childPropertyName)] = cardinalIndex;
+        child[this.getZeroBasedIndexPropertyName(childPropertyName)] = cardinalIndex - 1;
+      } else {
+        this.createIndicesVersionsOfAllRows(child[childPropertyName], child, childPropertyName);
+      }
     }
-    const zeroBasedIndicesPropertyName = this.getZeroBasedIndicesPropertyName(propertyName);
-    if(!parentLevel.hasOwnProperty(zeroBasedIndicesPropertyName)) {
-      parentLevel[zeroBasedIndicesPropertyName] = {};
+  }
+
+/* --------------------------------------------------------- */
+/*   personRows: [2, 3, 4]
+/*
+/*      //becomes:
+/*
+/*   personRows:                [2, 3, 4],
+/*   personRowCardinalIndices:  [2, 3, 4],
+/*   personRowZeroBasedIndices: [1, 2, 3]
+/* --------------------------------------------------------- */
+  createRowIndicesVersionsOfParentArray(child, parentPropertyName, parent) {
+    const cardinalIndices = child;
+    parent[this.getCardinalIndicesPropertyName(parentPropertyName)] = cardinalIndices;
+    parent[this.getZeroBasedIndicesPropertyName(parentPropertyName)] = Array.from(cardinalIndices, arrayElement => arrayElement - 1);
+  }
+
+/* --------------------------------------------------------- */
+/*   NON-ROW/COLUMN SPECIFIC
+/* --------------------------------------------------------- */
+  createCardinalAndZeroBasedIndicesProperties(parent, parentPropertyName) {
+    const cardinalIndicesPropertyName = this.getCardinalIndicesPropertyName(parentPropertyName);
+    if(!parent.hasOwnProperty(cardinalIndicesPropertyName)) {
+      parent[cardinalIndicesPropertyName] = {};
+    }
+    const zeroBasedIndicesPropertyName = this.getZeroBasedIndicesPropertyName(parentPropertyName);
+    if(!parent.hasOwnProperty(zeroBasedIndicesPropertyName)) {
+      parent[zeroBasedIndicesPropertyName] = {};
     }
     return {
       cardinalIndicesPropertyName: cardinalIndicesPropertyName,
       zeroBasedIndicesPropertyName: zeroBasedIndicesPropertyName
     };
+  }
+
+  isColumnPropertyName(str) {
+    return str.toLowerCase().endsWith(this.identifiers.column);
+  }
+
+  isColumnsPropertyName(str) {
+    return str.toLowerCase().endsWith(this.identifiers.columns);
+  }
+
+  isRowPropertyName(str) {
+    return str.toLowerCase().endsWith(this.identifiers.row);
+  }
+
+  isRowsPropertyName(str) {
+    return str.toLowerCase().endsWith(this.identifiers.rows);
   }
 
   getCardinalIndexPropertyName(propertyName) {
