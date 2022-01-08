@@ -9,11 +9,13 @@ sidebar: {
   },
   color: {
     type: 'buttons',
+    id: 'colorby',
     title: 'Color by',
     options: ['Timing' , 'Work Stream']
   },
   order: {
     type: 'buttons',
+    id: 'orderby',
     title: 'Order by',
     options: ['Timing' , 'Work Stream']
   }
@@ -24,9 +26,9 @@ class Sidebar {
   constructor(uiRef) {
     this.uiRef = uiRef;
     this.titleSuffix = ' Controls';
-    this.htmlBuilders = {
-      text: this.buildTextItemHtml,
-      buttons: this.buildButtonsItemHtml 
+    this.itemHtmlBuilders = {
+      text: 'buildTextItemHtml',
+      buttons: 'buildButtonsItemHtml' 
     };
   }
 
@@ -41,18 +43,40 @@ class Sidebar {
     var html = '';
     for(const itemName in config) {
       const item = config[itemName];
-      html += this.htmlBuilders[item.type](item);
+      html += this[this.itemHtmlBuilders[item.type]](item);
     }
     return html;
   }
 
+  buildTitleHtml(title) {
+    return '<h1>' + title + '</h1>';
+  }
+
+  buildButtonHtml(option) {
+    return '<input type="button" value="' + option + '">';
+  }
+
   buildTextItemHtml(item) {
-    return '<h1>' + item.title + '</h1>' +
-           '<p>' + item.text + '</p>';
+    return this.buildTitleHtml(item.title) + '<p>' + item.text + '</p>';
   }
 
   buildButtonsItemHtml(item) {
-    return '<h1>' + item.title + '</h1>' +
-           '<p>TODO</p>';
+    var html = '';
+    html += this.buildTitleHtml(item.title);
+    html += this.buildFormOpen(item.id);
+    for(const optionName in item.options) {
+      const option = item.options[optionName];
+      html += this.buildButtonHtml(option);
+    }
+    html += this.buildFormClose();
+    return html;
+  }
+
+  buildFormOpen(id) {
+    return '<form id="' + id + '">';
+  }
+
+  buildFormClose() {
+    return '</form>';
   }
 }
