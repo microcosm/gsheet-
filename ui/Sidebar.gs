@@ -65,7 +65,7 @@ class SidebarHtmlBuilder {
   }
 
   buildButtonHtml(option) {
-    return `<input type='button' onclick='submitForm();' value='` + option + `'>`;
+    return `<input type='button' class='inline' onclick='submitForm();' value='` + option + `'>`;
   }
 
   buildTextItemHtml(item) {
@@ -99,17 +99,20 @@ class SidebarHtmlBuilder {
   getHtmlTemplate() {
     return `<!DOCTYPE html>
 <html>
- <head>
-   <base target='_top'>
-   <script>
-     function submitForm() {
-       google.script.run.onSidebarSubmit(document.getElementById('sidebar'));
-     }
-   </script>
- </head>
- <body>
-   ` + this.bodyMarker + `
- </body>
+  <head>
+    <base target='_top'>
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <script>
+      function submitForm() {
+        google.script.run.onSidebarSubmit(document.getElementById('sidebar'));
+      }
+    </script>
+  </head>
+  <body>
+    <div class='sidebar'>
+      ` + this.bodyMarker + `
+    </div>
+  </body>
 </html>`;
   }
 }
