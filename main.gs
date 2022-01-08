@@ -43,6 +43,13 @@ function onShowSidebar() {
   endEventResponse();
 }
 
+function onSidebarSubmit(e) {
+  const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  stateManager.buildSheetState().buildUsersState().buildUserInterfaceState(); //yeah?
+  state.ui.sidebar.onSidebarSubmit(e);
+  endEventResponse();
+}
+
 /* Sheet Registration */
 function registerValuesSheet(config) {
   var sheet = new ValuesSheet(config);

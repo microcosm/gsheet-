@@ -26,17 +26,29 @@ class Sidebar {
   constructor(uiRef) {
     this.uiRef = uiRef;
     this.titleSuffix = ' Controls';
+    this.htmlBuilder = new SidebarHtmlBuilder(uiRef);
+  }
+
+  onShowSidebar() {
+    const html = this.htmlBuilder.buildHtml(state.activeSheet.config.sidebar);
+    var widget = HtmlService.createHtmlOutput(html);
+    widget.setTitle(state.activeSheet.name + this.titleSuffix);
+    this.uiRef.showSidebar(widget);
+  }
+
+  onSidebarSubmit(e) {
+    logString(e);
+  }
+}
+
+class SidebarHtmlBuilder {
+  constructor(uiRef) {
     this.itemHtmlBuilders = {
       text: 'buildTextItemHtml',
       buttons: 'buildButtonsItemHtml' 
     };
-  }
-
-  onShowSidebar() {
-    const html = this.buildHtml(state.activeSheet.config.sidebar);
-    var widget = HtmlService.createHtmlOutput(html);
-    widget.setTitle(state.activeSheet.name + this.titleSuffix);
-    this.uiRef.showSidebar(widget);
+    this.bodyMarker = '<x>';
+    this.htmlTemplate = this.getHtmlTemplate();
   }
 
   buildHtml(config) {
@@ -45,19 +57,19 @@ class Sidebar {
       const item = config[itemName];
       html += this[this.itemHtmlBuilders[item.type]](item);
     }
-    return html;
+    return this.wrapWithTemplate(html);
   }
 
   buildTitleHtml(title) {
-    return '<h1>' + title + '</h1>';
+    return `<h1>` + title + `</h1>`;
   }
 
   buildButtonHtml(option) {
-    return '<input type="button" value="' + option + '">';
+    return `<input type='button' onclick='submitForm();' value='` + option + `'>`;
   }
 
   buildTextItemHtml(item) {
-    return this.buildTitleHtml(item.title) + '<p>' + item.text + '</p>';
+    return this.buildTitleHtml(item.title) + `<p>` + item.text + `</p>`;
   }
 
   buildButtonsItemHtml(item) {
@@ -73,10 +85,31 @@ class Sidebar {
   }
 
   buildFormOpen(id) {
-    return '<form id="' + id + '">';
+    return `<form id='sidebar'>`;
   }
 
   buildFormClose() {
-    return '</form>';
+    return `</form>`;
+  }
+
+  wrapWithTemplate(html) {
+    return this.htmlTemplate.replace(this.bodyMarker, html);
+  }
+
+  getHtmlTemplate() {
+    return `<!DOCTYPE html>
+<html>
+ <head>
+   <base target='_top'>
+   <script>
+     function submitForm() {
+       google.script.run.onSidebarSubmit(document.getElementById('sidebar'));
+     }
+   </script>
+ </head>
+ <body>
+   ` + this.bodyMarker + `
+ </body>
+</html>`;
   }
 }
