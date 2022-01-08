@@ -7,7 +7,7 @@ class Menu {
   onSpreadsheetOpen() {
     this.uiRef
       .createMenu(this.menuName)
-      .addItem('Guidance', 'onShowGuidanceDialog')
+      .addItem('Show Guidance', 'onShowGuidanceDialog')
       .addToUi();
   }
 
@@ -18,6 +18,7 @@ class Menu {
   }
 
   onShowGuidanceDialog() {
-    this.uiRef.alert(state.defaultAlertMessage);
+    const config = state.activeSheet.config.menu;
+    this.uiRef.alert(config.guidance.title, config.guidance.message, this.uiRef.ButtonSet.OK);
   }
 }

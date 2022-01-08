@@ -39,10 +39,44 @@ class SheetConfigProcessor {
       columns:   'columns',
       row:       'row',
       rows:      'rows'
-    }
+    };
+    this.defaults = {
+      menu: {
+        guidance: {
+          title: 'Sorry',
+          message: 'No guidance available for this sheet.'
+        }
+      }
+    };
   }
 
   process() {
+    this.ensureDefaults(this.defaults, this.config);
+    this.buildColumnAndRowIndexObjects();
+  }
+
+/* --------------------------------------------------------- */
+/*   ENSURE DEFAULTS
+/*   ===============
+/* --------------------------------------------------------- */
+  ensureDefaults(obj, config) {
+    for(const propertyName in obj) {
+      const propertyValue = obj[propertyName];
+      if(!config.hasOwnProperty(propertyName)) {
+        config[propertyName] = propertyValue;
+      }
+      if(isObject(propertyValue)) {
+        this.ensureDefaults(propertyValue, config[propertyName]);
+      }
+    }
+  }
+
+/* --------------------------------------------------------- */
+/*   INDEX OBJECT BUILD & REPLACEMENTS
+/*   =================================
+/* --------------------------------------------------------- */
+
+  buildColumnAndRowIndexObjects() {
     this.buildIndexObjectForColumnsIn(this.config);
     this.buildIndexObjectForRowsIn(this.config);
   }

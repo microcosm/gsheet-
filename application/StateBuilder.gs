@@ -57,9 +57,14 @@ class StateBuilder {
   buildUserInterfaceState() {
     this.appendState({
       ui: new UserInterface(),
-      defaultAlertMessage: 'This menu option can\'t be used on this sheet'
+      activeSheet: this.getActiveSheet()
     });
     return this;
+  }
+
+  getActiveSheet() {
+    const activeSheetName = state.spreadsheet.getActiveSheet().getName();
+    return state.sheets.find(sheet => sheet.name === activeSheetName) || new Sheet({ name: activeSheetName });
   }
 
   appendState(moreState) {

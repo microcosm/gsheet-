@@ -38,7 +38,7 @@ function onSelectionChange() {
 /* Callbacks */
 function onShowGuidanceDialog() {
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateManager.buildUserInterfaceState();
+  stateManager.buildSheetState().buildUserInterfaceState();
   state.ui.menu.onShowGuidanceDialog();
   endEventResponse();
 }
