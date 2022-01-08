@@ -36,10 +36,10 @@ function onSelectionChange() {
 }
 
 /* Callbacks */
-function onShowGuidanceDialog() {
+function onShowSidebar() {
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildSheetState().buildUserInterfaceState();
-  state.ui.menu.onShowGuidanceDialog();
+  state.ui.sidebar.onShowSidebar();
   endEventResponse();
 }
 

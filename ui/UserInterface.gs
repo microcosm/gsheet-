@@ -3,6 +3,7 @@ class UserInterface {
     this.userPropertyKey_ActiveSheetName = 'UserInterface.activeSheetName';
     this.uiRef = SpreadsheetApp.getUi();
     this.menu = new Menu(this.uiRef);
+    this.sidebar = new Sidebar(this.uiRef);
   }
 
   onSpreadsheetOpen() {
