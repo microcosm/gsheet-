@@ -60,6 +60,11 @@ function registerValuesSheet(config) {
 function registerFeatureSheet(config) {
   const sheet = new FeatureSheet(config);
   state.sheets.push(sheet);
+  state.builder.appendFeatures(
+    config.features.map((feature) => {
+      return new feature(sheet)
+    })
+  );
   return sheet;
 }
 

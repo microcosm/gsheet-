@@ -48,10 +48,6 @@ class ValuesSheet extends Sheet {
 class FeatureSheet extends Sheet {
   constructor(config) {
     super(config);
-    state.features.registered = state.features.registered.concat(
-      config.features.map((featureClass) => { return new featureClass(this) })
-    );
-
     this.ensureAccessExpectations();
   }
 

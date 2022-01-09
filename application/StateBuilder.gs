@@ -24,7 +24,8 @@ class StateBuilder {
       today: getTodaysDate(),
       execution: { lock: null, timeout: 60000 },
       userProperties: PropertiesService.getUserProperties(),
-      log: ''
+      log: '',
+      builder: this,
     });
     return this;
   }
@@ -69,5 +70,9 @@ class StateBuilder {
 
   appendState(moreState) {
     state = Object.assign(state, moreState);
+  }
+
+  appendFeatures(features) {
+    state.features.registered = state.features.registered.concat(features);
   }
 }
