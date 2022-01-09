@@ -16,7 +16,7 @@ class Feature {
   }
 
   addResponseCapability(event) {
-    if(!this.respondsTo(event)) {
+    if(!this.responseCapabilities.includes(event)) {
       this.responseCapabilities.push(event);
     }
   }
