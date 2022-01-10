@@ -161,7 +161,7 @@ class EventsFromSpreadsheetStateBuilder {
       isVerbColValidString:     typeof row[this.columns.verb] == 'string' && row[this.columns.verb].length > 0,
       isValidDate:              this.widget.allowFillInTheBlanksDates || row[this.columns.workDate] instanceof Date,
       isValidUser:              !this.exclusionListNames.includes(row[this.columns.name]),
-      isCustomValidated:        typeof customEventWidgetValidation === "undefined" || customEventWidgetValidation(row, this.widget.columns)
+      isCustomValidated:        typeof isValidCustomSheetEventData === "undefined" || isValidCustomSheetEventData(row, this.widget.columns)
     };
     return Object.values(validity).every(check => check === true);
   }
