@@ -1,9 +1,8 @@
-var state;
+var state = { log: '' };
 
 class StateBuilder {
   constructor(spreadsheet) {
     this.spreadsheet = spreadsheet;
-    state = {};
     this.buildInitialState();
   }
 
@@ -24,7 +23,6 @@ class StateBuilder {
       today: getTodaysDate(),
       execution: { lock: null, timeout: 60000 },
       userProperties: PropertiesService.getUserProperties(),
-      log: '',
       builder: this,
     });
     return this;
