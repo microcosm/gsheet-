@@ -2,7 +2,7 @@
 function onSpreadsheetOpen() {
   startEventResponse(Event.onSpreadsheetOpen);
   const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateBuilder.buildUserInterfaceState();
+  stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.onSpreadsheetOpen();
   endEventResponse();
 }
@@ -81,6 +81,7 @@ function executeFeaturesForEvent(event, eventData=false) {
   for(key in state.features.registered) {
     const feature = state.features.registered[key];
     if(feature.respondsTo(event, eventData)) {
+      feature.setEventData(eventData);
       state.features.executions.push(feature);
     }
   }

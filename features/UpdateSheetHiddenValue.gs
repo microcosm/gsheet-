@@ -3,10 +3,11 @@ class UpdateSheetHiddenValue extends Feature {
     super(sheet);
     this.name = 'Update Sheet Hidden Value';
     this.addResponseCapability(Event.onSidebarSubmit);
+    this.sidebarFeature = true;
   }
 
   execute() {
     super.execute();
-    logString('TEST');
+    logString(JSON.stringify(this.getConfig()));
   }
 }

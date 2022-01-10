@@ -13,6 +13,7 @@ class Feature {
     this.sheet = sheet;
     this.responseCapabilities = [];
     this.camelCaseName = false;
+    this.sidebarFeature = false;
   }
 
   addResponseCapability(event) {
@@ -28,12 +29,19 @@ class Feature {
     return respondsToEvent && isValidEventData;
   }
 
+  setEventData(eventData) {
+    this.eventData = eventData;
+  }
+
   getCamelCaseName() {
     if(!this.camelCaseName) this.camelCaseName = toCamelCase(this.name);
     return this.camelCaseName;
   }
 
   getConfig() {
+    if(this.sidebarFeature) {
+      return this.sheet.config.sidebar[this.eventData.sidebar.configAccessor].feature[this.getCamelCaseName()];
+    }
     return this.sheet.config.features[this.getCamelCaseName()];
   }
 

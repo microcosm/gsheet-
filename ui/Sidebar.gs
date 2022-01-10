@@ -46,12 +46,8 @@ class SidebarHtmlBuilder {
   }
 
   getFeatureArgumentStr(item) {
-    logString(JSON.stringify(item));
-    logString(item.hasOwnProperty('feature'));
-    if(item.hasOwnProperty('feature') && Object.keys(item.feature).length == 1) {
-      return `"` + Object.keys(item.feature)[0] + `"`;
-    }
-    return '';
+    if(!item.hasOwnProperty('feature')) throw 'Item needs a feature';
+    return Object.keys(item.feature)[0];
   }
 
   buildHtml(config) {
@@ -59,6 +55,7 @@ class SidebarHtmlBuilder {
     var html = '';
     html += this.buildFormOpen();
     for(const itemName in this.config) {
+      this.currentItemName = itemName;
       const item = this.config[itemName];
       if(item) html += this[this.itemHtmlBuilders[item.type]](item);
     }
@@ -85,7 +82,7 @@ class SidebarHtmlBuilder {
   }
 
   buildButtonHtml(item, option) {
-    return `<input type='button' class='inline' onclick='submitForm(` + this.getFeatureArgumentStr(item) + `);' value='` + option + `'>`;
+    return `<input type='button' class='inline' onclick='submitForm("` + this.getFeatureArgumentStr(item) + `", "` + this.currentItemName + `");' value='` + option + `'>`;
   }
 
   buildFormOpen() {
@@ -107,12 +104,13 @@ class SidebarHtmlBuilder {
     <base target='_top'>
     <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
     <script>
-      function submitForm(feature=false) {
+      function submitForm(feature, configAccessor) {
         try {
           google.script.run.onSidebarSubmit({
             sidebar: {
               sheetName: '` + state.activeSheet.name + `',
-              feature: feature || 'could not find feature'
+              configAccessor: configAccessor,
+              feature: feature
             }
           });
         } catch(error) {
