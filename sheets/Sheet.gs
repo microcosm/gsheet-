@@ -51,6 +51,14 @@ class FeatureSheet extends Sheet {
     this.ensureAccessExpectations();
   }
 
+  isNamed(name) {
+    return this.name === name;
+  }
+
+  isTriggeredByColumn(columnCardinalIndex) {
+    return !this.hasTriggerColumns || this.triggerColumns.cardinalIndices.includes(columnCardinalIndex);
+  }
+
   ensureAccessExpectations() {
     this.assignPropertiesFromConfig(['id', 'triggerColumns', 'widgets', 'scriptResponsiveWidgetNames']);
   }

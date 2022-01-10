@@ -28,6 +28,18 @@ function logEventCreated(event) {
   state.log += "Creating " + removeNewlines(event.title) + "\n";
 }
 
+function logExecution(event) {
+  state.log += 'Event ' + event + ' called.\n';
+}
+
+function logFeatureEvaluation(featureName, sheetName, respondsToEvent, isValidEventData) {
+  if(config.toggles.logAllEvents) {
+    state.log += ((respondsToEvent && isValidEventData) ? '* ' : '') + '[Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\'] DOES' + (respondsToEvent ? '' : ' NOT') + ' respond to event, and HAS' + (isValidEventData ? '' : ' NOT') + ' received valid event data\n';
+  } else if(respondsToEvent && isValidEventData) {
+    state.log += '[Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\'] DOES respond to event, and HAS received valid event data\n';
+  }
+}
+
 function logLockObtained() {
   state.log += "Lock obtained...\n";
 }

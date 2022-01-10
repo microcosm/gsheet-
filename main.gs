@@ -1,19 +1,22 @@
 /* Installed Triggers */
-function onSpreadsheetOpen(e) {
+function onSpreadsheetOpen() {
+  logExecution(Event.onSpreadsheetOpen);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildUserInterfaceState();
   state.ui.onSpreadsheetOpen();
   endEventResponse();
 }
 
-function onSpreadsheetEdit(e) {
+function onSpreadsheetEdit(eventData) {
+  logExecution(Event.onSpreadsheetEdit);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildSheetState().buildUsersState();
-  executeFeaturesForEvent(Event.onSpreadsheetEdit, e.source.getActiveSheet().getName(), e.range.columnStart);
+  executeFeaturesForEvent(Event.onSpreadsheetEdit, eventData);
   endEventResponse();
 }
 
 function onCalendarEdit() {
+  logExecution(Event.onCalendarEdit);
   const stateManager = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
   stateManager.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onCalendarEdit);
@@ -21,6 +24,7 @@ function onCalendarEdit() {
 }
 
 function onOvernightTimer() {
+  logExecution(Event.onOvernightTimer);
   const stateManager = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
   stateManager.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onOvernightTimer);
@@ -29,6 +33,7 @@ function onOvernightTimer() {
 
 /* Simple Triggers */
 function onSelectionChange() {
+  logExecution(Event.onSelectionChange);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildUserInterfaceState();
   state.ui.onSelectionChange();
@@ -37,16 +42,18 @@ function onSelectionChange() {
 
 /* Callbacks */
 function onShowSidebar() {
+  logExecution(Event.onShowSidebar);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildSheetState().buildUserInterfaceState();
   state.ui.sidebar.onShowSidebar();
   endEventResponse();
 }
 
-function onSidebarSubmit(e) {
+function onSidebarSubmit(eventData) {
+  logExecution(Event.onSidebarSubmit);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildSheetState().buildUsersState().buildUserInterfaceState(); //yeah?
-  state.ui.sidebar.onSidebarSubmit(e);
+  state.ui.sidebar.onSidebarSubmit(eventData);
   endEventResponse();
 }
 
@@ -69,10 +76,11 @@ function registerFeatureSheet(config) {
 }
 
 /* Execution */
-function executeFeaturesForEvent(event, sheetName=false, column=false) {
+function executeFeaturesForEvent(event, eventData=false) {
+  logString('Searching registered features for valid responses...');
   for(key in state.features.registered) {
     const feature = state.features.registered[key];
-    if(feature.respondsTo(event) && (!sheetName || !column || feature.isRegisteredFor(sheetName, column))) {
+    if(feature.respondsTo(event, eventData)) {
       state.features.executions.push(feature);
     }
   }
