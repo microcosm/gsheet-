@@ -32,6 +32,10 @@ class Feature {
     return this.camelCaseName;
   }
 
+  getConfig() {
+    return this.sheet.config[this.getCamelCaseName()];
+  }
+
   isValidEventData(eventData) {
     if(!eventData) return true;
     return this.isValidSheetActivatedEventData(eventData);

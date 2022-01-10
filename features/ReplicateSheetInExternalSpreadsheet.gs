@@ -7,11 +7,12 @@ class ReplicateSheetInExternalSpreadsheet extends Feature {
 
   execute() {
     super.execute();
+    this.config = this.getConfig();
     const sourceSheet = this.sheet.sheetRef;
-    const destinationSpreadsheet = SpreadsheetApp.openById(this.sheet.config.destinationSpreadsheetID);
-    const destinationSheet = destinationSpreadsheet.getSheetByName(this.sheet.config.destinationSheetName);
+    const destinationSpreadsheet = SpreadsheetApp.openById(this.config.destinationSpreadsheetID);
+    const destinationSheet = destinationSpreadsheet.getSheetByName(this.config.destinationSheetName);
     this.cloneAllWithRichTextValues(sourceSheet, destinationSheet);
-    this.overwriteSingleColumnWithNonRichTextValues(sourceSheet, destinationSheet, this.sheet.config.nonRichTextColumnOverwrite);
+    this.overwriteSingleColumnWithNonRichTextValues(sourceSheet, destinationSheet, this.config.nonRichTextColumnOverwrite);
   }
 
   cloneAllWithRichTextValues(sourceSheet, destinationSheet) {

@@ -7,7 +7,8 @@ class UpdateSpreadsheetFromCalendar extends Feature {
 
   execute() {
     super.execute();
-    this.buildCalendarEvents(this.sheet.config.fromDate, this.sheet.config.eventsToNumYearsFromNow);
+    this.config = this.getConfig();
+    this.buildCalendarEvents(this.config.fromDate, this.config.eventsToNumYearsFromNow);
     this.updateSheet(this.sheet);
   }
 
@@ -47,10 +48,10 @@ class UpdateSpreadsheetFromCalendar extends Feature {
   }
 
   setupSheetState(sheet) {
-    const beginRow = sheet.config.beginRow.cardinalIndex;
-    const filterRow = sheet.config.filterRow.cardinalIndex;
-    const dateColumn = sheet.config.dateColumn.cardinalIndex;
-    const eventColumn = sheet.config.eventColumn.cardinalIndex;
+    const beginRow = this.config.beginRow.cardinalIndex;
+    const filterRow = this.config.filterRow.cardinalIndex;
+    const dateColumn = this.config.dateColumn.cardinalIndex;
+    const eventColumn = this.config.eventColumn.cardinalIndex;
     const numRows = sheet.sheetRef.getMaxRows() - beginRow;
     this.eventRangeForUpdate = sheet.sheetRef.getRange(beginRow, eventColumn, numRows, 1);
     this.eventValuesForUpdate = this.eventRangeForUpdate.getValues();

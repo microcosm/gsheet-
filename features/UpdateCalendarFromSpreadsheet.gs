@@ -4,12 +4,12 @@ class UpdateCalendarFromSpreadsheet extends Feature {
     this.name = 'Update Calendar From Spreadsheet';
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);
-    this.eventsFromUserCalendarsStateBuilder = new EventsFromUserCalendarsStateBuilder();
-    this.eventsFromSpreadsheetStateBuilder = new EventsFromSheetStateBuilder(this);
   }
 
   execute() {
     super.execute();
+    this.eventsFromUserCalendarsStateBuilder = new EventsFromUserCalendarsStateBuilder();
+    this.eventsFromSpreadsheetStateBuilder = new EventsFromSheetStateBuilder(this);
     state.users.forEach((user) => {
       user.calendarEvents = this.eventsFromUserCalendarsStateBuilder.build(user);
       user.spreadsheetEvents = this.eventsFromSpreadsheetStateBuilder.build(user);
@@ -109,7 +109,7 @@ class EventsFromUserCalendarsStateBuilder {
 class EventsFromSheetStateBuilder {
   constructor(feature) {
     this.sheet = feature.sheet;
-    this.config = this.sheet.config[feature.getCamelCaseName()];
+    this.config = feature.getConfig();
     this.currentWidget = '';
     this.events = [];
     this.fillInTheBlanksDate = state.today;
