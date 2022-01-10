@@ -1,32 +1,32 @@
 /* Installed Triggers */
 function onSpreadsheetOpen() {
   startEventResponse(Event.onSpreadsheetOpen);
-  const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateManager.buildUserInterfaceState();
+  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  stateBuilder.buildUserInterfaceState();
   state.ui.onSpreadsheetOpen();
   endEventResponse();
 }
 
 function onSpreadsheetEdit(eventData) {
   startEventResponse(Event.onSpreadsheetEdit);
-  const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateManager.buildSheetState().buildUsersState();
+  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onSpreadsheetEdit, eventData);
   endEventResponse();
 }
 
 function onCalendarEdit() {
   startEventResponse(Event.onCalendarEdit);
-  const stateManager = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
-  stateManager.buildSheetState().buildUsersState();
+  const stateBuilder = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
+  stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onCalendarEdit);
   endEventResponse();
 }
 
 function onOvernightTimer() {
   startEventResponse(Event.onOvernightTimer);
-  const stateManager = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
-  stateManager.buildSheetState().buildUsersState();
+  const stateBuilder = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
+  stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onOvernightTimer);
   endEventResponse();
 }
@@ -34,8 +34,8 @@ function onOvernightTimer() {
 /* Simple Triggers */
 function onSelectionChange() {
   startEventResponse(Event.onSelectionChange);
-  const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateManager.buildUserInterfaceState();
+  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  stateBuilder.buildUserInterfaceState();
   state.ui.onSelectionChange();
   endEventResponse();
 }
@@ -43,16 +43,16 @@ function onSelectionChange() {
 /* Callbacks */
 function onShowSidebar() {
   startEventResponse(Event.onShowSidebar);
-  const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateManager.buildSheetState().buildUserInterfaceState();
+  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.sidebar.onShowSidebar();
   endEventResponse();
 }
 
 function onSidebarSubmit(eventData) {
   startEventResponse(Event.onSidebarSubmit);
-  const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateManager.buildSheetState().buildUsersState().buildUserInterfaceState(); //yeah?
+  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  stateBuilder.buildSheetState().buildUsersState().buildUserInterfaceState(); // yeah?
   state.ui.sidebar.onSidebarSubmit(eventData);
   endEventResponse();
 }
