@@ -34,7 +34,7 @@ class Feature {
   }
 
   getConfig() {
-    return this.sheet.config[this.getCamelCaseName()];
+    return this.sheet.config.features[this.getCamelCaseName()];
   }
 
   isValidEventData(eventData) {

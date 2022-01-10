@@ -13,6 +13,12 @@ class StateBuilder {
       sheets: [],
       valuesSheet: null,
       features: {
+        classes: {
+          replicateSheetInExternalSpreadsheet: ReplicateSheetInExternalSpreadsheet,
+          updateCalendarFromSpreadsheet: UpdateCalendarFromSpreadsheet,
+          updateSheetHiddenValue: UpdateSheetHiddenValue,
+          updateSpreadsheetFromCalendar: UpdateSpreadsheetFromCalendar,
+        },
         registered: [],
         executions: []
       },

@@ -52,8 +52,8 @@ class SheetConfigProcessor {
   }
 
   process() {
-    this.ensureDefaults(this.defaults, this.config);
-    this.trimDefaults();
+    this.ensureAndTrimDefaults();
+    this.buildFeatureClassArrays();
     this.buildColumnAndRowIndexObjects();
   }
 
@@ -61,14 +61,19 @@ class SheetConfigProcessor {
 /*   DEFAULTS
 /*   ========
 /* --------------------------------------------------------- */
-  ensureDefaults(obj, config) {
-    for(const propertyName in obj) {
-      const propertyValue = obj[propertyName];
+  ensureAndTrimDefaults() {
+    this.ensureDefaultsIn(this.defaults, this.config);
+    this.trimDefaults();
+  }
+
+  ensureDefaultsIn(defaults, config) {
+    for(const propertyName in defaults) {
+      const propertyValue = defaults[propertyName];
       if(!config.hasOwnProperty(propertyName)) {
         config[propertyName] = propertyValue;
       }
       if(isObject(propertyValue)) {
-        this.ensureDefaults(propertyValue, config[propertyName]);
+        this.ensureDefaultsIn(propertyValue, config[propertyName]);
       }
     }
   }
@@ -76,6 +81,29 @@ class SheetConfigProcessor {
   trimDefaults() {
     if(Object.keys(this.config.sidebar).length > 1) {
       this.config.sidebar.default = false;
+    }
+  }
+
+/* --------------------------------------------------------- */
+/*   FEATURES
+/*   ========
+/* --------------------------------------------------------- */
+  buildFeatureClassArrays() {
+    this.config.featureClasses = [];
+    this.buildFeatureClassArraysFrom(this.config);
+  }
+
+  buildFeatureClassArraysFrom(config) {
+    for(const propertyName in config) {
+      const propertyValue = config[propertyName];
+      if(propertyName === 'feature' || propertyName === 'features') {
+        Object.keys(propertyValue).forEach(featureName => {
+          this.config.featureClasses.push(state.features.classes[featureName]);
+        });
+      }
+      if(isObject(propertyValue)) {
+        this.buildFeatureClassArraysFrom(propertyValue);
+      }
     }
   }
 
