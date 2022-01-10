@@ -33,10 +33,6 @@ class Sidebar {
     widget.setTitle(state.activeSheet.name + this.titleSuffix);
     this.uiRef.showSidebar(widget);
   }
-
-  onSidebarSubmit(e) {
-    logString(e);
-  }
 }
 
 class SidebarHtmlBuilder {
@@ -49,40 +45,50 @@ class SidebarHtmlBuilder {
     this.htmlTemplate = this.getHtmlTemplate();
   }
 
+  getFeatureArgumentStr(item) {
+    logString(JSON.stringify(item));
+    logString(item.hasOwnProperty('feature'));
+    if(item.hasOwnProperty('feature') && Object.keys(item.feature).length == 1) {
+      return `"` + Object.keys(item.feature)[0] + `"`;
+    }
+    return '';
+  }
+
   buildHtml(config) {
+    this.config = config;
     var html = '';
-    for(const itemName in config) {
-      const item = config[itemName];
+    html += this.buildFormOpen();
+    for(const itemName in this.config) {
+      const item = this.config[itemName];
       if(item) html += this[this.itemHtmlBuilders[item.type]](item);
     }
+    html += this.buildFormClose();
     return this.wrapWithTemplate(html);
   }
 
-  buildTitleHtml(title) {
-    return `<h1>` + title + `</h1>`;
-  }
-
-  buildButtonHtml(option) {
-    return `<input type='button' class='inline' onclick='submitForm();' value='` + option + `'>`;
+  buildTitleHtml(item) {
+    return `<h1>` + item.title + `</h1>`;
   }
 
   buildTextItemHtml(item) {
-    return this.buildTitleHtml(item.title) + `<p>` + item.text + `</p>`;
+    return this.buildTitleHtml(item) + `<p>` + item.text + `</p>`;
   }
 
   buildButtonsItemHtml(item) {
     var html = '';
-    html += this.buildTitleHtml(item.title);
-    html += this.buildFormOpen(item.id);
+    html += this.buildTitleHtml(item);
     for(const optionName in item.options) {
       const option = item.options[optionName];
-      html += this.buildButtonHtml(option);
+      html += this.buildButtonHtml(item, option);
     }
-    html += this.buildFormClose();
     return html;
   }
 
-  buildFormOpen(id) {
+  buildButtonHtml(item, option) {
+    return `<input type='button' class='inline' onclick='submitForm(` + this.getFeatureArgumentStr(item) + `);' value='` + option + `'>`;
+  }
+
+  buildFormOpen() {
     return `<form id='sidebar'>`;
   }
 
@@ -99,10 +105,21 @@ class SidebarHtmlBuilder {
 <html>
   <head>
     <base target='_top'>
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
     <script>
-      function submitForm() {
-        google.script.run.onSidebarSubmit(document.getElementById('sidebar'));
+      function submitForm(feature=false) {
+        try {
+          google.script.run.onSidebarSubmit({
+            sidebar: {
+              sheetName: '` + state.activeSheet.name + `',
+              feature: feature || 'could not find feature'
+            }
+          });
+        } catch(error) {
+          console.log(error);
+          /* https://issuetracker.google.com/issues/69270374 */
+          alert("Unable to process request. Try logging into only one Google account, in another browser or private window. Google Apps Script doesn't yet support multiple account logins.");
+        }
       }
     </script>
   </head>

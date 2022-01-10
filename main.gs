@@ -52,8 +52,8 @@ function onShowSidebar() {
 function onSidebarSubmit(eventData) {
   startEventResponse(Event.onSidebarSubmit);
   const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateBuilder.buildSheetState();
-  state.ui.sidebar.onSidebarSubmit(eventData);
+  stateBuilder.buildSheetState().buildUserInterfaceState();
+  executeFeaturesForEvent(Event.onSidebarSubmit, eventData);
   endEventResponse();
 }
 

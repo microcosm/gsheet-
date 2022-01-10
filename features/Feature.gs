@@ -4,7 +4,8 @@ const Event = {
   onCalendarEdit:    'onCalendarEdit',
   onOvernightTimer:  'onOvernightTimer',
   onSelectionChange: 'onSelectionChange',
-  onShowSidebar:     'onShowSidebar'
+  onShowSidebar:     'onShowSidebar',
+  onSidebarSubmit:   'onSidebarSubmit'
 };
 
 class Feature {
@@ -38,7 +39,7 @@ class Feature {
 
   isValidEventData(eventData) {
     if(!eventData) return true;
-    return (!this.isSheetActivatedEventData(eventData) || this.isValidSheetActivatedEventData(eventData));
+    return this.isValidSheetActivatedEventData(eventData) || this.isValidSidebarSubmissionEventData(eventData);
   }
 
   isSheetActivatedEventData(eventData) {
@@ -46,17 +47,23 @@ class Feature {
   }
 
   isValidSheetActivatedEventData(eventData) {
+    if(!this.isSheetActivatedEventData(eventData)) return false;
     const sheetName = eventData.source.getActiveSheet().getName();
     const column = eventData.range.columnStart;
     return this.sheet.isNamed(sheetName) && this.sheet.isTriggeredByColumn(column);
   }
 
   isSidebarSubmissionEventData(eventData) {
-    return eventData.hasOwnProperty('sidebar');
+    return eventData.hasOwnProperty('sidebar') &&
+           eventData.sidebar.hasOwnProperty('feature') &&
+           eventData.sidebar.feature === this.getCamelCaseName();
   }
 
   isValidSidebarSubmissionEventData(eventData) {
-    return eventData.sidebar.feature === this.getCamelCaseName();
+    if(!this.isSidebarSubmissionEventData(eventData)) return false;
+    const feature = eventData.sidebar.feature;
+    const sheetName = eventData.sidebar.sheetName;
+    return this.sheet.isNamed(sheetName) && feature === this.getCamelCaseName();
   }
 
   execute() {

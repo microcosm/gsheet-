@@ -30,6 +30,9 @@ class StateBuilder {
 
   buildSheetState() {
     buildSheets();
+    this.appendState({
+      activeSheet: this.getActiveSheet()
+    });
     return this;
   }
 
@@ -55,8 +58,7 @@ class StateBuilder {
 
   buildUserInterfaceState() {
     this.appendState({
-      ui: new UserInterface(),
-      activeSheet: this.getActiveSheet()
+      ui: new UserInterface()
     });
     return this;
   }
