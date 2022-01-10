@@ -52,5 +52,6 @@ class Feature {
 
   execute() {
     logFeatureExecution(this.name);
+    this.config = this.getConfig();
   }
 }

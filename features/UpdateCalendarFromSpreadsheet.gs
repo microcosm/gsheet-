@@ -109,7 +109,7 @@ class EventsFromUserCalendarsStateBuilder {
 class EventsFromSheetStateBuilder {
   constructor(feature) {
     this.sheet = feature.sheet;
-    this.config = feature.getConfig();
+    this.config = feature.config;
     this.currentWidget = '';
     this.events = [];
     this.fillInTheBlanksDate = state.today;

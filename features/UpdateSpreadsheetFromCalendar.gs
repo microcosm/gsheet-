@@ -7,7 +7,6 @@ class UpdateSpreadsheetFromCalendar extends Feature {
 
   execute() {
     super.execute();
-    this.config = this.getConfig();
     this.buildCalendarEvents(this.config.fromDate, this.config.eventsToNumYearsFromNow);
     this.updateSheet(this.sheet);
   }
