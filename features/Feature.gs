@@ -39,4 +39,8 @@ class Feature {
     }
     return true;
   }
+
+  execute() {
+    logFeatureExecution(this.featureName);
+  }
 }

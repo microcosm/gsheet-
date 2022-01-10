@@ -9,7 +9,7 @@ class UpdateCalendarFromSpreadsheet extends Feature {
   }
 
   execute() {
-    logFeatureExecution(this.featureName);
+    super.execute();
     state.users.forEach((user) => {
       user.calendarEvents = this.eventsFromUserCalendarsStateBuilder.build(user);
       user.spreadsheetEvents = this.eventsFromSpreadsheetStateBuilder.build(user);

@@ -6,7 +6,7 @@ class ReplicateSheetInExternalSpreadsheet extends Feature {
   }
 
   execute() {
-    logFeatureExecution(this.featureName);
+    super.execute();
     const sourceSheet = this.sheet.sheetRef;
     const destinationSpreadsheet = SpreadsheetApp.openById(this.sheet.config.destinationSpreadsheetID);
     const destinationSheet = destinationSpreadsheet.getSheetByName(this.sheet.config.destinationSheetName);

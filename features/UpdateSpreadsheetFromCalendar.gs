@@ -6,7 +6,7 @@ class UpdateSpreadsheetFromCalendar extends Feature {
   }
 
   execute() {
-    logFeatureExecution(this.featureName);
+    super.execute();
     this.buildCalendarEvents(this.sheet.config.fromDate, this.sheet.config.eventsToNumYearsFromNow);
     this.updateSheet(this.sheet);
   }
