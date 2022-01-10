@@ -30,7 +30,7 @@ class UpdateCalendarFromSpreadsheet extends Feature {
         matchingCalendarEvent.existsInSpreadsheet = true;
         spreadsheetEvent.existsInCalendar = true;
       }
-      logEventFound(spreadsheetEvent, matchingCalendarEvent);
+      logCalendarEventFound(spreadsheetEvent, matchingCalendarEvent);
     });
   }
 
@@ -67,14 +67,14 @@ class UpdateCalendarFromSpreadsheet extends Feature {
   }
 
   deleteCalendarEvent(calendarEvent) {
-    logEventDeleted(calendarEvent);
+    logCalendarEventDeleted(calendarEvent);
     if(config.toggles.performDataUpdates) {
       calendarEvent.gcal.deleteEvent();
     }
   }
 
   createCalendarEvent(spreadsheetEvent, calendar) {
-    logEventCreated(spreadsheetEvent);
+    logCalendarEventCreated(spreadsheetEvent);
     if(config.toggles.performDataUpdates) {
       spreadsheetEvent.isAllDay ?
         calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :

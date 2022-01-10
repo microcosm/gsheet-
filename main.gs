@@ -1,6 +1,6 @@
 /* Installed Triggers */
 function onSpreadsheetOpen() {
-  logExecution(Event.onSpreadsheetOpen);
+  startEventResponse(Event.onSpreadsheetOpen);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildUserInterfaceState();
   state.ui.onSpreadsheetOpen();
@@ -8,7 +8,7 @@ function onSpreadsheetOpen() {
 }
 
 function onSpreadsheetEdit(eventData) {
-  logExecution(Event.onSpreadsheetEdit);
+  startEventResponse(Event.onSpreadsheetEdit);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onSpreadsheetEdit, eventData);
@@ -16,7 +16,7 @@ function onSpreadsheetEdit(eventData) {
 }
 
 function onCalendarEdit() {
-  logExecution(Event.onCalendarEdit);
+  startEventResponse(Event.onCalendarEdit);
   const stateManager = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
   stateManager.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onCalendarEdit);
@@ -24,7 +24,7 @@ function onCalendarEdit() {
 }
 
 function onOvernightTimer() {
-  logExecution(Event.onOvernightTimer);
+  startEventResponse(Event.onOvernightTimer);
   const stateManager = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
   stateManager.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onOvernightTimer);
@@ -33,7 +33,7 @@ function onOvernightTimer() {
 
 /* Simple Triggers */
 function onSelectionChange() {
-  logExecution(Event.onSelectionChange);
+  startEventResponse(Event.onSelectionChange);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildUserInterfaceState();
   state.ui.onSelectionChange();
@@ -42,7 +42,7 @@ function onSelectionChange() {
 
 /* Callbacks */
 function onShowSidebar() {
-  logExecution(Event.onShowSidebar);
+  startEventResponse(Event.onShowSidebar);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildSheetState().buildUserInterfaceState();
   state.ui.sidebar.onShowSidebar();
@@ -50,7 +50,7 @@ function onShowSidebar() {
 }
 
 function onSidebarSubmit(eventData) {
-  logExecution(Event.onSidebarSubmit);
+  startEventResponse(Event.onSidebarSubmit);
   const stateManager = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateManager.buildSheetState().buildUsersState().buildUserInterfaceState(); //yeah?
   state.ui.sidebar.onSidebarSubmit(eventData);
@@ -116,6 +116,10 @@ function releaseLock() {
   SpreadsheetApp.flush();
   state.execution.lock.releaseLock();
   logLockReleased();
+}
+
+function startEventResponse(event) {
+  logEventExecution(event)
 }
 
 function endEventResponse() {
