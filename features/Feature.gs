@@ -38,16 +38,25 @@ class Feature {
 
   isValidEventData(eventData) {
     if(!eventData) return true;
-    return this.isValidSheetActivatedEventData(eventData);
+    return (!this.isSheetActivatedEventData(eventData) || this.isValidSheetActivatedEventData(eventData));
+  }
+
+  isSheetActivatedEventData(eventData) {
+    return eventData.hasOwnProperty('source') && eventData.hasOwnProperty('range');
   }
 
   isValidSheetActivatedEventData(eventData) {
-    if(eventData.hasOwnProperty('source') && eventData.hasOwnProperty('range')) {
-      const sheetName = eventData.source.getActiveSheet().getName();
-      const column = eventData.range.columnStart;
-      return this.sheet.isNamed(sheetName) && this.sheet.isTriggeredByColumn(column);
-    }
-    return true;
+    const sheetName = eventData.source.getActiveSheet().getName();
+    const column = eventData.range.columnStart;
+    return this.sheet.isNamed(sheetName) && this.sheet.isTriggeredByColumn(column);
+  }
+
+  isSidebarSubmissionEventData(eventData) {
+    return eventData.hasOwnProperty('sidebar');
+  }
+
+  isValidSidebarSubmissionEventData(eventData) {
+    return eventData.sidebar.feature === this.getCamelCaseName();
   }
 
   execute() {

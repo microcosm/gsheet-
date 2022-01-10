@@ -52,7 +52,7 @@ function onShowSidebar() {
 function onSidebarSubmit(eventData) {
   startEventResponse(Event.onSidebarSubmit);
   const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateBuilder.buildSheetState().buildUsersState().buildUserInterfaceState(); // yeah?
+  stateBuilder.buildSheetState();
   state.ui.sidebar.onSidebarSubmit(eventData);
   endEventResponse();
 }

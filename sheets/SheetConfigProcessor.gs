@@ -41,10 +41,11 @@ class SheetConfigProcessor {
       rows:      'rows'
     };
     this.defaults = {
-      menu: {
-        guidance: {
+      sidebar: {
+        default: {
+          type: 'text',
           title: 'Sorry',
-          message: 'No guidance available for this sheet.'
+          text: 'The sidebar has not been configured for this sheet.'
         }
       }
     };
@@ -52,12 +53,13 @@ class SheetConfigProcessor {
 
   process() {
     this.ensureDefaults(this.defaults, this.config);
+    this.trimDefaults();
     this.buildColumnAndRowIndexObjects();
   }
 
 /* --------------------------------------------------------- */
-/*   ENSURE DEFAULTS
-/*   ===============
+/*   DEFAULTS
+/*   ========
 /* --------------------------------------------------------- */
   ensureDefaults(obj, config) {
     for(const propertyName in obj) {
@@ -68,6 +70,12 @@ class SheetConfigProcessor {
       if(isObject(propertyValue)) {
         this.ensureDefaults(propertyValue, config[propertyName]);
       }
+    }
+  }
+
+  trimDefaults() {
+    if(Object.keys(this.config.sidebar).length > 1) {
+      this.config.sidebar.default = false;
     }
   }
 

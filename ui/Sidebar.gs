@@ -9,13 +9,11 @@ sidebar: {
   },
   color: {
     type: 'buttons',
-    id: 'colorby',
     title: 'Color by',
     options: ['Timing' , 'Work Stream']
   },
   order: {
     type: 'buttons',
-    id: 'orderby',
     title: 'Order by',
     options: ['Timing' , 'Work Stream']
   }
@@ -55,7 +53,7 @@ class SidebarHtmlBuilder {
     var html = '';
     for(const itemName in config) {
       const item = config[itemName];
-      html += this[this.itemHtmlBuilders[item.type]](item);
+      if(item) html += this[this.itemHtmlBuilders[item.type]](item);
     }
     return this.wrapWithTemplate(html);
   }
