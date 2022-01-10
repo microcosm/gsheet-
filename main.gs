@@ -119,5 +119,6 @@ function releaseLock() {
 }
 
 function endEventResponse() {
+  logString('Execution completed.')
   outputLog();
 }
