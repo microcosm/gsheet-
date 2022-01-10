@@ -60,7 +60,7 @@ class FeatureSheet extends Sheet {
   }
 
   ensureAccessExpectations() {
-    this.assignPropertiesFromConfig(['id', 'triggerColumns', 'widgets', 'scriptResponsiveWidgetNames']);
+    this.assignPropertiesFromConfig(['id', 'triggerColumns']);
   }
 
   assignPropertiesFromConfig(propertyNames) {

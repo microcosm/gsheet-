@@ -1,7 +1,7 @@
 class UpdateSpreadsheetFromCalendar extends Feature {
   constructor(sheet) {
     super(sheet);
-    this.featureName = 'Update Spreadsheet From Calendar';
+    this.name = 'Update Spreadsheet From Calendar';
     this.addResponseCapability(Event.onCalendarEdit);
   }
 

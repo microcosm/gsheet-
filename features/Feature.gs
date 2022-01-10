@@ -11,6 +11,7 @@ class Feature {
   constructor(sheet) {
     this.sheet = sheet;
     this.responseCapabilities = [];
+    this.camelCaseName = false;
   }
 
   addResponseCapability(event) {
@@ -22,8 +23,13 @@ class Feature {
   respondsTo(event, eventData) {
     const respondsToEvent = this.responseCapabilities.includes(event);
     const isValidEventData = this.isValidEventData(eventData);
-    logFeatureEvaluation(this.featureName, this.sheet.name, respondsToEvent, isValidEventData);
+    logFeatureEvaluation(this.name, this.sheet.name, respondsToEvent, isValidEventData);
     return respondsToEvent && isValidEventData;
+  }
+
+  getCamelCaseName() {
+    if(!this.camelCaseName) this.camelCaseName = toCamelCase(this.name);
+    return this.camelCaseName;
   }
 
   isValidEventData(eventData) {
@@ -41,6 +47,6 @@ class Feature {
   }
 
   execute() {
-    logFeatureExecution(this.featureName);
+    logFeatureExecution(this.name);
   }
 }

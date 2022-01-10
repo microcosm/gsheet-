@@ -1,11 +1,11 @@
 class UpdateCalendarFromSpreadsheet extends Feature {
   constructor(sheet) {
     super(sheet);
-    this.featureName = 'Update Calendar From Spreadsheet';
+    this.name = 'Update Calendar From Spreadsheet';
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);
     this.eventsFromUserCalendarsStateBuilder = new EventsFromUserCalendarsStateBuilder();
-    this.eventsFromSpreadsheetStateBuilder = new EventsFromSpreadsheetStateBuilder();
+    this.eventsFromSpreadsheetStateBuilder = new EventsFromSheetStateBuilder(this);
   }
 
   execute() {
@@ -106,42 +106,33 @@ class EventsFromUserCalendarsStateBuilder {
   }
 }
 
-class EventsFromSpreadsheetStateBuilder {
+class EventsFromSheetStateBuilder {
+  constructor(feature) {
+    this.sheet = feature.sheet;
+    this.config = this.sheet.config[feature.getCamelCaseName()];
+    this.currentWidget = '';
+    this.events = [];
+    this.fillInTheBlanksDate = state.today;
+  }
+
   build(user) {
-    this.currentWidget = '',
-    this.events = [],
-    this.user = user,
-    this.exclusionListNames = this.getOtherUsersNames(user),
-    this.fillInTheBlanksDate = state.today
-
-    state.sheets.forEach((sheet) => {
-      if(sheet.hasWidgets) {
-        this.sheet = sheet;
-        this.buildEventsFromWidgets();
-      }
-    });
-
+    this.user = user;
+    this.exclusionListNames = this.getOtherUsersNames(user);
+    for(var widgetCategory in this.config.widgetCategories) {
+      this.widgetCategory = this.config.widgetCategories[widgetCategory];
+      this.columns = this.widgetCategory.columns.zeroBasedIndices;
+      this.buildEventsFromWidgetCategory();
+    }
     return this.events;
   }
 
-  buildEventsFromWidgets() {
-    for(var widgetName in this.sheet.widgets) {
-      var widget = this.sheet.widgets[widgetName];
-      if(widget.hasEvents) {
-        this.widget = widget;
-        this.columns = widget.columns.zeroBasedIndices;
-        this.buildEventsFromWidget();
-      }
-    }
-  }
-
-  buildEventsFromWidget() {
-    const sheetValues = this.sheet.sheetRef.getDataRange().getValues();
+  buildEventsFromWidgetCategory() {
+    const sheetValues = this.sheet.getValues();
     for(var i = 0; i < sheetValues.length; i++) {
       const row = sheetValues[i];
 
       if(this.isWorkDateLabel(row[this.columns.workDate])) {
-        this.currentWidget = sheetValues[i + this.widget.name.rowOffset][this.widget.name.column.zeroBasedIndex];
+        this.currentWidget = sheetValues[i + this.widgetCategory.name.rowOffset][this.widgetCategory.name.column.zeroBasedIndex];
       } else if(this.isValidEvent(row)) {
         var eventFromSpreadsheet = this.buildEventFromRow(row);
         this.events.push(eventFromSpreadsheet);
@@ -155,13 +146,13 @@ class EventsFromSpreadsheetStateBuilder {
 
   isValidEvent(row) {
     var validity = {
-      isScriptResponsiveWidget: this.sheet.scriptResponsiveWidgetNames.includes(this.currentWidget),
-      isNotDoneOrWaiting:       !this.getIsDoneOrWaiting(this.widget, row),
+      isScriptResponsiveWidget: this.config.scriptResponsiveWidgetNames.includes(this.currentWidget),
+      isNotDoneOrWaiting:       !this.getIsDoneOrWaiting(this.widgetCategory, row),
       isNounColValidString:     typeof row[this.columns.noun] == 'string' && row[this.columns.noun].length > 0,
       isVerbColValidString:     typeof row[this.columns.verb] == 'string' && row[this.columns.verb].length > 0,
-      isValidDate:              this.widget.allowFillInTheBlanksDates || row[this.columns.workDate] instanceof Date,
+      isValidDate:              this.widgetCategory.allowFillInTheBlanksDates || row[this.columns.workDate] instanceof Date,
       isValidUser:              !this.exclusionListNames.includes(row[this.columns.name]),
-      isCustomValidated:        typeof isValidCustomSheetEventData === "undefined" || isValidCustomSheetEventData(row, this.widget.columns)
+      isCustomValidated:        typeof isValidCustomSheetEventData === "undefined" || isValidCustomSheetEventData(row, this.widgetCategory.columns)
     };
     return Object.values(validity).every(check => check === true);
   }
@@ -169,7 +160,7 @@ class EventsFromSpreadsheetStateBuilder {
   buildEventFromRow(row) {
     var startDateTime, endDateTime, isAllDay;
 
-    if(this.isFillInTheBlanks(row, this.widget)) {
+    if(this.isFillInTheBlanks(row, this.widgetCategory)) {
       isAllDay = true;
       startDateTime = new Date(this.fillInTheBlanksDate);
       endDateTime = null;
@@ -227,8 +218,8 @@ class EventsFromSpreadsheetStateBuilder {
     return isValidTimeString(startTime) ? startTime.split(':')[1] : false;
   }
 
-  isFillInTheBlanks(row, widget) {
-    return widget.allowFillInTheBlanksDates && (!(row[this.columns.workDate] instanceof Date));
+  isFillInTheBlanks(row, widgetCategory) {
+    return widgetCategory.allowFillInTheBlanksDates && (!(row[this.columns.workDate] instanceof Date));
   }
 
   getPulledForward(dateTime) {
@@ -242,8 +233,8 @@ class EventsFromSpreadsheetStateBuilder {
     return dateTime;
   }
 
-  getIsDoneOrWaiting(widget, row) {
-    if(widget.hasDoneCol) {
+  getIsDoneOrWaiting(widgetCategory, row) {
+    if(widgetCategory.hasDoneCol) {
       return row[this.columns.done] === 'Yes' || row[this.columns.done] === 'Waiting';
     }
     return false;
