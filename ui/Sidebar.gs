@@ -137,7 +137,9 @@ class SidebarHtmlBuilder {
       var activeSheetIDGlobal = '` + getHtmlSafeID(state.activeSheet.name) + `';
       setInterval(checkForNewSheetID, 1000);
       function checkForNewSheetID() {
-        google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetID();
+        if(document.visibilityState == 'visible') {
+          google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetID();
+        }
       }
       function logActiveSheet(sheetID) {
         if(activeSheetIDGlobal !== sheetID) {
