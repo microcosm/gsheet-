@@ -104,6 +104,10 @@ class SidebarHtmlBuilder {
     <base target='_top'>
     <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
     <script>
+      console.log(google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetName());
+      function logActiveSheet(sheetName) {
+        console.log(sheetName);
+      }
       function submitForm(feature, configAccessor) {
         try {
           google.script.run.onSidebarSubmit({

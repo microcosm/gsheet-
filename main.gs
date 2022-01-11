@@ -57,6 +57,10 @@ function onSidebarSubmit(eventData) {
   endEventResponse();
 }
 
+function getActiveSheetName() {
+  return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
+}
+
 /* Sheet Registration */
 function registerValuesSheet(config) {
   var sheet = new ValuesSheet(config);
