@@ -43,6 +43,7 @@ class SidebarHtmlBuilder {
     };
     this.bodyMarker = '<x>';
     this.htmlTemplate = this.getHtmlTemplate();
+    this.defaultSidebarID = 'default-sidebar';
   }
 
   getFeatureArgumentStr(item) {
@@ -54,12 +55,23 @@ class SidebarHtmlBuilder {
     var html = '';
     html += this.buildFormOpen();
     state.sheets.forEach((sheet) => {
-      html += this.buildSidebarOpen(sheet.name);
-      html += this.buildSidebarHtml(sheet.config.sidebar);
-      html += this.buildSidebarClose();
+      if(sheet.config.hasOwnProperty('sidebar')) {
+        html += this.buildSidebarOpen(sheet.name);
+        html += this.buildSidebarHtml(sheet.config.sidebar);
+        html += this.buildSidebarClose();
+      }
     });
+    html += this.buildDefaultSidebarHtml();
     html += this.buildFormClose();
     return this.wrapWithTemplate(html);
+  }
+
+  buildDefaultSidebarHtml() {
+    var html = '';
+    html += this.buildSidebarOpen(this.defaultSidebarID);
+    html += this.buildSidebarHtml({ default: { type: 'text', title: 'Sorry', text: 'The sidebar has not been configured for this sheet.' }});
+    html += this.buildSidebarClose();
+    return html;
   }
 
   buildSidebarOpen(sheetName) {

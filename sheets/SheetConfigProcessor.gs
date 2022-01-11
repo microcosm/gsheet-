@@ -40,15 +40,7 @@ class SheetConfigProcessor {
       row:       'row',
       rows:      'rows'
     };
-    this.defaults = {
-      sidebar: {
-        default: {
-          type: 'text',
-          title: 'Sorry',
-          text: 'The sidebar has not been configured for this sheet.'
-        }
-      }
-    };
+    this.defaults = {};
   }
 
   process() {
@@ -60,10 +52,20 @@ class SheetConfigProcessor {
 /* --------------------------------------------------------- */
 /*   DEFAULTS
 /*   ========
+/*   Apply default values to config in this format if needed:
+/*
+/*   this.defaults = {
+/*     sidebar: {
+/*       default: {
+/*         type: 'text',
+/*         title: 'Sorry',
+/*         text: 'Some text.'
+/*       }
+/*     }
+/*   };
 /* --------------------------------------------------------- */
   ensureAndTrimDefaults() {
     this.ensureDefaultsIn(this.defaults, this.config);
-    this.trimDefaults();
   }
 
   ensureDefaultsIn(defaults, config) {
@@ -75,12 +77,6 @@ class SheetConfigProcessor {
       if(isObject(propertyValue)) {
         this.ensureDefaultsIn(propertyValue, config[propertyName]);
       }
-    }
-  }
-
-  trimDefaults() {
-    if(Object.keys(this.config.sidebar).length > 1) {
-      this.config.sidebar.default = false;
     }
   }
 
