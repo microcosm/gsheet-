@@ -104,12 +104,16 @@ class SidebarHtmlBuilder {
     <base target='_top'>
     <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
     <script>
-      setInterval(checkForNewSheetName, 3000);
+      var activeSheetNameGlobal = '` + state.activeSheet.name + `';
+      setInterval(checkForNewSheetName, 1000);
       function checkForNewSheetName() {
         google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetName();
       }
       function logActiveSheet(sheetName) {
-        console.log(sheetName);
+        if(activeSheetNameGlobal !== sheetName) {
+          activeSheetNameGlobal = sheetName;
+          console.log(sheetName);
+        }
       }
       function submitForm(feature, configAccessor) {
         try {
