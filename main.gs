@@ -57,8 +57,8 @@ function onSidebarSubmit(eventData) {
   endEventResponse();
 }
 
-function getActiveSheetName() {
-  return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
+function getActiveSheetID() {
+  return getHtmlSafeID(SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName());
 }
 
 /* Sheet Registration */

@@ -23,12 +23,12 @@ sidebar: {
 class Sidebar {
   constructor(uiRef) {
     this.uiRef = uiRef;
-    this.titleSuffix = ' Controls';
+    this.titleSuffix = ' Controls';// to change
     this.htmlBuilder = new SidebarHtmlBuilder(uiRef);
   }
 
   onShowSidebar() {
-    const html = this.htmlBuilder.buildHtml(state.activeSheet.config.sidebar);
+    const html = this.htmlBuilder.buildHtml();
     var widget = HtmlService.createHtmlOutput(html);
     widget.setTitle(state.activeSheet.name + this.titleSuffix);
     this.uiRef.showSidebar(widget);
@@ -50,17 +50,35 @@ class SidebarHtmlBuilder {
     return Object.keys(item.feature)[0];
   }
 
-  buildHtml(config) {
-    this.config = config;
+  buildHtml() {
     var html = '';
     html += this.buildFormOpen();
+    state.sheets.forEach((sheet) => {
+      html += this.buildSidebarOpen(sheet.name);
+      html += this.buildSidebarHtml(sheet.config.sidebar);
+      html += this.buildSidebarClose();
+    });
+    html += this.buildFormClose();
+    return this.wrapWithTemplate(html);
+  }
+
+  buildSidebarOpen(sheetName) {
+    return `<div id='` + getHtmlSafeID(sheetName) + `'>`;
+  }
+
+  buildSidebarClose() {
+    return `</div>`;
+  }
+
+  buildSidebarHtml(config) {
+    this.config = config;
+    var html = '';
     for(const itemName in this.config) {
       this.currentItemName = itemName;
       const item = this.config[itemName];
       if(item) html += this[this.itemHtmlBuilders[item.type]](item);
     }
-    html += this.buildFormClose();
-    return this.wrapWithTemplate(html);
+    return html;
   }
 
   buildTitleHtml(item) {
@@ -104,15 +122,15 @@ class SidebarHtmlBuilder {
     <base target='_top'>
     <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
     <script>
-      var activeSheetNameGlobal = '` + state.activeSheet.name + `';
-      setInterval(checkForNewSheetName, 1000);
-      function checkForNewSheetName() {
-        google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetName();
+      var activeSheetIDGlobal = '` + getHtmlSafeID(state.activeSheet.name) + `';
+      setInterval(checkForNewSheetID, 1000);
+      function checkForNewSheetID() {
+        google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetID();
       }
-      function logActiveSheet(sheetName) {
-        if(activeSheetNameGlobal !== sheetName) {
-          activeSheetNameGlobal = sheetName;
-          console.log(sheetName);
+      function logActiveSheet(sheetID) {
+        if(activeSheetIDGlobal !== sheetID) {
+          activeSheetIDGlobal = sheetID;
+          console.log(sheetID);
         }
       }
       function submitForm(feature, configAccessor) {

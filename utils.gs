@@ -26,6 +26,10 @@ function isValidTimeString(candidate) {
   return typeof candidate == 'string' && candidate.includes(':');
 }
 
+function getHtmlSafeID(unsafe) {
+  return unsafe.replace(' ', '-');
+}
+
 function getTodaysDate() {
   var date = new Date();
   return setToMidnight(date);
