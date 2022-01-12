@@ -42,8 +42,10 @@ class SidebarHtmlBuilder {
       buttons: 'buildButtonsItemHtml' 
     };
     this.bodyMarker = '<x>';
-    this.htmlTemplate = this.getHtmlTemplate();
-    this.defaultSidebarID = 'default-sidebar';
+    this.sidebarThirdPartyCSSClass = 'sidebar';
+    this.formID = 'sidebar-form';
+    this.defaultItemID = 'default-item';
+    this.activeSheetID = getHtmlSafeID(state.activeSheet.name);
   }
 
   getFeatureArgumentStr(item) {
@@ -68,14 +70,17 @@ class SidebarHtmlBuilder {
 
   buildDefaultSidebarHtml() {
     var html = '';
-    html += this.buildSidebarOpen(this.defaultSidebarID);
+    html += this.buildSidebarOpen(this.defaultItemID);
     html += this.buildSidebarHtml({ default: { type: 'text', title: 'Sorry', text: 'The sidebar has not been configured for this sheet.' }});
     html += this.buildSidebarClose();
     return html;
   }
 
   buildSidebarOpen(sheetName) {
-    return `<div id='` + getHtmlSafeID(sheetName) + `'>`;
+    const sheetID = getHtmlSafeID(sheetName);
+    const hidden = !(this.activeSheetID === sheetID);
+    const hiddenHtml = hidden ? ` class='hidden'` : ``;
+    return `<div id='` + sheetID + `'` + hiddenHtml + `>`;
   }
 
   buildSidebarClose() {
@@ -116,7 +121,7 @@ class SidebarHtmlBuilder {
   }
 
   buildFormOpen() {
-    return `<form id='sidebar'>`;
+    return `<form id='` + this.formID + `'>`;
   }
 
   buildFormClose() {
@@ -124,7 +129,7 @@ class SidebarHtmlBuilder {
   }
 
   wrapWithTemplate(html) {
-    return this.htmlTemplate.replace(this.bodyMarker, html);
+    return this.getHtmlTemplate().replace(this.bodyMarker, html);
   }
 
   getHtmlTemplate() {
@@ -132,40 +137,63 @@ class SidebarHtmlBuilder {
 <html>
   <head>
     <base target='_top'>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
     <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
     <script>
-      var activeSheetIDGlobal = '` + getHtmlSafeID(state.activeSheet.name) + `';
-      setInterval(checkForNewSheetID, 1000);
-      function checkForNewSheetID() {
-        if(document.visibilityState == 'visible') {
-          google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetID();
+      document.addEventListener("DOMContentLoaded", function() {
+        var activeSheetIDGlobal = '` + this.activeSheetID + `';
+        setInterval(checkForNewSheetID, 300);
+        function checkForNewSheetID() {
+          if(document.visibilityState == 'visible') {
+            google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetID();
+          }
         }
-      }
-      function logActiveSheet(sheetID) {
-        if(activeSheetIDGlobal !== sheetID) {
-          activeSheetIDGlobal = sheetID;
-          console.log(sheetID);
+        function logActiveSheet(sheetID) {
+          if(activeSheetIDGlobal !== sheetID) {
+            activeSheetIDGlobal = sheetID;
+            showCurrentSheetSidebar();
+          }
         }
-      }
-      function submitForm(feature, configAccessor) {
-        try {
-          google.script.run.onSidebarSubmit({
-            sidebar: {
-              sheetName: '` + state.activeSheet.name + `',
-              configAccessor: configAccessor,
-              feature: feature
+        function showCurrentSheetSidebar() {
+          let found = false;
+          let sidebar = document.getElementById('` + this.formID + `');
+          for(item of sidebar.children) {
+            if(item.id === activeSheetIDGlobal) {
+              item.classList.remove('hidden');
+              found = true;
+            } else {
+              item.classList.add('hidden');
             }
-          });
-        } catch(error) {
-          console.log(error);
-          /* https://issuetracker.google.com/issues/69270374 */
-          alert("Unable to process request. Try logging into only one Google account, in another browser or private window. Google Apps Script doesn't yet support multiple account logins.");
+          }
+          if(!found) {
+            document.getElementById('` + this.defaultItemID + `').classList.remove('hidden');
+          }
         }
-      }
+        function submitForm(feature, configAccessor) {
+          try {
+            google.script.run.onSidebarSubmit({
+              sidebar: {
+                sheetName: '` + state.activeSheet.name + `',
+                configAccessor: configAccessor,
+                feature: feature
+              }
+            });
+          } catch(error) {
+            console.log(error);
+            /* https://issuetracker.google.com/issues/69270374 */
+            alert("Unable to process request. Try logging into only one Google account, in another browser or private window. Google Apps Script doesn't yet support multiple account logins.");
+          }
+        }
+        showCurrentSheetSidebar();
+      });
     </script>
   </head>
   <body>
-    <div class='sidebar'>
+    <div class='` + this.sidebarThirdPartyCSSClass + `'>
       ` + this.bodyMarker + `
     </div>
   </body>

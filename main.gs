@@ -35,7 +35,7 @@ function onOvernightTimer() {
 function onSelectionChange() {
   startEventResponse(Event.onSelectionChange);
   const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
-  stateBuilder.buildUserInterfaceState();
+  stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.onSelectionChange();
   endEventResponse();
 }
