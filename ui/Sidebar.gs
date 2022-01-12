@@ -121,7 +121,7 @@ class SidebarHtmlBuilder {
   }
 
   buildFormOpen() {
-    return `<form id='` + this.formID + `'>`;
+    return `<form id='` + this.formID + `' class='waiting'>`;
   }
 
   buildFormClose() {
@@ -143,6 +143,14 @@ class SidebarHtmlBuilder {
       }
     </style>
     <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
+    <style type='text/css'>
+      .processing {
+        pointer-events: none;
+      }
+      .waiting {
+        pointer-events: all;
+      }
+    </style>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
         var activeSheetIDGlobal = '` + this.activeSheetID + `';
@@ -178,7 +186,7 @@ class SidebarHtmlBuilder {
 
       function submitForm(feature, configAccessor, value) {
         try {
-          disableAllInputs();
+          updateToProcessingState();
           google.script.run.withSuccessHandler(respondToSidebarSubmitSuccess).onSidebarSubmit({
             sidebar: true,
             sheetName: '` + state.activeSheet.name + `',
@@ -187,7 +195,7 @@ class SidebarHtmlBuilder {
             value: value
           });
         } catch(error) {
-          enableAllInputs();
+          updateToWaitingState();
           console.log(error);
           /* https://issuetracker.google.com/issues/69270374 */
           alert("Unable to process request. Try logging into only one Google account, in another browser or private window. Google Apps Script doesn't yet support multiple account logins.");
@@ -195,21 +203,19 @@ class SidebarHtmlBuilder {
       }
 
       function respondToSidebarSubmitSuccess() {
-        enableAllInputs();
+        updateToWaitingState();
       }
 
-      function disableAllInputs() {
-        let inputs = document.getElementById('` + this.formID + `').getElementsByTagName('input');
-        for(let i = 0; i < inputs.length; i++) {
-          inputs[i].setAttribute('disabled', 'disabled');
-        }
+      function updateToProcessingState() {
+        let form = document.getElementById('` + this.formID + `');
+        form.classList.remove('waiting');
+        form.classList.add('processing');
       }
 
-      function enableAllInputs(parent) {
-        let inputs = document.getElementById('` + this.formID + `').getElementsByTagName('input');
-        for(let i = 0; i < inputs.length; i++) {
-          inputs[i].removeAttribute('disabled');
-        }
+      function updateToWaitingState() {
+        let form = document.getElementById('` + this.formID + `');
+        form.classList.remove('processing');
+        form.classList.add('waiting');
       }
     </script>
   </head>
