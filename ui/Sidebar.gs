@@ -149,10 +149,10 @@ class SidebarHtmlBuilder {
         setInterval(checkForNewSheetID, 300);
         function checkForNewSheetID() {
           if(document.visibilityState == 'visible') {
-            google.script.run.withSuccessHandler(logActiveSheet).getActiveSheetID();
+            google.script.run.withSuccessHandler(respondToActiveSheetSuccess).getActiveSheetID();
           }
         }
-        function logActiveSheet(sheetID) {
+        function respondToActiveSheetSuccess(sheetID) {
           if(activeSheetIDGlobal !== sheetID) {
             activeSheetIDGlobal = sheetID;
             showCurrentSheetSidebar();
@@ -161,7 +161,7 @@ class SidebarHtmlBuilder {
         function showCurrentSheetSidebar() {
           let found = false;
           let sidebar = document.getElementById('` + this.formID + `');
-          for(item of sidebar.children) {
+          for(const item of sidebar.children) {
             if(item.id === activeSheetIDGlobal) {
               item.classList.remove('hidden');
               found = true;
@@ -178,7 +178,8 @@ class SidebarHtmlBuilder {
 
       function submitForm(feature, configAccessor, value) {
         try {
-          google.script.run.onSidebarSubmit({
+          disableAllInputs();
+          google.script.run.withSuccessHandler(respondToSidebarSubmitSuccess).onSidebarSubmit({
             sidebar: true,
             sheetName: '` + state.activeSheet.name + `',
             configAccessor: configAccessor,
@@ -186,9 +187,28 @@ class SidebarHtmlBuilder {
             value: value
           });
         } catch(error) {
+          enableAllInputs();
           console.log(error);
           /* https://issuetracker.google.com/issues/69270374 */
           alert("Unable to process request. Try logging into only one Google account, in another browser or private window. Google Apps Script doesn't yet support multiple account logins.");
+        }
+      }
+
+      function respondToSidebarSubmitSuccess() {
+        enableAllInputs();
+      }
+
+      function disableAllInputs() {
+        let inputs = document.getElementById('` + this.formID + `').getElementsByTagName('input');
+        for(let i = 0; i < inputs.length; i++) {
+          inputs[i].setAttribute('disabled', 'disabled');
+        }
+      }
+
+      function enableAllInputs(parent) {
+        let inputs = document.getElementById('` + this.formID + `').getElementsByTagName('input');
+        for(let i = 0; i < inputs.length; i++) {
+          inputs[i].removeAttribute('disabled');
         }
       }
     </script>
