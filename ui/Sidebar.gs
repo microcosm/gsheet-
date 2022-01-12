@@ -53,6 +53,10 @@ class SidebarHtmlBuilder {
     return Object.keys(item.feature)[0];
   }
 
+  getElementID(itemName, value) {
+    return itemName + `.` + getHtmlSafeID(value);
+  }
+
   buildHtml() {
     var html = '';
     html += this.buildFormOpen();
@@ -117,7 +121,8 @@ class SidebarHtmlBuilder {
   }
 
   buildButtonHtml(item, option) {
-    return `<input type='button' class='inline' onclick='submitForm("` + this.getFeatureArgumentStr(item) + `", "` + this.currentItemName + `", "` + option + `");' value='` + option + `'>`;
+    const elementID = this.getElementID(this.currentItemName, option);
+    return `<input type='button' class='inline' id='` + elementID + `' onclick='submitForm("` + this.getFeatureArgumentStr(item) + `", "` + this.currentItemName + `", "` + option + `", "` + elementID + `");' value='` + option + `'>`;
   }
 
   buildFormOpen() {
@@ -184,9 +189,9 @@ class SidebarHtmlBuilder {
         showCurrentSheetSidebar();
       });
 
-      function submitForm(feature, configAccessor, value) {
+      function submitForm(feature, configAccessor, value, elementID) {
         try {
-          updateToProcessingState();
+          updateToProcessingState(elementID);
           google.script.run
             .withSuccessHandler(onSidebarSubmitSuccess)
             .withFailureHandler(onSidebarSubmitFailure)
@@ -215,16 +220,22 @@ class SidebarHtmlBuilder {
         updateToWaitingState();
       }
 
-      function updateToProcessingState() {
+      function updateToProcessingState(elementID) {
         let form = document.getElementById('` + this.formID + `');
         form.classList.remove('waiting');
         form.classList.add('processing');
+        document.getElementById(elementID).setAttribute('disabled', 'disabled');
       }
 
       function updateToWaitingState() {
         let form = document.getElementById('` + this.formID + `');
         form.classList.remove('processing');
         form.classList.add('waiting');
+
+        let inputs = form.getElementsByTagName('input');
+        for(let i = 0; i < inputs.length; i++) {
+          inputs[i].removeAttribute('disabled');
+        }
       }
     </script>
   </head>
