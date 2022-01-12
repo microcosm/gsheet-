@@ -18,7 +18,7 @@ class UserInterface {
 
   onSheetChange() {
     logString('Sheet changed to ' + this.activeSheetName);
-    this.menu.onSheetChange(this.activeSheetName);
+    //Dynamic menus are a problem: https://issuetracker.google.com/issues/202989059
   }
 
   saveActiveSheetName(sheetName=false) {
