@@ -187,22 +187,31 @@ class SidebarHtmlBuilder {
       function submitForm(feature, configAccessor, value) {
         try {
           updateToProcessingState();
-          google.script.run.withSuccessHandler(respondToSidebarSubmitSuccess).onSidebarSubmit({
-            sidebar: true,
-            sheetName: '` + state.activeSheet.name + `',
-            configAccessor: configAccessor,
-            feature: feature,
-            value: value
-          });
+          google.script.run
+            .withSuccessHandler(onSidebarSubmitSuccess)
+            .withFailureHandler(onSidebarSubmitFailure)
+            .onSidebarSubmit({
+              sidebar: true,
+              sheetName: '` + state.activeSheet.name + `',
+              configAccessor: configAccessor,
+              feature: feature,
+              value: value
+            }
+          );
         } catch(error) {
           updateToWaitingState();
           console.log(error);
           /* https://issuetracker.google.com/issues/69270374 */
-          alert("Unable to process request. Try logging into only one Google account, in another browser or private window. Google Apps Script doesn't yet support multiple account logins.");
+          alert('Unable to process request. Try logging into only one Google account at a time, perhaps using a private window.');
         }
       }
 
-      function respondToSidebarSubmitSuccess() {
+      function onSidebarSubmitSuccess() {
+        updateToWaitingState();
+      }
+
+      function onSidebarSubmitFailure() {
+        alert('Unable to process request. Make sure you have an active internet connection and are logged in.');
         updateToWaitingState();
       }
 
