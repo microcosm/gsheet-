@@ -40,7 +40,7 @@ class Feature {
 
   getConfig() {
     if(this.sidebarFeature) {
-      return this.sheet.config.sidebar[this.eventData.sidebar.configAccessor].feature[this.getCamelCaseName()];
+      return this.sheet.config.sidebar[this.eventData.configAccessor].feature[this.getCamelCaseName()];
     }
     return this.sheet.config.features[this.getCamelCaseName()];
   }
@@ -63,14 +63,14 @@ class Feature {
 
   isSidebarSubmissionEventData(eventData) {
     return eventData.hasOwnProperty('sidebar') &&
-           eventData.sidebar.hasOwnProperty('feature') &&
-           eventData.sidebar.feature === this.getCamelCaseName();
+           eventData.hasOwnProperty('feature') &&
+           eventData.feature === this.getCamelCaseName();
   }
 
   isValidSidebarSubmissionEventData(eventData) {
     if(!this.isSidebarSubmissionEventData(eventData)) return false;
-    const feature = eventData.sidebar.feature;
-    const sheetName = eventData.sidebar.sheetName;
+    const feature = eventData.feature;
+    const sheetName = eventData.sheetName;
     return this.sheet.isNamed(sheetName) && feature === this.getCamelCaseName();
   }
 

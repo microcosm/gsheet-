@@ -117,7 +117,7 @@ class SidebarHtmlBuilder {
   }
 
   buildButtonHtml(item, option) {
-    return `<input type='button' class='inline' onclick='submitForm("` + this.getFeatureArgumentStr(item) + `", "` + this.currentItemName + `");' value='` + option + `'>`;
+    return `<input type='button' class='inline' onclick='submitForm("` + this.getFeatureArgumentStr(item) + `", "` + this.currentItemName + `", "` + option + `");' value='` + option + `'>`;
   }
 
   buildFormOpen() {
@@ -173,23 +173,24 @@ class SidebarHtmlBuilder {
             document.getElementById('` + this.defaultItemID + `').classList.remove('hidden');
           }
         }
-        function submitForm(feature, configAccessor) {
-          try {
-            google.script.run.onSidebarSubmit({
-              sidebar: {
-                sheetName: '` + state.activeSheet.name + `',
-                configAccessor: configAccessor,
-                feature: feature
-              }
-            });
-          } catch(error) {
-            console.log(error);
-            /* https://issuetracker.google.com/issues/69270374 */
-            alert("Unable to process request. Try logging into only one Google account, in another browser or private window. Google Apps Script doesn't yet support multiple account logins.");
-          }
-        }
         showCurrentSheetSidebar();
       });
+
+      function submitForm(feature, configAccessor, value) {
+        try {
+          google.script.run.onSidebarSubmit({
+            sidebar: true,
+            sheetName: '` + state.activeSheet.name + `',
+            configAccessor: configAccessor,
+            feature: feature,
+            value: value
+          });
+        } catch(error) {
+          console.log(error);
+          /* https://issuetracker.google.com/issues/69270374 */
+          alert("Unable to process request. Try logging into only one Google account, in another browser or private window. Google Apps Script doesn't yet support multiple account logins.");
+        }
+      }
     </script>
   </head>
   <body>
