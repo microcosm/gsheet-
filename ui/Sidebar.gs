@@ -49,8 +49,8 @@ class SidebarHtmlBuilder {
   }
 
   getFeatureArgumentStr(item) {
-    if(!item.hasOwnProperty('feature')) throw 'Item needs a feature';
-    return Object.keys(item.feature)[0];
+    if(!item.hasOwnProperty('features')) throw 'Item needs at least one feature';
+    return Object.keys(item.features).join();
   }
 
   getElementID(itemName, value) {
@@ -191,7 +191,7 @@ class SidebarHtmlBuilder {
         showCurrentSheetSidebar();
       });
 
-      function submitForm(feature, configAccessor, value, elementID, spinnerParent) {
+      function submitForm(features, configAccessor, value, elementID, spinnerParent) {
         try {
           updateToProcessingState(elementID, spinnerParent);
           google.script.run
@@ -201,7 +201,7 @@ class SidebarHtmlBuilder {
               sidebar: true,
               sheetName: '` + state.activeSheet.name + `',
               configAccessor: configAccessor,
-              feature: feature,
+              features: features,
               value: value
             }
           );
