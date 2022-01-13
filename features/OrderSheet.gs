@@ -17,7 +17,8 @@ class OrderSheet extends Feature {
 
   execute() {
     super.execute();
-    this.updateRange(this.getGoogleConfigArray());
+    const googleConfigArray = this.getGoogleConfigArray();
+    this.sheet.getMainSectionRange().sort(googleConfigArray);
   }
 
   getGoogleConfigArray() {
@@ -30,13 +31,5 @@ class OrderSheet extends Feature {
       });
     }
     return googleConfigArray;
-  }
-
-  updateRange(googleConfigArray) {
-    const startRow = this.sheet.sheetRef.getFrozenRows() + 1;
-    const startColumn = 1;
-    const numRows = this.sheet.sheetRef.getMaxRows() - startRow;
-    const numColumns = this.sheet.sheetRef.getMaxColumns();
-    this.sheet.sheetRef.getRange(startRow, startColumn, numRows, numColumns).sort(googleConfigArray);
   }
 }
