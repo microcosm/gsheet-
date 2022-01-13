@@ -14,18 +14,26 @@ class Sheet {
     this.doneSectionEndMarker =   'DONE_END';
   }
 
-  getSectionRange(beginRow, endRow) {
+  getRangeOfRow(row) {
+    const startColumn = 1;
+    const numRows = 1;
+    const numColumns = this.getDataRange().getNumColumns();
+    return this.sheetRef.getRange(row, startColumn, numRows, numColumns);
+  }
+
+  getRangeOfRows(beginRow, endRow) {
+    const startColumn = 1;
     const numRows = endRow - beginRow;
     const numColumns = this.getDataRange().getNumColumns();
-    return this.sheetRef.getRange(beginRow, 1, numRows, numColumns);
+    return this.sheetRef.getRange(beginRow, startColumn, numRows, numColumns);
   }
 
   getMainSectionRange() {
-    return this.getSectionRange(this.getMainSectionBeginRow(), this.getMainSectionEndRow());
+    return this.getRangeOfRows(this.getMainSectionBeginRow(), this.getMainSectionEndRow());
   }
 
   getDoneSectionRange() {
-    return this.getSectionRange(this.getDoneSectionBeginRow(), this.getDoneSectionEndRow());
+    return this.getRangeOfRows(this.getDoneSectionBeginRow(), this.getDoneSectionEndRow());
   }
 
   getMainSectionBeginRow() {

@@ -9,6 +9,7 @@ const Event = {
 };
 
 const featureClasses = {
+  moveRowsToArchive:                   MoveRowsToArchive,
   orderSheet:                          OrderSheet,
   replicateSheetInExternalSpreadsheet: ReplicateSheetInExternalSpreadsheet,
   updateCalendarFromSpreadsheet:       UpdateCalendarFromSpreadsheet,
