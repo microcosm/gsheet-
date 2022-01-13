@@ -1,13 +1,3 @@
-const Event = {
-  onSpreadsheetOpen: 'onSpreadsheetOpen',
-  onSpreadsheetEdit: 'onSpreadsheetEdit',
-  onCalendarEdit:    'onCalendarEdit',
-  onOvernightTimer:  'onOvernightTimer',
-  onSelectionChange: 'onSelectionChange',
-  onShowSidebar:     'onShowSidebar',
-  onSidebarSubmit:   'onSidebarSubmit'
-};
-
 class Feature {
   constructor(sheet) {
     this.sheet = sheet;
