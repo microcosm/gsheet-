@@ -7,7 +7,7 @@ class Menu {
   onSpreadsheetOpen() {
     this.uiRef
       .createMenu(this.menuName)
-      .addItem('Show Sidebar', 'onShowSidebar')
+      .addItem('Show Controls', 'onShowSidebar')
       .addToUi();
   }
 }
