@@ -9,7 +9,7 @@ class UpdateSheetHiddenValue extends Feature {
   execute() {
     super.execute();
     const column = this.config.cellToUpdate.column.cardinalIndex;
-    const row = this.config.cellToUpdate.row.cardinalIndex;
+    const row = this.config.hiddenValueRow.cardinalIndex;
     const range = this.sheet.sheetRef.getRange(row, column, 1, 1);
     range.setValue(this.eventData.value);
   }
