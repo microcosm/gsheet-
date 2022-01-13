@@ -103,7 +103,8 @@ class SidebarHtmlBuilder {
   }
 
   buildTitleHtml(item) {
-    return `<h1>` + item.title + `</h1>`;
+    this.currentTitleID = getHtmlSafeID(item.title);
+    return `<h1>` + item.title + `<span class='hidden spinner-parent' id='` + this.currentTitleID + `'>&nbsp;<i class='fas fa-spinner'></i></span></h1>`;
   }
 
   buildTextItemHtml(item) {
@@ -122,7 +123,7 @@ class SidebarHtmlBuilder {
 
   buildButtonHtml(item, option) {
     const elementID = this.getElementID(this.currentItemName, option);
-    return `<input type='button' class='inline' id='` + elementID + `' onclick='submitForm("` + this.getFeatureArgumentStr(item) + `", "` + this.currentItemName + `", "` + option + `", "` + elementID + `");' value='` + option + `'>`;
+    return `<input type='button' class='inline' id='` + elementID + `' onclick="submitForm('` + this.getFeatureArgumentStr(item) + `', '` + this.currentItemName + `', '` + option + `', '` + elementID + `', '` + this.currentTitleID + `');" value='` + option + `'>`;
   }
 
   buildFormOpen() {
@@ -148,6 +149,7 @@ class SidebarHtmlBuilder {
       }
     </style>
     <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'>
     <style type='text/css'>
       .processing {
         pointer-events: none;
@@ -157,7 +159,7 @@ class SidebarHtmlBuilder {
       }
     </style>
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
+      document.addEventListener('DOMContentLoaded', function() {
         var activeSheetIDGlobal = '` + this.activeSheetID + `';
         setInterval(checkForNewSheetID, 300);
         function checkForNewSheetID() {
@@ -189,9 +191,9 @@ class SidebarHtmlBuilder {
         showCurrentSheetSidebar();
       });
 
-      function submitForm(feature, configAccessor, value, elementID) {
+      function submitForm(feature, configAccessor, value, elementID, spinnerParent) {
         try {
-          updateToProcessingState(elementID);
+          updateToProcessingState(elementID, spinnerParent);
           google.script.run
             .withSuccessHandler(onSidebarSubmitSuccess)
             .withFailureHandler(onSidebarSubmitFailure)
@@ -220,11 +222,12 @@ class SidebarHtmlBuilder {
         updateToWaitingState();
       }
 
-      function updateToProcessingState(elementID) {
+      function updateToProcessingState(elementID, spinnerParent) {
         let form = document.getElementById('` + this.formID + `');
         form.classList.remove('waiting');
         form.classList.add('processing');
         document.getElementById(elementID).setAttribute('disabled', 'disabled');
+        document.getElementById(spinnerParent).classList.remove('hidden');
       }
 
       function updateToWaitingState() {
@@ -235,6 +238,10 @@ class SidebarHtmlBuilder {
         let inputs = form.getElementsByTagName('input');
         for(let i = 0; i < inputs.length; i++) {
           inputs[i].removeAttribute('disabled');
+        }
+        let spinnerParents = form.getElementsByClassName('spinner-parent');
+        for(let i = 0; i < spinnerParents.length; i++) {
+          spinnerParents[i].classList.add('hidden');
         }
       }
     </script>
