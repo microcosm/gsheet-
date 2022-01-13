@@ -23,14 +23,14 @@ sidebar: {
 class Sidebar {
   constructor(uiRef) {
     this.uiRef = uiRef;
-    this.titleSuffix = ' Controls';// to change
+    this.title = 'Controls';
     this.htmlBuilder = new SidebarHtmlBuilder(uiRef);
   }
 
   onShowSidebar() {
     const html = this.htmlBuilder.buildHtml();
     var widget = HtmlService.createHtmlOutput(html);
-    widget.setTitle(state.activeSheet.name + this.titleSuffix);
+    widget.setTitle(this.title);
     this.uiRef.showSidebar(widget);
   }
 }
