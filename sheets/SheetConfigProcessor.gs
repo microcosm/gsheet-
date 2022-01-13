@@ -13,6 +13,8 @@
 /*           time: 'B',
 /*           start: 'C'
 /*         }
+/*       },
+/*       more: [{ id: 4 }, 'D' ]
 /*         ...
 /*
 /*           parent
@@ -23,6 +25,8 @@
 /*           time:<--childPropertyName       'B',  <--childPropertyValue
 /*           start:<--childPropertyName      'C'   <--childPropertyValue
 /*         }
+/*       },
+/*       more: [{ id: 4 }, 'D' ]      <--- childValue(s) of array
 /*         ...
 /*
 /* --------------------------------------------------------- */
@@ -129,8 +133,14 @@ class SheetConfigProcessor {
       } else {
         this.replaceColumnValuePropertiesAndRecurseObjectProperties(child);
       }
-    } else if(isArray(child) && this.isColumnsPropertyName(parentPropertyName)) {
-      this.replaceColumnsArrayWithIndicesObject(child, parent, parentPropertyName);
+    } else if(isArray(child)) {
+      if(this.isColumnsPropertyName(parentPropertyName)) {
+        this.replaceColumnsArrayWithIndicesObject(child, parent, parentPropertyName);
+      } else {
+        for(const childValue of child) {
+          this.buildIndexObjectForColumnsIn(childValue, child);
+        }
+      }
     }
   }
 
@@ -238,8 +248,14 @@ class SheetConfigProcessor {
       } else {
         this.replaceRowValuePropertiesAndRecurseObjectProperties(child);
       }
-    } else if(isArray(child) && this.isRowsPropertyName(parentPropertyName)) {
-      this.replaceRowsArrayWithIndicesObject(child, parent, parentPropertyName);
+    } else if(isArray(child)) {
+      if(this.isRowsPropertyName(parentPropertyName)) {
+        this.replaceRowsArrayWithIndicesObject(child, parent, parentPropertyName);
+      } else {
+        for(const childValue of child) {
+          this.buildIndexObjectForRowsIn(childValue, child);
+        }
+      }
     }
   }
 
