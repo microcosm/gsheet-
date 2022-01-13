@@ -104,7 +104,7 @@ class SidebarHtmlBuilder {
 
   buildTitleHtml(item) {
     this.currentTitleID = getHtmlSafeID(item.title);
-    return `<h1>` + item.title + `<span class='hidden spinner-parent' id='` + this.currentTitleID + `'>&nbsp;<i class='fas fa-spinner'></i></span></h1>`;
+    return `<h1>` + item.title + `<span class='hidden spinner-parent' id='` + this.currentTitleID + `'>&nbsp;<i class='fas fa-spinner fa-spin'></i></span></h1>`;
   }
 
   buildTextItemHtml(item) {
