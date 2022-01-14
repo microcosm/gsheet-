@@ -1,11 +1,12 @@
 const Event = {
-  onSpreadsheetOpen: 'onSpreadsheetOpen',
-  onSpreadsheetEdit: 'onSpreadsheetEdit',
-  onCalendarEdit:    'onCalendarEdit',
-  onOvernightTimer:  'onOvernightTimer',
-  onSelectionChange: 'onSelectionChange',
-  onShowSidebar:     'onShowSidebar',
-  onSidebarSubmit:   'onSidebarSubmit'
+  onSpreadsheetOpen:  'onSpreadsheetOpen',
+  onSpreadsheetEdit:  'onSpreadsheetEdit',
+  onCalendarEdit:     'onCalendarEdit',
+  onOvernightTimer:   'onOvernightTimer',
+  onSelectionChange:  'onSelectionChange',
+  onShowSidebar:      'onShowSidebar',
+  onSidebarSubmit:    'onSidebarSubmit',
+  onGetActiveSheetID: 'onGetActiveSheetID'
 };
 
 const featureClasses = {

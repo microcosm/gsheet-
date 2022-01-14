@@ -57,8 +57,11 @@ function onSidebarSubmit(eventData) {
   endEventResponse();
 }
 
-function getActiveSheetID() {
-  return getHtmlSafeID(SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName());
+function onGetActiveSheetID() {
+  startEventResponse(Event.onGetActiveSheetID);
+  const activeSheetID = getHtmlSafeID(SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName());
+  endEventResponse(activeSheetID);
+  return activeSheetID;
 }
 
 /* Sheet Registration */
@@ -127,7 +130,10 @@ function startEventResponse(event) {
   logEventExecution(event)
 }
 
-function endEventResponse() {
-  logString('Execution completed.')
+function endEventResponse(returnValue=false) {
+  if(returnValue) {
+    logString('Returning value: ' + returnValue);
+  }
+  logString('Execution completed.');
   outputLog();
 }

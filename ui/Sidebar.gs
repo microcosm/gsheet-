@@ -164,7 +164,7 @@ class SidebarHtmlBuilder {
         setInterval(checkForNewSheetID, 300);
         function checkForNewSheetID() {
           if(document.visibilityState == 'visible') {
-            google.script.run.withSuccessHandler(respondToActiveSheetSuccess).getActiveSheetID();
+            google.script.run.withSuccessHandler(respondToActiveSheetSuccess).onGetActiveSheetID();
           }
         }
         function respondToActiveSheetSuccess(sheetID) {
