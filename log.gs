@@ -23,6 +23,10 @@ function logString(str) {
   state.log += str + "\n";
 }
 
+function logObject(str, obj) {
+  state.log += str + JSON.stringify(obj, null, 2) + "\n";
+}
+
 function logNewline() {
   state.log += "\n";
 }
