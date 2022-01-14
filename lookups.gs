@@ -9,8 +9,8 @@ const Event = {
 };
 
 const featureClasses = {
-  moveRowsToArchive:                   MoveRowsToArchive,
-  orderSheet:                          OrderSheet,
+  moveMatchingRowsFromMainToArchive:   MoveMatchingRowsFromMainToArchive,
+  orderMainSection:                    OrderMainSection,
   replicateSheetInExternalSpreadsheet: ReplicateSheetInExternalSpreadsheet,
   updateCalendarFromSpreadsheet:       UpdateCalendarFromSpreadsheet,
   updateSheetHiddenValue:              UpdateSheetHiddenValue,
