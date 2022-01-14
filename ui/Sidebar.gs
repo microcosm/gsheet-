@@ -42,6 +42,7 @@ class SidebarHtmlBuilder {
       buttons: 'buildButtonsItemHtml' 
     };
     this.bodyMarker = '<x>';
+    this.statusUpdateInterval = 600;
     this.sidebarThirdPartyCSSClass = 'sidebar';
     this.formID = 'sidebar-form';
     this.defaultItemID = 'default-item';
@@ -161,7 +162,7 @@ class SidebarHtmlBuilder {
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         var activeSheetIDGlobal = '` + this.activeSheetID + `';
-        setInterval(checkForNewSheetID, 300);
+        setInterval(checkForNewSheetID, ` + this.statusUpdateInterval + `);
         function checkForNewSheetID() {
           if(document.visibilityState == 'visible') {
             google.script.run.withSuccessHandler(respondToActiveSheetSuccess).onGetActiveSheetID();
