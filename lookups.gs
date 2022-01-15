@@ -10,10 +10,15 @@ const Event = {
 };
 
 const featureClasses = {
-  moveMatchingRowsFromMainToArchive:   MoveMatchingRowsFromMainToArchive,
-  orderMainSection:                    OrderMainSection,
+  //Calendar initiated features
+  updateSpreadsheetFromCalendar:       UpdateSpreadsheetFromCalendar,
+
+  //Sheet initiated features
   replicateSheetInExternalSpreadsheet: ReplicateSheetInExternalSpreadsheet,
   updateCalendarFromSpreadsheet:       UpdateCalendarFromSpreadsheet,
-  updateSheetHiddenValue:              UpdateSheetHiddenValue,
-  updateSpreadsheetFromCalendar:       UpdateSpreadsheetFromCalendar
+
+  //Sidebar initiated features
+  moveMatchingRowsFromMainToArchive:   MoveMatchingRowsFromMainToArchive,
+  orderMainSection:                    OrderMainSection,
+  updateSheetHiddenValue:              UpdateSheetHiddenValue
 }

@@ -36,33 +36,58 @@ class Feature {
   }
 
   isValidEventData(eventData) {
-    if(!eventData) return true;
-    return this.isValidSheetActivatedEventData(eventData) || this.isValidSidebarSubmissionEventData(eventData);
+    logStringVerbose('isValidEventData for feature \'' + this.name + '\' of sheet ' + this.sheet.name + '?');
+    startLogBlockVerbose();
+    if(!eventData) {
+      logStringVerbose('isValidEventData is true because eventData is null');
+      endLogBlock();
+      return true;
+    }
+    const isValidEventData = this.isValidSheetActivatedEventData(eventData) || this.isValidSidebarSubmissionEventData(eventData);
+    logStringVerbose('isValidEventData is ' + isValidEventData);
+    endLogBlockVerbose();
+    return isValidEventData;
   }
 
   isSheetActivatedEventData(eventData) {
-    return eventData.hasOwnProperty('source') && eventData.hasOwnProperty('range');
+    const isSheetActivatedEventData = eventData.hasOwnProperty('source') && eventData.hasOwnProperty('range');
+    logStringVerbose('isSheetActivatedEventData is ' + isSheetActivatedEventData);
+    return isSheetActivatedEventData;
   }
 
   isValidSheetActivatedEventData(eventData) {
     if(!this.isSheetActivatedEventData(eventData)) return false;
     const sheetName = eventData.source.getActiveSheet().getName();
     const column = eventData.range.columnStart;
-    return this.sheet.isNamed(sheetName) && this.sheet.isTriggeredByColumn(column);
+    const isMatchingSheet = this.sheet.isNamed(sheetName);
+    const isTriggerColumn = this.sheet.isTriggeredByColumn(column);
+    const isValidSheetActivatedEventData = isMatchingSheet && isTriggerColumn;
+    logStringVerbose('isValidSheetActivatedEventData is ' + isValidSheetActivatedEventData + ' because isMatchingSheet is ' + isMatchingSheet + ' and isTriggerColumn is ' + isTriggerColumn);
+    return isValidSheetActivatedEventData;
   }
 
   isSidebarSubmissionEventData(eventData) {
-    return eventData.hasOwnProperty('sidebar') && eventData.hasOwnProperty('features');
+    const isSidebarSubmissionEventData = eventData.hasOwnProperty('sidebar') && eventData.hasOwnProperty('features');
+    logStringVerbose('isSidebarSubmissionEventData is ' + isSidebarSubmissionEventData);
+    return isSidebarSubmissionEventData;
   }
 
   isValidSidebarSubmissionEventData(eventData) {
-    if(!this.isSidebarSubmissionEventData(eventData) || !this.sheet.isNamed(eventData.sheetName)) return false;
+    if(!this.isSidebarSubmissionEventData(eventData)) return false;
+    const isMatchingSheet = this.sheet.isNamed(eventData.sheetName);
+    if(!isMatchingSheet) {
+      logStringVerbose('isValidSidebarSubmissionEventData is false because isMatchingSheet is false');
+      return false;
+    }
+
     let found = false;
     for(const feature of eventData.features.split(',')) {
       if(feature === this.getCamelCaseName()) {
+        logStringVerbose('isValidSidebarSubmissionEventData is true because isMatchingSheet is true and feature ' + feature + ' was found');
         return true;
       }
     }
+    logStringVerbose('isValidSidebarSubmissionEventData is false because isMatchingSheet is true and no features from ' + eventData.features + ' were found');
     return false;
   }
 

@@ -19,29 +19,67 @@ function alert(text){
 
 /* GENERIC */
 
+let logIndentation = false;
+
+function startLogBlock() {
+  logString('[');
+  logIndentation = true;
+}
+
+function startLogBlockVerbose() {
+  logStringVerbose('[');
+  logIndentation = true;
+}
+
+function endLogBlock() {
+  logIndentation = false;
+  logString(']');
+}
+
+function endLogBlockVerbose() {
+  logIndentation = false;
+  logStringVerbose(']');
+}
+
+function indentLog(str) {
+  return logIndentation ? '  ' + indentLogNewlines(str) : str;
+}
+
+function indentLogNewlines(str) {
+  return str.replaceAll('\n', '\n  ');
+}
+
 function logString(str) {
-  state.log += str + "\n";
+  state.log += indentLog(str) + '\n';
+}
+
+function logStringVerbose(str) {
+  if(config.toggles.verboseLogging) logString(str);
 }
 
 function logObject(str, obj) {
-  state.log += str + JSON.stringify(obj, null, 2) + "\n";
+  state.log += indentLog(str) + (isObject(obj) ? JSON.stringify(obj, null, 2) : '[not an object]') + "\n";
 }
 
-function logNewline() {
-  state.log += "\n";
+function logObjectVerbose(str, obj) {
+  if(config.toggles.verboseLogging) {
+    logObject(str, obj);
+    logString('');
+  }
 }
 
 /* MAIN */
 
-function logEventExecution(event) {
+function logEventExecution(event, eventData=false) {
   state.log += 'Event ' + event + ' called.\n';
+  if(eventData) logObjectVerbose('Event data:\n', eventData);
 }
 
 function logFeatureEvaluation(featureName, sheetName, respondsToEvent, isValidEventData) {
   if(config.toggles.verboseLogging) {
-    state.log += ((respondsToEvent && isValidEventData) ? '* ' : '') + '[Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\'] DOES' + (respondsToEvent ? '' : ' NOT') + ' respond to event, and HAS' + (isValidEventData ? '' : ' NOT') + ' received valid event data\n';
+    state.log += ((respondsToEvent && isValidEventData) ? '* ' : '') + 'Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\' DOES' + (respondsToEvent ? '' : ' NOT') + ' respond to event and HAS' + (isValidEventData ? '' : ' NOT') + ' received valid event data\n\n';
   } else if(respondsToEvent && isValidEventData) {
-    state.log += '[Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\'] DOES respond to event, and HAS received valid event data\n';
+    state.log += 'Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\' DOES respond to event and HAS received valid event data\n';
   }
 }
 

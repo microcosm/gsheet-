@@ -50,7 +50,7 @@ function onShowSidebar() {
 }
 
 function onSidebarSubmit(eventData) {
-  startEventResponse(Event.onSidebarSubmit);
+  startEventResponse(Event.onSidebarSubmit, eventData);
   const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
   stateBuilder.buildSheetState().buildUserInterfaceState();
   executeFeaturesForEvent(Event.onSidebarSubmit, eventData);
@@ -126,8 +126,8 @@ function releaseLock() {
   logLockReleased();
 }
 
-function startEventResponse(event) {
-  logEventExecution(event)
+function startEventResponse(event, eventData=false) {
+  logEventExecution(event, eventData)
 }
 
 function endEventResponse(returnValue=false) {
