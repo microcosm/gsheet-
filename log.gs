@@ -38,7 +38,7 @@ function logEventExecution(event) {
 }
 
 function logFeatureEvaluation(featureName, sheetName, respondsToEvent, isValidEventData) {
-  if(config.toggles.logAllEvents) {
+  if(config.toggles.verboseLogging) {
     state.log += ((respondsToEvent && isValidEventData) ? '* ' : '') + '[Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\'] DOES' + (respondsToEvent ? '' : ' NOT') + ' respond to event, and HAS' + (isValidEventData ? '' : ' NOT') + ' received valid event data\n';
   } else if(respondsToEvent && isValidEventData) {
     state.log += '[Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\'] DOES respond to event, and HAS received valid event data\n';
@@ -60,7 +60,7 @@ function logLockReleased() {
 /* FEATURES */
 
 function logCalendarEventFound(event, hasMatch) {
-  if(config.toggles.logAllEvents) {
+  if(config.toggles.verboseLogging) {
     state.log += (hasMatch ? '' : '* ') + buildCalendarEventLogStr(event);
   } else if(!hasMatch) {
     state.log += '* ' + buildCalendarEventLogStr(event);

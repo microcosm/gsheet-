@@ -23,7 +23,7 @@ var config = {
   },
   toggles: {
     performDataUpdates: true|false, //whether to actually apply any data updates to target sheets, calendars etc
-    logAllEvents: true|false, //whether logging should be verbose
+    verboseLogging: true|false, //whether logging should be verbose
     showLogAlert: true|false  //whether to show the log as a UI alert when a user event is initiated via a spreadsheet 
   }
 }
