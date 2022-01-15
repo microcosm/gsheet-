@@ -37,12 +37,10 @@ class Sheet {
   }
 
   getMainSectionBeginRow() {
-    logString('getMainSectionBeginRow() = ' + this.lookupRowIndex(this.dataSectionBeginMarker, 2));
     return this.lookupRowIndex(this.dataSectionBeginMarker, 2);
   }
 
   getMainSectionEndRow() {
-    logString('getMainSectionEndRow() = ' + this.lookupRowIndex(this.dataSectionEndMarker, -1));
     return this.lookupRowIndex(this.dataSectionEndMarker, -1);
   }
 
