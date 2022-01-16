@@ -15,6 +15,7 @@ const featureClasses = {
 
   //Sheet initiated features
   replicateSheetInExternalSpreadsheet: ReplicateSheetInExternalSpreadsheet,
+  resetSpreadsheetStyles:              ResetSpreadsheetStyles,
   updateCalendarFromSpreadsheet:       UpdateCalendarFromSpreadsheet,
 
   //Sidebar initiated features
