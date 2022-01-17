@@ -18,7 +18,7 @@ class MoveMatchingRowsFromMainToArchive extends Feature {
   }
 
   findTextMatchingRowsInMainSection() {
-    const matchRanges = this.sheet.getMainSectionRange().createTextFinder(this.matchText).findAll();
+    const matchRanges = this.sheet.getMainSectionRowsRange().createTextFinder(this.matchText).findAll();
     for(const range of matchRanges) {
       if(range.getColumn() === this.matchColumn) {
         this.foundRows.push(range.getRow());

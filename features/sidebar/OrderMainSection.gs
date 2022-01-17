@@ -18,7 +18,7 @@ class OrderMainSection extends Feature {
   execute() {
     super.execute();
     const googleConfigArray = this.getGoogleConfigArray();
-    this.sheet.getMainSectionRange().sort(googleConfigArray);
+    this.sheet.getMainSectionRowsRange().sort(googleConfigArray);
   }
 
   getGoogleConfigArray() {

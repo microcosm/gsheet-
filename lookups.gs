@@ -23,3 +23,8 @@ const featureClasses = {
   orderMainSection:                    OrderMainSection,
   updateSheetHiddenValue:              UpdateSheetHiddenValue
 }
+
+const borderStyles = {
+  SOLID:       SpreadsheetApp.BorderStyle.SOLID,
+  SOLID_THICK: SpreadsheetApp.BorderStyle.SOLID_THICK
+}

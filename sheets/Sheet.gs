@@ -25,7 +25,7 @@ class Sheet {
 
   getRangeOfRows(beginRow, endRow) {
     const beginColumn = 1;
-    const numRows = endRow - beginRow;
+    const numRows = endRow - beginRow + 1;
     const numColumns = this.getDataRange().getNumColumns();
     return this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
   }
@@ -58,10 +58,30 @@ class Sheet {
   }
 
   getMainSectionRange() {
-    return this.getRangeOfRows(this.getMainSectionBeginRow(), this.getMainSectionEndRow());
+    const beginRow = this.getMainSectionBeginRow();
+    const numRows = this.getMainSectionEndRow() - beginRow + 1;
+    const beginColumn = this.getContentSectionsBeginColumn();
+    const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
+    return this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
   }
 
   getDoneSectionRange() {
+    const beginRow = this.getDoneSectionBeginRow();
+    const numRows = this.getDoneSectionEndRow() - beginRow + 1;
+    const beginColumn = this.getContentSectionsBeginColumn();
+    const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
+    return this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
+  }
+
+  getDoneSectionRowsRange() {
+    return this.getRangeOfRows(this.getDoneSectionBeginRow(), this.getDoneSectionEndRow());
+  }
+
+  getMainSectionRowsRange() {
+    return this.getRangeOfRows(this.getMainSectionBeginRow(), this.getMainSectionEndRow());
+  }
+
+  getDoneSectionRowsRange() {
     return this.getRangeOfRows(this.getDoneSectionBeginRow(), this.getDoneSectionEndRow());
   }
 
@@ -79,6 +99,14 @@ class Sheet {
 
   getDoneSectionEndRow() {
     return this.lookupRowIndex(this.doneSectionEndMarker, -1);
+  }
+
+  getContentSectionsBeginColumn() {
+    return this.getDataRange().createTextFinder(this.headerSectionsLeftMarker).findNext().getColumn() + 1;
+  }
+
+  getContentSectionsEndColumn() {
+    return this.getDataRange().createTextFinder(this.headerSectionsRightMarker).findNext().getColumn() - 1;
   }
 
   lookupRowIndex(marker, offset=0) {
