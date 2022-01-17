@@ -118,12 +118,20 @@ class Sheet {
     return this.lookupRowIndex(this.mainSectionEndMarker, -1);
   }
 
+  getMainSectionNumRows() {
+    return this.getMainSectionEndRow() - this.getMainSectionBeginRow() + 1;
+  }
+
   getDoneSectionBeginRow() {
     return this.lookupRowIndex(this.doneSectionBeginMarker, 2);
   }
 
   getDoneSectionEndRow() {
     return this.lookupRowIndex(this.doneSectionEndMarker, -1);
+  }
+
+  getDoneSectionNumRows() {
+    return this.getDoneSectionEndRow() - this.getDoneSectionBeginRow() + 1;
   }
 
   getContentSectionsBeginColumn() {

@@ -8,28 +8,54 @@ class ResetSpreadsheetStyles extends Feature {
 
   execute() {
     super.execute();
-    this.setStyle(this.sheet.getMainSectionRange(), this.config.contentSections);
-    this.setStyle(this.sheet.getDoneSectionRange(), this.config.contentSections);
+    this.setRanges();
+    this.setStyles();
+    this.setHeights();
+  }
 
-    const headerSectionRanges = this.sheet.getHeaderSectionRanges();
-    for(const headerSectionRange of headerSectionRanges) {
-      this.setStyle(headerSectionRange, this.config.headers);
-    }
+  setRanges() {
+    this.titleSectionRanges = this.sheet.getTitleSectionRanges();
+    this.headerSectionRanges = this.sheet.getHeaderSectionRanges();
+    this.mainSectionRange = this.sheet.getMainSectionRange();
+    this.doneSectionRange = this.sheet.getDoneSectionRange();
+    this.underContentSectionRanges = this.sheet.getUnderContentSectionRanges();
+  }
 
-    const underContentSectionRanges = this.sheet.getUnderContentSectionRanges();
-    for(const underContentSectionRange of underContentSectionRanges) {
-      this.setStyle(underContentSectionRange, this.config.underContentSections);
-    }
+  setStyles() {
+    this.setMultipleRangeStyles(this.titleSectionRanges,        this.config.titles);
+    this.setMultipleRangeStyles(this.headerSectionRanges,       this.config.headers);
+    this.setSingleRangeStyle   (this.mainSectionRange,          this.config.contentSections);
+    this.setSingleRangeStyle   (this.doneSectionRange,          this.config.contentSections);
+    this.setMultipleRangeStyles(this.underContentSectionRanges, this.config.underContentSections);
+  }
 
-    const titleSectionRanges = this.sheet.getTitleSectionRanges();
-    for(const titleSectionRange of titleSectionRanges) {
-      this.setStyle(titleSectionRange, this.config.titles);
+  setMultipleRangeStyles(ranges, config) {
+    for(const range of ranges) {
+      this.setSingleRangeStyle(range, config);
     }
   }
 
-  setStyle(range, config) {
+  setSingleRangeStyle(range, config) {
     if(config.hasOwnProperty('fontFamily')) range.setFontFamily(config.fontFamily);
     if(config.hasOwnProperty('fontSize')) range.setFontSize(config.fontSize);
     if(config.hasOwnProperty('border')) range.setBorder(config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
+  }
+
+  setHeights() {
+    this.setMultipleRangeHeights(this.titleSectionRanges,        this.config.titles);
+    this.setMultipleRangeHeights(this.headerSectionRanges,       this.config.headers);
+    this.setSingleRangeHeights  (this.mainSectionRange,          this.config.contentSections);
+    this.setSingleRangeHeights  (this.doneSectionRange,          this.config.contentSections);
+    this.setMultipleRangeHeights(this.underContentSectionRanges, this.config.underContentSections);
+  }
+
+  setMultipleRangeHeights(ranges, config) {
+    for(const range of ranges) {
+      this.setSingleRangeHeights(range, config)
+    }
+  }
+
+  setSingleRangeHeights(range, config) {
+    if(config.hasOwnProperty('rowHeight')) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
   }
 }
