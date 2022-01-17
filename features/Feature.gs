@@ -1,9 +1,10 @@
 class Feature {
-  constructor(sheet) {
+  constructor(sheet, name, initiatior) {
     this.sheet = sheet;
+    this.name = name;
+    this.initiatior = initiatior;
     this.responseCapabilities = [];
     this.camelCaseName = false;
-    this.sidebarFeature = false;
   }
 
   addResponseCapability(event) {
@@ -29,7 +30,7 @@ class Feature {
   }
 
   getConfig() {
-    if(this.sidebarFeature) {
+    if(this.initiatior === featureInitiators.sidebar) {
       return this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()];
     }
     return this.sheet.config.features[this.getCamelCaseName()];

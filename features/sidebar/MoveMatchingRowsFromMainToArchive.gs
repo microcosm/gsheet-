@@ -1,9 +1,7 @@
 class MoveMatchingRowsFromMainToArchive extends Feature {
   constructor(sheet) {
-    super(sheet);
-    this.name = 'Move Matching Rows From Main To Archive';
+    super(sheet, 'Move Matching Rows From Main To Archive', featureInitiators.sidebar);
     this.addResponseCapability(Event.onSidebarSubmit);
-    this.sidebarFeature = true;
   }
 
   execute() {

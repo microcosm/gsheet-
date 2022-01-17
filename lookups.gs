@@ -24,6 +24,12 @@ const featureClasses = {
   updateSheetHiddenValue:              UpdateSheetHiddenValue
 }
 
+const featureInitiators = {
+  calendar: 'calendar',
+  sheet:    'sheet',
+  sidebar:  'sidebar'
+}
+
 const borderStyles = {
   SOLID:       SpreadsheetApp.BorderStyle.SOLID,
   SOLID_THICK: SpreadsheetApp.BorderStyle.SOLID_THICK

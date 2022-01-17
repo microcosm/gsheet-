@@ -1,7 +1,6 @@
 class ResetSpreadsheetStyles extends Feature {
   constructor(sheet) {
-    super(sheet);
-    this.name = 'Reset Spreadsheet Styles';
+    super(sheet, 'Reset Spreadsheet Styles', featureInitiators.sheet);
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);

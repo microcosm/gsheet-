@@ -1,17 +1,7 @@
-/* EXAMPLE CONFIG
-orderMainSection: {
-  by {
-    timing: [{ column: 'D', direction: 'ascending' }, { column: 'B', direction 'ascending' }],
-    workStream: [{ column: 'B', direction: 'ascending' }, { column: 'D', direction 'ascending' }]
-  }
-}*/
-
 class OrderMainSection extends Feature {
   constructor(sheet) {
-    super(sheet);
-    this.name = 'Order Main Section';
+    super(sheet, 'Order Main Section', featureInitiators.sidebar);
     this.addResponseCapability(Event.onSidebarSubmit);
-    this.sidebarFeature = true;
     this.ascendingMarker = 'ascending';
   }
 
