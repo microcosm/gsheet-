@@ -1,6 +1,6 @@
-class MoveMatchingRowsFromMainToArchive extends Feature {
+class MoveMatchingRowsFromMainToDone extends Feature {
   constructor(sheet) {
-    super(sheet, 'Move Matching Rows From Main To Archive', featureInitiators.sidebar);
+    super(sheet, 'Move Matching Rows From Main To Done', featureInitiators.sidebar);
     this.addResponseCapability(Event.onSidebarSubmit);
   }
 
@@ -8,11 +8,11 @@ class MoveMatchingRowsFromMainToArchive extends Feature {
     super.execute();
     this.matchText = this.config.matchText;
     this.matchColumn = this.config.matchColumn.cardinalIndex;
-    this.archiveIndex = this.sheet.getDoneSectionBeginRow();
+    this.doneSectionIndex = this.sheet.getDoneSectionBeginRow();
     this.foundRows = [];
     this.findTextMatchingRowsInMainSection();
     this.sortFoundRows();
-    this.moveRowsToArchive()
+    this.moveRowsToDone();
   }
 
   findTextMatchingRowsInMainSection() {
@@ -28,10 +28,10 @@ class MoveMatchingRowsFromMainToArchive extends Feature {
     this.foundRows.sort().reverse();
   }
 
-  moveRowsToArchive() {
+  moveRowsToDone() {
     for(const row of this.foundRows) {
       const range = this.sheet.getRangeOfRow(row);
-      this.sheet.sheetRef.moveRows(range, this.archiveIndex);
+      this.sheet.sheetRef.moveRows(range, this.doneSectionIndex);
     }
   }
 }
