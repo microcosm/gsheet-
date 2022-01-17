@@ -16,11 +16,16 @@ class ResetSpreadsheetStyles extends Feature {
     for(const headerSectionRange of headerSectionRanges) {
       this.setStyle(headerSectionRange, this.config.headers);
     }
+
+    const underContentSectionRanges = this.sheet.getUnderContentSectionRanges();
+    for(const underContentSectionRange of underContentSectionRanges) {
+      this.setStyle(underContentSectionRange, this.config.underContentSections);
+    }
   }
 
   setStyle(range, config) {
-    range.setFontFamily(config.fontFamily);
-    range.setFontSize(config.fontSize);
-    range.setBorder(config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
+    if(config.hasOwnProperty('fontFamily')) range.setFontFamily(config.fontFamily);
+    if(config.hasOwnProperty('fontSize')) range.setFontSize(config.fontSize);
+    if(config.hasOwnProperty('border')) range.setBorder(config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
   }
 }

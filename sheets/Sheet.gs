@@ -109,6 +109,18 @@ class Sheet {
     return this.getDataRange().createTextFinder(this.headerSectionsRightMarker).findNext().getColumn() - 1;
   }
 
+  getUnderContentSectionRanges() {
+    let ranges = [];
+    const mainSectionEndMarkerRow = this.lookupRowIndex(this.mainSectionEndMarker);
+    const doneSectionEndMarkerRow = this.lookupRowIndex(this.doneSectionEndMarker);
+    const numRows = 1;
+    const beginColumn = this.getContentSectionsBeginColumn();
+    const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
+    ranges.push(this.sheetRef.getRange(mainSectionEndMarkerRow, beginColumn, numRows, numColumns));
+    ranges.push(this.sheetRef.getRange(doneSectionEndMarkerRow, beginColumn, numRows, numColumns));
+    return ranges;
+  }
+
   lookupRowIndex(marker, offset=0) {
     return this.getDataRange().createTextFinder(marker).findNext().getRow() + offset;
   }
