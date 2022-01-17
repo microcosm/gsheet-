@@ -9,8 +9,8 @@ class ResetSpreadsheetStyles extends Feature {
 
   execute() {
     super.execute();
-    this.setStyle(this.sheet.getMainSectionRange(), this.config.mainSection);
-    this.setStyle(this.sheet.getDoneSectionRange(), this.config.doneSection);
+    this.setStyle(this.sheet.getMainSectionRange(), this.config.contentSections);
+    this.setStyle(this.sheet.getDoneSectionRange(), this.config.contentSections);
 
     const headerSectionRanges = this.sheet.getHeaderSectionRanges();
     for(const headerSectionRange of headerSectionRanges) {
