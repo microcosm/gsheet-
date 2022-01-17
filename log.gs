@@ -42,15 +42,15 @@ function endLogBlockVerbose() {
 }
 
 function indentLog(str) {
-  return logIndentation ? '  ' + indentLogNewlines(str) : str;
+  return logIndentation ? `  ` + indentLogNewlines(str) : str;
 }
 
 function indentLogNewlines(str) {
-  return str.replaceAll('\n', '\n  ');
+  return str.replaceAll(`\n`, `\n  `);
 }
 
 function logString(str) {
-  state.log += indentLog(str) + '\n';
+  state.log += indentLog(str) + `\n`;
 }
 
 function logStringVerbose(str) {
@@ -58,7 +58,7 @@ function logStringVerbose(str) {
 }
 
 function logObject(str, obj) {
-  state.log += indentLog(str) + (isObject(obj) ? JSON.stringify(obj, null, 2) : '[not an object]') + "\n";
+  state.log += indentLog(str) + (isObject(obj) ? JSON.stringify(obj, null, 2) : `[not an object]`) + `\n`;
 }
 
 function logObjectVerbose(str, obj) {
@@ -71,28 +71,28 @@ function logObjectVerbose(str, obj) {
 /* MAIN */
 
 function logEventExecution(event, eventData=false) {
-  state.log += 'Event ' + event + ' called.\n';
-  if(eventData) logObjectVerbose('Event data:\n', eventData);
+  state.log += `Event ` + event + ` called.\n`;
+  if(eventData) logObjectVerbose(`Event data:\n`, eventData);
 }
 
 function logFeatureEvaluation(featureName, sheetName, respondsToEvent, isValidEventData) {
   if(config.toggles.verboseLogging) {
-    state.log += ((respondsToEvent && isValidEventData) ? '* ' : '') + 'Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\' DOES' + (respondsToEvent ? '' : ' NOT') + ' respond to event and HAS' + (isValidEventData ? '' : ' NOT') + ' received valid event data\n\n';
+    state.log += ((respondsToEvent && isValidEventData) ? `* ` : ``) + `Feature '` + featureName + `' with Sheet '` + sheetName + `' DOES` + (respondsToEvent ? `` : ` NOT`) + ` respond to event and HAS` + (isValidEventData ? `` : ` NOT`) + ` received valid event data\n\n`;
   } else if(respondsToEvent && isValidEventData) {
-    state.log += 'Feature \'' + featureName + '\' with Sheet \'' + sheetName + '\' DOES respond to event and HAS received valid event data\n';
+    state.log += `Feature '` + featureName + `' with Sheet '` + sheetName + `' DOES respond to event and HAS received valid event data\n`;
   }
 }
 
 function logFeatureExecution(featureName) {//SEE ABOVE
-  state.log += "Executing feature \'" + featureName + "\'\n";
+  state.log += `Executing feature '` + featureName + `'\n`;
 }
 
 function logLockObtained() {
-  state.log += "Lock obtained...\n";
+  state.log += `Lock obtained...\n`;
 }
 
 function logLockReleased() {
-  state.log += "Lock released.\n";
+  state.log += `Lock released.\n`;
 }
 
 /* FEATURES */
@@ -116,9 +116,9 @@ function buildCalendarEventLogStr(event) {
 }
 
 function logCalendarEventDeleted(event) {
-  state.log += "Deleting " + removeNewlines(event.title) + "\n";
+  state.log += `Deleting ` + removeNewlines(event.title) + `\n`;
 }
 
 function logCalendarEventCreated(event) {
-  state.log += "Creating " + removeNewlines(event.title) + "\n";
+  state.log += `Creating ` + removeNewlines(event.title) + `\n`;
 }
