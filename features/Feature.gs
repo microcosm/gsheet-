@@ -7,6 +7,11 @@ class Feature {
     this.camelCaseName = false;
   }
 
+  execute() {
+    logFeatureExecution(this.name);
+    this.config = this.getConfig();
+  }
+
   addResponseCapability(event) {
     if(!this.responseCapabilities.includes(event)) {
       this.responseCapabilities.push(event);
@@ -20,10 +25,6 @@ class Feature {
     return respondsToEvent && isValidEventData;
   }
 
-  setEventData(eventData) {
-    this.eventData = eventData;
-  }
-
   getCamelCaseName() {
     if(!this.camelCaseName) this.camelCaseName = toCamelCase(this.name);
     return this.camelCaseName;
@@ -34,6 +35,10 @@ class Feature {
       return this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()];
     }
     return this.sheet.config.features[this.getCamelCaseName()];
+  }
+
+  setEventData(eventData) {
+    this.eventData = eventData;
   }
 
   isValidEventData(eventData) {
@@ -90,10 +95,5 @@ class Feature {
     }
     logStringVerbose('isValidSidebarSubmissionEventData is false because isMatchingSheet is true and no features from ' + eventData.features + ' were found');
     return false;
-  }
-
-  execute() {
-    logFeatureExecution(this.name);
-    this.config = this.getConfig();
   }
 }
