@@ -9,7 +9,19 @@ class ResetSpreadsheetStyles extends Feature {
 
   execute() {
     super.execute();
-    const range = this.sheet.getDataRange();
-    range.setFontFamily(this.config.fontFamily);
+
+    const mainSectionRange = this.sheet.getMainSectionRange();
+    mainSectionRange.setFontFamily(this.config.mainSection.fontFamily);
+    mainSectionRange.setFontSize(this.config.mainSection.fontSize);
+
+    const doneSectionRange = this.sheet.getDoneSectionRange();
+    doneSectionRange.setFontFamily(this.config.doneSection.fontFamily);
+    doneSectionRange.setFontSize(this.config.doneSection.fontSize);
+
+    const headerSectionRanges = this.sheet.getHeaderSectionRanges();
+    for(const headerSectionRange of headerSectionRanges) {
+      headerSectionRange.setFontFamily(this.config.headers.fontFamily);
+      headerSectionRange.setFontSize(this.config.headers.fontSize);
+    }
   }
 }

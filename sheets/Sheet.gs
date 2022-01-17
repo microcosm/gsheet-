@@ -8,24 +8,53 @@ class Sheet {
     this.validate();
     this.range = this.config.range || 'A:Z';
     this.values = false;
-    this.dataSectionBeginMarker = 'DATA_BEGIN';
-    this.dataSectionEndMarker =   'DATA_END';
-    this.doneSectionBeginMarker = 'DONE_BEGIN';
-    this.doneSectionEndMarker =   'DONE_END';
+    this.headerSectionsLeftMarker =  'HEADER_LEFT';
+    this.headerSectionsRightMarker = 'HEADER_RIGHT';
+    this.dataSectionBeginMarker =    'DATA_BEGIN';
+    this.dataSectionEndMarker =      'DATA_END';
+    this.doneSectionBeginMarker =    'DONE_BEGIN';
+    this.doneSectionEndMarker =      'DONE_END';
   }
 
   getRangeOfRow(row) {
-    const startColumn = 1;
+    const beginColumn = 1;
     const numRows = 1;
     const numColumns = this.getDataRange().getNumColumns();
-    return this.sheetRef.getRange(row, startColumn, numRows, numColumns);
+    return this.sheetRef.getRange(row, beginColumn, numRows, numColumns);
   }
 
   getRangeOfRows(beginRow, endRow) {
-    const startColumn = 1;
+    const beginColumn = 1;
     const numRows = endRow - beginRow;
     const numColumns = this.getDataRange().getNumColumns();
-    return this.sheetRef.getRange(beginRow, startColumn, numRows, numColumns);
+    return this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
+  }
+
+  getHeaderSectionRanges() {
+    let ranges = [];
+    const leftMarkerRanges = this.getDataRange().createTextFinder(this.headerSectionsLeftMarker).findAll();
+    const rightMarkerRanges = this.getDataRange().createTextFinder(this.headerSectionsRightMarker).findAll();
+    let leftMarkerRow = 1; let rightMarkerRow = 1; let leftColumn = 1; let rightColumn = 1; let row = 1; let numRows = 1; let numColumns = 1;
+
+    if(leftMarkerRanges.length === rightMarkerRanges.length) {
+      for(let i = 0; i < leftMarkerRanges.length; i++) {
+        leftMarkerRow = leftMarkerRanges[i].getRow();
+        rightMarkerRow = rightMarkerRanges[i].getRow();
+
+        if(leftMarkerRow === rightMarkerRow) {
+          row = leftMarkerRow;
+          leftColumn = leftMarkerRanges[i].getColumn() + 1;
+          rightColumn = rightMarkerRanges[i].getColumn() - 1;
+          numColumns = rightColumn - leftColumn + 1;
+          ranges.push(this.sheetRef.getRange(row, leftColumn, numRows, numColumns));
+        } else {
+          logError('Header markers not aligned');
+        }
+      }
+    } else {
+      logError('Header markers not found in pairs');
+    }
+    return ranges;
   }
 
   getMainSectionRange() {
