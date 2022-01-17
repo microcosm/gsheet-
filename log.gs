@@ -75,16 +75,16 @@ function logEventExecution(event, eventData=false) {
   if(eventData) logObjectVerbose(`Event data:\n`, eventData);
 }
 
-function logFeatureEvaluation(featureName, sheetName, respondsToEvent, isValidEventData) {
+function logFeatureEvaluation(feature, respondsToEvent, isValidEventData) {
   if(config.toggles.verboseLogging) {
-    state.log += ((respondsToEvent && isValidEventData) ? `* ` : ``) + `Feature '` + featureName + `' with Sheet '` + sheetName + `' DOES` + (respondsToEvent ? `` : ` NOT`) + ` respond to event and HAS` + (isValidEventData ? `` : ` NOT`) + ` received valid event data\n\n`;
+    state.log += ((respondsToEvent && isValidEventData) ? `* ` : ``) + `Feature '` + feature.name + `' with Sheet '` + feature.sheet.name + `' DOES` + (respondsToEvent ? `` : ` NOT`) + ` respond to event and HAS` + (isValidEventData ? `` : ` NOT`) + ` received valid event data\n\n`;
   } else if(respondsToEvent && isValidEventData) {
-    state.log += `Feature '` + featureName + `' with Sheet '` + sheetName + `' DOES respond to event and HAS received valid event data\n`;
+    state.log += `Feature '` + feature.name + `' with Sheet '` + feature.sheet.name + `' DOES respond to event and HAS received valid event data\n`;
   }
 }
 
-function logFeatureExecution(featureName) {//SEE ABOVE
-  state.log += `Executing feature '` + featureName + `'\n`;
+function logFeatureExecution(feature) {
+  state.log += `Executing feature '` + feature.name + `' (` + feature.getPriority() + `)\n`;
 }
 
 function logLockObtained() {

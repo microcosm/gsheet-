@@ -22,7 +22,12 @@ const featureClasses = {
   moveMatchingRowsFromMainToArchive:   MoveMatchingRowsFromMainToArchive,
   orderMainSection:                    OrderMainSection,
   updateSheetHiddenValue:              UpdateSheetHiddenValue
-}
+};
+
+const priorities = {
+  HIGH_PRIORITY: 'HIGH_PRIORITY',
+  LOW_PRIORITY:  'LOW_PRIORITY'
+};
 
 const featureInitiators = {
   calendar: 'calendar',
@@ -33,4 +38,4 @@ const featureInitiators = {
 const borderStyles = {
   SOLID:       SpreadsheetApp.BorderStyle.SOLID,
   SOLID_THICK: SpreadsheetApp.BorderStyle.SOLID_THICK
-}
+};

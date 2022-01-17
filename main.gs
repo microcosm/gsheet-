@@ -101,6 +101,7 @@ function executeFeatures() {
     return;
   }
   try {
+    state.builder.prepareForExecution();
     state.features.executions.forEach((feature) => { feature.execute() });
   } catch(exception) {
     alertError(exception);

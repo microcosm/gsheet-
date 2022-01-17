@@ -5,11 +5,13 @@ class Feature {
     this.initiatior = initiatior;
     this.responseCapabilities = [];
     this.camelCaseName = false;
+    this.config = false;
+    this.priority = false;
   }
 
   execute() {
-    logFeatureExecution(this.name);
-    this.config = this.getConfig();
+    logFeatureExecution(this);
+    this.setConfig();
   }
 
   addResponseCapability(event) {
@@ -21,7 +23,7 @@ class Feature {
   respondsTo(event, eventData) {
     const respondsToEvent = this.responseCapabilities.includes(event);
     const isValidEventData = this.isValidEventData(eventData);
-    logFeatureEvaluation(this.name, this.sheet.name, respondsToEvent, isValidEventData);
+    logFeatureEvaluation(this, respondsToEvent, isValidEventData);
     return respondsToEvent && isValidEventData;
   }
 
@@ -30,11 +32,18 @@ class Feature {
     return this.camelCaseName;
   }
 
-  getConfig() {
-    if(this.initiatior === featureInitiators.sidebar) {
-      return this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()];
+  getPriority() {
+    this.setConfig();
+    if(!this.priority) this.priority = this.config.hasOwnProperty('priority') ? priorities[this.config.priority] : priorities.LOW_PRIORITY;
+    return this.priority;
+  }
+
+  setConfig() {
+    if(!this.config) {
+      this.config = this.initiatior === featureInitiators.sidebar ?
+        this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()] :
+        this.sheet.config.features[this.getCamelCaseName()];
     }
-    return this.sheet.config.features[this.getCamelCaseName()];
   }
 
   setEventData(eventData) {

@@ -76,4 +76,10 @@ class StateBuilder {
   appendFeatures(features) {
     state.features.registered = state.features.registered.concat(features);
   }
+
+  prepareForExecution() {
+    state.features.executions.sort((a, b) => {
+      return a.getPriority() > b.getPriority() ? 1 : -1;
+    });
+  }
 }
