@@ -19,6 +19,7 @@ const featureClasses = {
   updateCalendarFromSpreadsheet:       UpdateCalendarFromSpreadsheet,
 
   //Sidebar initiated features
+  collapseDoneSection:                 CollapseDoneSection,
   moveMatchingRowsFromMainToDone:      MoveMatchingRowsFromMainToDone,
   orderMainSection:                    OrderMainSection,
   updateSheetHiddenValue:              UpdateSheetHiddenValue

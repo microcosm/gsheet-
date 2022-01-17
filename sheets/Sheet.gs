@@ -102,16 +102,12 @@ class Sheet {
     return this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
   }
 
-  getDoneSectionRowsRange() {
-    return this.getRangeOfRows(this.getDoneSectionBeginRow(), this.getDoneSectionEndRow());
+  getMainSectionRowsRange(beginOffset=0, endOffset=0) {
+    return this.getRangeOfRows(this.getMainSectionBeginRow() + beginOffset, this.getMainSectionEndRow() + endOffset);
   }
 
-  getMainSectionRowsRange() {
-    return this.getRangeOfRows(this.getMainSectionBeginRow(), this.getMainSectionEndRow());
-  }
-
-  getDoneSectionRowsRange() {
-    return this.getRangeOfRows(this.getDoneSectionBeginRow(), this.getDoneSectionEndRow());
+  getDoneSectionRowsRange(beginOffset=0, endOffset=0) {
+    return this.getRangeOfRows(this.getDoneSectionBeginRow() + beginOffset, this.getDoneSectionEndRow() + endOffset);
   }
 
   getMainSectionBeginRow() {
