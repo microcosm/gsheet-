@@ -10,8 +10,8 @@ class Sheet {
     this.values = false;
     this.headerSectionsLeftMarker =  'HEADER_LEFT';
     this.headerSectionsRightMarker = 'HEADER_RIGHT';
-    this.dataSectionBeginMarker =    'DATA_BEGIN';
-    this.dataSectionEndMarker =      'DATA_END';
+    this.mainSectionBeginMarker =    'MAIN_BEGIN';
+    this.mainSectionEndMarker =      'MAIN_END';
     this.doneSectionBeginMarker =    'DONE_BEGIN';
     this.doneSectionEndMarker =      'DONE_END';
   }
@@ -86,11 +86,11 @@ class Sheet {
   }
 
   getMainSectionBeginRow() {
-    return this.lookupRowIndex(this.dataSectionBeginMarker, 2);
+    return this.lookupRowIndex(this.mainSectionBeginMarker, 2);
   }
 
   getMainSectionEndRow() {
-    return this.lookupRowIndex(this.dataSectionEndMarker, -1);
+    return this.lookupRowIndex(this.mainSectionEndMarker, -1);
   }
 
   getDoneSectionBeginRow() {
