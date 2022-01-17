@@ -8,6 +8,8 @@ class Sheet {
     this.validate();
     this.range = this.config.range || 'A:Z';
     this.values = false;
+    this.titleSectionsLeftMarker =   'TITLE_LEFT';
+    this.titleSectionsRightMarker =  'TITLE_RIGHT';
     this.headerSectionsLeftMarker =  'HEADER_LEFT';
     this.headerSectionsRightMarker = 'HEADER_RIGHT';
     this.mainSectionBeginMarker =    'MAIN_BEGIN';
@@ -28,6 +30,33 @@ class Sheet {
     const numRows = endRow - beginRow + 1;
     const numColumns = this.getDataRange().getNumColumns();
     return this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
+  }
+
+  getTitleSectionRanges() {
+    let ranges = [];
+    const leftMarkerRanges = this.getDataRange().createTextFinder(this.titleSectionsLeftMarker).findAll();
+    const rightMarkerRanges = this.getDataRange().createTextFinder(this.titleSectionsRightMarker).findAll();
+    let leftMarkerRow = 1; let rightMarkerRow = 1; let leftMarkerColumn = 1; let rightMarkerColumn = 1; let row = 1; let column = 1; let numRows = 1; let numColumns = 1;
+
+    if(leftMarkerRanges.length === rightMarkerRanges.length) {
+      for(let i = 0; i < leftMarkerRanges.length; i++) {
+        leftMarkerRow = leftMarkerRanges[i].getRow();
+        rightMarkerRow = rightMarkerRanges[i].getRow();
+        leftMarkerColumn = leftMarkerRanges[i].getColumn();
+        rightMarkerColumn = rightMarkerRanges[i].getColumn();
+
+        if(leftMarkerRow === rightMarkerRow || leftMarkerColumn + 2 !== rightMarkerColumn) {
+          row = leftMarkerRow;
+          column = leftMarkerColumn + 1;
+          ranges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
+        } else {
+          logError('Title markers not aligned or positioned correctly');
+        }
+      }
+    } else {
+      logError('Title markers not found in pairs');
+    }
+    return ranges;
   }
 
   getHeaderSectionRanges() {

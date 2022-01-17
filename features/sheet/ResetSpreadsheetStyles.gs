@@ -21,6 +21,11 @@ class ResetSpreadsheetStyles extends Feature {
     for(const underContentSectionRange of underContentSectionRanges) {
       this.setStyle(underContentSectionRange, this.config.underContentSections);
     }
+
+    const titleSectionRanges = this.sheet.getTitleSectionRanges();
+    for(const titleSectionRange of titleSectionRanges) {
+      this.setStyle(titleSectionRange, this.config.titles);
+    }
   }
 
   setStyle(range, config) {
