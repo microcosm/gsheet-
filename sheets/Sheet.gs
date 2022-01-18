@@ -26,6 +26,7 @@ class Sheet {
       values: false,
       dataRange: false,
       titleSectionRanges: false,
+      titleAboveBelowSectionRanges: false,
       headerSectionRanges: false,
       mainSectionRange: false,
       doneSectionRange: false,
@@ -83,6 +84,25 @@ class Sheet {
       this.cache.titleSectionRanges = ranges;
     }
     return this.cache.titleSectionRanges;
+  }
+
+  getTitleAboveBelowSectionRanges() {
+    if(!this.cache.titleAboveBelowSectionRanges) {
+      const titleSectionRanges = this.getTitleSectionRanges();
+      let ranges = [];
+      let aboveRow = 1, belowRow = 1, column = 1, numRows = 1, numColumns = 1;
+      for(const titleSectionRange of titleSectionRanges) {
+        aboveRow = titleSectionRange.getRow() - 1;
+        belowRow = titleSectionRange.getRow() + 1;
+        column = titleSectionRange.getColumn();
+        numRows = 1;
+        numColumns = titleSectionRange.getNumColumns();
+        ranges.push(this.sheetRef.getRange(aboveRow, column, numRows, numColumns));
+        ranges.push(this.sheetRef.getRange(belowRow, column, numRows, numColumns));
+      }
+      this.cache.titleAboveBelowSectionRanges = ranges;
+    }
+    return this.cache.titleAboveBelowSectionRanges;
   }
 
   getHeaderSectionRanges() {

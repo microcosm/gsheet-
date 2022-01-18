@@ -14,19 +14,21 @@ class ResetSpreadsheetStyles extends Feature {
   }
 
   setRanges() {
-    this.titleSectionRanges = this.sheet.getTitleSectionRanges();
-    this.headerSectionRanges = this.sheet.getHeaderSectionRanges();
-    this.mainSectionRange = this.sheet.getMainSectionRange();
-    this.doneSectionRange = this.sheet.getDoneSectionRange();
-    this.underContentSectionRanges = this.sheet.getUnderContentSectionRanges();
+    this.titleSectionRanges           = this.sheet.getTitleSectionRanges();
+    this.titleAboveBelowSectionRanges = this.sheet.getTitleAboveBelowSectionRanges();
+    this.headerSectionRanges          = this.sheet.getHeaderSectionRanges();
+    this.mainSectionRange             = this.sheet.getMainSectionRange();
+    this.doneSectionRange             = this.sheet.getDoneSectionRange();
+    this.underContentSectionRanges    = this.sheet.getUnderContentSectionRanges();
   }
 
   setStyles() {
-    this.setMultipleRangeStyles(this.titleSectionRanges,        this.config.titles);
-    this.setMultipleRangeStyles(this.headerSectionRanges,       this.config.headers);
-    this.setSingleRangeStyle   (this.mainSectionRange,          this.config.contentSections);
-    this.setSingleRangeStyle   (this.doneSectionRange,          this.config.contentSections);
-    this.setMultipleRangeStyles(this.underContentSectionRanges, this.config.underContentSections);
+    this.setMultipleRangeStyles(this.titleSectionRanges,           this.config.titles);
+    this.setMultipleRangeStyles(this.titleAboveBelowSectionRanges, this.config.titlesAboveBelow);
+    this.setMultipleRangeStyles(this.headerSectionRanges,          this.config.headers);
+    this.setSingleRangeStyle   (this.mainSectionRange,             this.config.contentSections);
+    this.setSingleRangeStyle   (this.doneSectionRange,             this.config.contentSections);
+    this.setMultipleRangeStyles(this.underContentSectionRanges,    this.config.underContentSections);
   }
 
   setMultipleRangeStyles(ranges, config) {
@@ -37,16 +39,17 @@ class ResetSpreadsheetStyles extends Feature {
 
   setSingleRangeStyle(range, config) {
     if(config.hasOwnProperty('fontFamily')) range.setFontFamily(config.fontFamily);
-    if(config.hasOwnProperty('fontSize')) range.setFontSize(config.fontSize);
-    if(config.hasOwnProperty('border')) range.setBorder(config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
+    if(config.hasOwnProperty('fontSize'))   range.setFontSize  (config.fontSize);
+    if(config.hasOwnProperty('border'))     range.setBorder    (config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
   }
 
   setHeights() {
-    this.setMultipleRangeHeights(this.titleSectionRanges,        this.config.titles);
-    this.setMultipleRangeHeights(this.headerSectionRanges,       this.config.headers);
-    this.setSingleRangeHeights  (this.mainSectionRange,          this.config.contentSections);
-    this.setSingleRangeHeights  (this.doneSectionRange,          this.config.contentSections);
-    this.setMultipleRangeHeights(this.underContentSectionRanges, this.config.underContentSections);
+    this.setMultipleRangeHeights(this.titleSectionRanges,           this.config.titles);
+    this.setMultipleRangeHeights(this.titleAboveBelowSectionRanges, this.config.titlesAboveBelow);
+    this.setMultipleRangeHeights(this.headerSectionRanges,          this.config.headers);
+    this.setSingleRangeHeights  (this.mainSectionRange,             this.config.contentSections);
+    this.setSingleRangeHeights  (this.doneSectionRange,             this.config.contentSections);
+    this.setMultipleRangeHeights(this.underContentSectionRanges,    this.config.underContentSections);
   }
 
   setMultipleRangeHeights(ranges, config) {
