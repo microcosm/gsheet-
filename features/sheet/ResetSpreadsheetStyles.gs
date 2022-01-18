@@ -49,7 +49,8 @@ class ResetSpreadsheetStyles extends Feature {
       headers:          this.getLookup(this.config.headers,          'getHeaderSectionRanges',          'setMultipleRangeStyles', 'setMultipleRangeHeights'),
       main:             this.getLookup(this.config.contents,         'getMainSectionRange',             'setSingleRangeStyle',    'setSingleRangeHeights'  ),
       done:             this.getLookup(this.config.contents,         'getDoneSectionRange',             'setSingleRangeStyle',    'setSingleRangeHeights'  ),
-      underContents:    this.getLookup(this.config.underContents,    'getUnderContentSectionRanges',    'setMultipleRangeStyles', 'setMultipleRangeHeights')
+      underMain:        this.getLookup(this.config.underContents,    'getUnderMainSectionRange',        'setSingleRangeStyle',    'setSingleRangeHeights'  ),
+      underDone:        this.getLookup(this.config.underContents,    'getUnderDoneSectionRange',        'setSingleRangeStyle',    'setSingleRangeHeights'  )
     };
   }
 

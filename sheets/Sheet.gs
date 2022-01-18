@@ -42,7 +42,8 @@ class Sheet {
       doneSectionNumRows: false,
       contentSectionsBeginColumn: false,
       contentSectionsEndColumn: false,
-      underContentSectionRanges: false
+      underMainSectionRange: false,
+      underDoneSectionRange: false
     };
   }
 
@@ -235,19 +236,26 @@ class Sheet {
     return this.cache.contentSectionsEndColumn;
   }
 
-  getUnderContentSectionRanges() {
-    if(!this.cache.underContentSectionRanges) {
-      let ranges = [];
-      const mainSectionEndMarkerRow = this.lookupRowIndex(sectionMarkers.mainEnd);
-      const doneSectionEndMarkerRow = this.lookupRowIndex(sectionMarkers.doneEnd);
-      const numRows = 1;
-      const beginColumn = this.getContentSectionsBeginColumn();
-      const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
-      ranges.push(this.sheetRef.getRange(mainSectionEndMarkerRow, beginColumn, numRows, numColumns));
-      ranges.push(this.sheetRef.getRange(doneSectionEndMarkerRow, beginColumn, numRows, numColumns));
-      this.cache.underContentSectionRanges = ranges;
+  getUnderMainSectionRange() {
+    if(!this.cache.underMainSectionRange) {
+      this.cache.underMainSectionRange = this.getUnderContentSectionRange(sectionMarkers.mainEnd);
     }
-    return this.cache.underContentSectionRanges
+    return this.cache.underMainSectionRange;
+  }
+
+  getUnderDoneSectionRange() {
+    if(!this.cache.underDoneSectionRange) {
+      this.cache.underDoneSectionRange = this.getUnderContentSectionRange(sectionMarkers.doneEnd);
+    }
+    return this.cache.underDoneSectionRange;
+  }
+
+  getUnderContentSectionRange(marker) {
+    const contentSectionEndMarkerRow = this.lookupRowIndex(marker);
+    const numRows = 1;
+    const beginColumn = this.getContentSectionsBeginColumn();
+    const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
+    return this.sheetRef.getRange(contentSectionEndMarkerRow, beginColumn, numRows, numColumns);
   }
 
   getMainSectionRowsRange(beginOffset=0, endOffset=0) {
