@@ -16,6 +16,7 @@ class ResetSpreadsheetStyles extends Feature {
   setRanges() {
     this.titleSectionRanges           = this.sheet.getTitleSectionRanges();
     this.titleAboveBelowSectionRanges = this.sheet.getTitleAboveBelowSectionRanges();
+    this.hiddenValuesRowRange         = this.sheet.getHiddenValuesRowRange();
     this.headerSectionRanges          = this.sheet.getHeaderSectionRanges();
     this.mainSectionRange             = this.sheet.getMainSectionRange();
     this.doneSectionRange             = this.sheet.getDoneSectionRange();
@@ -25,6 +26,7 @@ class ResetSpreadsheetStyles extends Feature {
   setStyles() {
     this.setMultipleRangeStyles(this.titleSectionRanges,           this.config.titles);
     this.setMultipleRangeStyles(this.titleAboveBelowSectionRanges, this.config.titlesAboveBelow);
+    this.setSingleRangeStyle   (this.hiddenValuesRowRange,         this.config.hiddenValues);
     this.setMultipleRangeStyles(this.headerSectionRanges,          this.config.headers);
     this.setSingleRangeStyle   (this.mainSectionRange,             this.config.contentSections);
     this.setSingleRangeStyle   (this.doneSectionRange,             this.config.contentSections);
@@ -46,6 +48,7 @@ class ResetSpreadsheetStyles extends Feature {
   setHeights() {
     this.setMultipleRangeHeights(this.titleSectionRanges,           this.config.titles);
     this.setMultipleRangeHeights(this.titleAboveBelowSectionRanges, this.config.titlesAboveBelow);
+    this.setSingleRangeHeights  (this.hiddenValuesRowRange,         this.config.hiddenValues);
     this.setMultipleRangeHeights(this.headerSectionRanges,          this.config.headers);
     this.setSingleRangeHeights  (this.mainSectionRange,             this.config.contentSections);
     this.setSingleRangeHeights  (this.doneSectionRange,             this.config.contentSections);

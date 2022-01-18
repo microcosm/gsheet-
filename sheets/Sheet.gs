@@ -1,6 +1,8 @@
 const sectionMarkers = {
   titleLeft:   'TITLE_LEFT',
   titleRight:  'TITLE_RIGHT',
+  hiddenLeft:  'HIDDEN_LEFT',
+  hiddenRight: 'HIDDEN_RIGHT',
   headerLeft:  'HEADER_LEFT',
   headerRight: 'HEADER_RIGHT',
   mainBegin:   'MAIN_BEGIN',
@@ -28,11 +30,13 @@ class Sheet {
       titleSectionRanges: false,
       titleAboveBelowSectionRanges: false,
       headerSectionRanges: false,
+      hiddenValuesRowRange: false,
+      hiddenValuesSectionRow: false,
       mainSectionRange: false,
-      doneSectionRange: false,
       mainSectionBeginRow: false,
       mainSectionEndRow: false,
       mainSectionNumRows: false,
+      doneSectionRange: false,
       doneSectionBeginRow: false,
       doneSectionEndRow: false,
       doneSectionNumRows: false,
@@ -105,6 +109,17 @@ class Sheet {
     return this.cache.titleAboveBelowSectionRanges;
   }
 
+  getHiddenValuesRowRange() {
+    if(!this.cache.hiddenValuesRowRange) {
+      const row = this.getHiddenValuesSectionRow();
+      const numRows = 1;
+      const beginColumn = this.getContentSectionsBeginColumn();
+      const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
+      this.cache.hiddenValuesRowRange = this.sheetRef.getRange(row, beginColumn, numRows, numColumns);
+    }
+    return this.cache.hiddenValuesRowRange;
+  }
+
   getHeaderSectionRanges() {
     if(!this.cache.headerSectionRanges) {
       let ranges = [];
@@ -155,6 +170,13 @@ class Sheet {
       this.cache.doneSectionRange = this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
     }
     return this.cache.doneSectionRange;
+  }
+
+  getHiddenValuesSectionRow() {
+    if(!this.cache.hiddenValuesSectionRow) {
+      this.cache.hiddenValuesSectionRow = this.lookupRowIndex(sectionMarkers.hiddenLeft);
+    }
+    return this.cache.hiddenValuesSectionRow;
   }
 
   getMainSectionBeginRow() {
