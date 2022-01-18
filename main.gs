@@ -96,17 +96,21 @@ function executeFeaturesForEvent(event, eventData=false) {
 }
 
 function executeFeatures() {
-  if(!waitForLocks()){
-    alertError("couldn't lock script");
-    return;
-  }
-  try {
-    state.builder.prepareForExecution();
-    state.features.executions.forEach((feature) => { feature.execute() });
-  } catch(exception) {
-    alertError(exception);
-  } finally {
-    releaseLock();
+  if(state.features.executions.length > 0) {
+    if(!waitForLocks()){
+      alertError('Could not lock script');
+      return;
+    }
+    try {
+      state.builder.prepareForExecution();
+      state.features.executions.forEach((feature) => { feature.execute() });
+    } catch(exception) {
+      alertError(exception);
+    } finally {
+      releaseLock();
+    }
+  } else {
+    logString('No executable features found');
   }
 }
 
@@ -135,6 +139,6 @@ function endEventResponse(returnValue=false) {
   if(returnValue) {
     logString('Returning value: ' + returnValue);
   }
-  logString('Execution completed.');
+  logString('Completed.');
   outputLog();
 }
