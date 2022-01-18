@@ -40,7 +40,7 @@ class Feature {
 
   setConfig() {
     if(!this.config) {
-      this.config = this.initiatior === featureInitiators.sidebar ?
+      this.config = this.initiatior === featureInitiators.sidebar && this.eventData ?
         this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()] :
         this.sheet.config.features[this.getCamelCaseName()];
     }
