@@ -73,11 +73,8 @@ class Feature {
   isValidSheetActivatedEventData(eventData) {
     if(!this.isSheetActivatedEventData(eventData)) return false;
     const sheetName = eventData.source.getActiveSheet().getName();
-    const column = eventData.range.columnStart;
-    const isMatchingSheet = this.sheet.isNamed(sheetName);
-    const isTriggerColumn = this.sheet.isTriggeredByColumn(column);
-    const isValidSheetActivatedEventData = isMatchingSheet && isTriggerColumn;
-    logStringVerbose('isValidSheetActivatedEventData is ' + isValidSheetActivatedEventData + ' because isMatchingSheet is ' + isMatchingSheet + ' and isTriggerColumn is ' + isTriggerColumn);
+    const isValidSheetActivatedEventData = this.sheet.isNamed(sheetName);
+    logStringVerbose('isValidSheetActivatedEventData is ' + isValidSheetActivatedEventData);
     return isValidSheetActivatedEventData;
   }
 

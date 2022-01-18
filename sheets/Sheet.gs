@@ -314,12 +314,8 @@ class FeatureSheet extends Sheet {
     return this.name === name;
   }
 
-  isTriggeredByColumn(columnCardinalIndex) {
-    return !this.hasTriggerColumns || this.triggerColumns.cardinalIndices.includes(columnCardinalIndex);
-  }
-
   ensureAccessExpectations() {
-    this.assignPropertiesFromConfig(['id', 'triggerColumns']);
+    this.assignPropertiesFromConfig(['id']);
   }
 
   assignPropertiesFromConfig(propertyNames) {
