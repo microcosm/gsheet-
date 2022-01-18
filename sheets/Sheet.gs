@@ -1,3 +1,14 @@
+const sectionMarkers = {
+  titleLeft:   'TITLE_LEFT',
+  titleRight:  'TITLE_RIGHT',
+  headerLeft:  'HEADER_LEFT',
+  headerRight: 'HEADER_RIGHT',
+  mainBegin:   'MAIN_BEGIN',
+  mainEnd:     'MAIN_END',
+  doneBegin:   'DONE_BEGIN',
+  doneEnd:     'DONE_END'
+}
+
 class Sheet {
   constructor(config) {
     this.config = config;
@@ -8,14 +19,6 @@ class Sheet {
     this.validate();
     this.range = this.config.range || 'A:Z';
     this.values = false;
-    this.titleSectionsLeftMarker =   'TITLE_LEFT';
-    this.titleSectionsRightMarker =  'TITLE_RIGHT';
-    this.headerSectionsLeftMarker =  'HEADER_LEFT';
-    this.headerSectionsRightMarker = 'HEADER_RIGHT';
-    this.mainSectionBeginMarker =    'MAIN_BEGIN';
-    this.mainSectionEndMarker =      'MAIN_END';
-    this.doneSectionBeginMarker =    'DONE_BEGIN';
-    this.doneSectionEndMarker =      'DONE_END';
   }
 
   getRangeOfRow(row) {
@@ -34,8 +37,8 @@ class Sheet {
 
   getTitleSectionRanges() {
     let ranges = [];
-    const leftMarkerRanges = this.getDataRange().createTextFinder(this.titleSectionsLeftMarker).findAll();
-    const rightMarkerRanges = this.getDataRange().createTextFinder(this.titleSectionsRightMarker).findAll();
+    const leftMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.titleLeft).findAll();
+    const rightMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.titleRight).findAll();
     let leftMarkerRow = 1; let rightMarkerRow = 1; let leftMarkerColumn = 1; let rightMarkerColumn = 1; let row = 1; let column = 1; let numRows = 1; let numColumns = 1;
 
     if(leftMarkerRanges.length === rightMarkerRanges.length) {
@@ -61,8 +64,8 @@ class Sheet {
 
   getHeaderSectionRanges() {
     let ranges = [];
-    const leftMarkerRanges = this.getDataRange().createTextFinder(this.headerSectionsLeftMarker).findAll();
-    const rightMarkerRanges = this.getDataRange().createTextFinder(this.headerSectionsRightMarker).findAll();
+    const leftMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.headerLeft).findAll();
+    const rightMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.headerRight).findAll();
     let leftMarkerRow = 1; let rightMarkerRow = 1; let leftColumn = 1; let rightColumn = 1; let row = 1; let numRows = 1; let numColumns = 1;
 
     if(leftMarkerRanges.length === rightMarkerRanges.length) {
@@ -111,11 +114,11 @@ class Sheet {
   }
 
   getMainSectionBeginRow() {
-    return this.lookupRowIndex(this.mainSectionBeginMarker, 2);
+    return this.lookupRowIndex(sectionMarkers.mainBegin, 2);
   }
 
   getMainSectionEndRow() {
-    return this.lookupRowIndex(this.mainSectionEndMarker, -1);
+    return this.lookupRowIndex(sectionMarkers.mainEnd, -1);
   }
 
   getMainSectionNumRows() {
@@ -123,11 +126,11 @@ class Sheet {
   }
 
   getDoneSectionBeginRow() {
-    return this.lookupRowIndex(this.doneSectionBeginMarker, 2);
+    return this.lookupRowIndex(sectionMarkers.doneBegin, 2);
   }
 
   getDoneSectionEndRow() {
-    return this.lookupRowIndex(this.doneSectionEndMarker, -1);
+    return this.lookupRowIndex(sectionMarkers.doneEnd, -1);
   }
 
   getDoneSectionNumRows() {
@@ -135,17 +138,17 @@ class Sheet {
   }
 
   getContentSectionsBeginColumn() {
-    return this.getDataRange().createTextFinder(this.headerSectionsLeftMarker).findNext().getColumn() + 1;
+    return this.getDataRange().createTextFinder(sectionMarkers.headerLeft).findNext().getColumn() + 1;
   }
 
   getContentSectionsEndColumn() {
-    return this.getDataRange().createTextFinder(this.headerSectionsRightMarker).findNext().getColumn() - 1;
+    return this.getDataRange().createTextFinder(sectionMarkers.headerRight).findNext().getColumn() - 1;
   }
 
   getUnderContentSectionRanges() {
     let ranges = [];
-    const mainSectionEndMarkerRow = this.lookupRowIndex(this.mainSectionEndMarker);
-    const doneSectionEndMarkerRow = this.lookupRowIndex(this.doneSectionEndMarker);
+    const mainSectionEndMarkerRow = this.lookupRowIndex(sectionMarkers.mainEnd);
+    const doneSectionEndMarkerRow = this.lookupRowIndex(sectionMarkers.doneEnd);
     const numRows = 1;
     const beginColumn = this.getContentSectionsBeginColumn();
     const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
