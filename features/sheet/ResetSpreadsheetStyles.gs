@@ -42,6 +42,7 @@ class ResetSpreadsheetStyles extends Feature {
   setSingleRangeStyle(range, config) {
     if(config.hasOwnProperty('fontFamily')) range.setFontFamily(config.fontFamily);
     if(config.hasOwnProperty('fontSize'))   range.setFontSize  (config.fontSize);
+    if(config.hasOwnProperty('fontColor'))  range.setFontColor (config.fontColor);
     if(config.hasOwnProperty('border'))     range.setBorder    (config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
   }
 
