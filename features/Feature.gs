@@ -55,7 +55,7 @@ class Feature {
     startLogBlockVerbose();
     if(!eventData) {
       logStringVerbose('isValidEventData is true because eventData is null');
-      endLogBlock();
+      endLogBlockVerbose();
       return true;
     }
     const isValidEventData = this.isValidSheetActivatedEventData(eventData) || this.isValidSidebarSubmissionEventData(eventData);
