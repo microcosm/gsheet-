@@ -1,6 +1,5 @@
 const sectionMarkers = {
   titleLeft:   'TITLE_LEFT',
-  titleRight:  'TITLE_RIGHT',
   hiddenLeft:  'HIDDEN_LEFT',
   hiddenRight: 'HIDDEN_RIGHT',
   headerLeft:  'HEADER_LEFT',
@@ -64,27 +63,13 @@ class Sheet {
   getTitleSectionRanges() {
     if(!this.cache.titleSectionRanges) {
       let ranges = [];
-      const leftMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.titleLeft).findAll();
-      const rightMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.titleRight).findAll();
-      let leftMarkerRow = 1; let rightMarkerRow = 1; let leftMarkerColumn = 1; let rightMarkerColumn = 1; let row = 1; let column = 1; let numRows = 1; let numColumns = 1;
-
-      if(leftMarkerRanges.length === rightMarkerRanges.length) {
-        for(let i = 0; i < leftMarkerRanges.length; i++) {
-          leftMarkerRow = leftMarkerRanges[i].getRow();
-          rightMarkerRow = rightMarkerRanges[i].getRow();
-          leftMarkerColumn = leftMarkerRanges[i].getColumn();
-          rightMarkerColumn = rightMarkerRanges[i].getColumn();
-
-          if(leftMarkerRow === rightMarkerRow || leftMarkerColumn + 2 !== rightMarkerColumn) {
-            row = leftMarkerRow;
-            column = leftMarkerColumn + 1;
-            ranges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
-          } else {
-            logError('Title markers not aligned or positioned correctly');
-          }
-        }
-      } else {
-        logError('Title markers not found in pairs');
+      const titleLeftMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.titleLeft).findAll();
+      for(const titleLeftMarkerRange of titleLeftMarkerRanges) {
+        const row = titleLeftMarkerRange.getRow();
+        const column = titleLeftMarkerRange.getColumn() + 1;
+        const numRows = 1;
+        const numColumns = 1;
+        ranges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
       }
       this.cache.titleSectionRanges = ranges;
     }
@@ -95,13 +80,12 @@ class Sheet {
     if(!this.cache.titleAboveBelowSectionRanges) {
       const titleSectionRanges = this.getTitleSectionRanges();
       let ranges = [];
-      let aboveRow = 1, belowRow = 1, column = 1, numRows = 1, numColumns = 1;
       for(const titleSectionRange of titleSectionRanges) {
-        aboveRow = titleSectionRange.getRow() - 1;
-        belowRow = titleSectionRange.getRow() + 1;
-        column = titleSectionRange.getColumn();
-        numRows = 1;
-        numColumns = titleSectionRange.getNumColumns();
+        const aboveRow = titleSectionRange.getRow() - 1;
+        const belowRow = aboveRow + 2;
+        const column = titleSectionRange.getColumn();
+        const numRows = 1;
+        const numColumns = titleSectionRange.getNumColumns();
         ranges.push(this.sheetRef.getRange(aboveRow, column, numRows, numColumns));
         ranges.push(this.sheetRef.getRange(belowRow, column, numRows, numColumns));
       }
