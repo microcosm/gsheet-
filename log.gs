@@ -2,7 +2,7 @@
 
 function outputLog() {
   console.log(state.log);
-  if(config.toggles.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
+  if(state.toggles.showLogAlert) SpreadsheetApp.getUi().alert(state.log);
 }
 
 function alertError(cause){
@@ -10,7 +10,7 @@ function alertError(cause){
     (cause.hasOwnProperty('stack') ? cause.stack : '');
 
   console.log(output);
-  if(config.toggles.showLogAlert) SpreadsheetApp.getUi().alert(output);
+  if(state.toggles.showLogAlert) SpreadsheetApp.getUi().alert(output);
 }
 
 function alert(text){
@@ -54,7 +54,7 @@ function logString(str) {
 }
 
 function logStringVerbose(str) {
-  if(config.toggles.verboseLogging) logString(str);
+  if(state.toggles.verboseLogging) logString(str);
 }
 
 function logObject(str, obj) {
@@ -62,7 +62,7 @@ function logObject(str, obj) {
 }
 
 function logObjectVerbose(str, obj) {
-  if(config.toggles.verboseLogging) {
+  if(state.toggles.verboseLogging) {
     logObject(str, obj);
     logString('');
   }
@@ -76,7 +76,7 @@ function logEventExecution(event, eventData=false) {
 }
 
 function logFeatureEvaluation(feature, respondsToEvent, isValidEventData) {
-  if(config.toggles.verboseLogging) {
+  if(state.toggles.verboseLogging) {
     state.log += ((respondsToEvent && isValidEventData) ? `* ` : ``) + `Feature '` + feature.name + `' with Sheet '` + feature.sheet.name + `' DOES` + (respondsToEvent ? `` : ` NOT`) + ` respond to event and HAS` + (isValidEventData ? `` : ` NOT`) + ` received valid event data\n\n`;
   } else if(respondsToEvent && isValidEventData) {
     state.log += `Feature '` + feature.name + `' with Sheet '` + feature.sheet.name + `' DOES respond to event and HAS received valid event data\n`;
@@ -98,7 +98,7 @@ function logLockReleased() {
 /* FEATURES */
 
 function logCalendarEventFound(event, hasMatch) {
-  if(config.toggles.verboseLogging) {
+  if(state.toggles.verboseLogging) {
     state.log += (hasMatch ? '' : '* ') + buildCalendarEventLogStr(event);
   } else if(!hasMatch) {
     state.log += '* ' + buildCalendarEventLogStr(event);

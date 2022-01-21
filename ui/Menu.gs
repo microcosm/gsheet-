@@ -1,6 +1,6 @@
 class Menu {
   constructor(uiRef) {
-    this.menuName = '⚙️ [' + config.gsheet.name + ']';
+    this.menuName = '⚙️ [' + state.spreadsheet.name + ']';
     this.uiRef = uiRef;
   }
 

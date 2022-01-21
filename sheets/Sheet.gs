@@ -17,7 +17,7 @@ class Sheet {
     const configProcessor = new SheetConfigProcessor(this.config);
     configProcessor.process();
     this.name = this.config.name;
-    this.sheetRef = state.spreadsheet.getSheetByName(this.name);
+    this.sheetRef = state.spreadsheet.ref.getSheetByName(this.name);
     this.validate();
     this.range = this.config.range || 'A:Z';
   }

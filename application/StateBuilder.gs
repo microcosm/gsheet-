@@ -1,14 +1,21 @@
-var state = { log: '' };
+//Pre-instantiation state properties which must be available as early as possible during execution 
+var state = {
+  log: '',
+  toggles: {
+    performDataUpdates: true,
+    verboseLogging: false,
+    showLogAlert: false
+  }
+};
 
 class StateBuilder {
-  constructor(spreadsheet) {
-    this.spreadsheet = spreadsheet;
+  constructor(spreadsheetSource) {
     this.buildInitialState();
+    this.buildSpreadsheetState(spreadsheetSource);
   }
 
   buildInitialState() {
     this.appendState({
-      spreadsheet: this.spreadsheet,
       users: [],
       sheets: [],
       valuesSheet: null,
@@ -26,7 +33,17 @@ class StateBuilder {
       userProperties: PropertiesService.getUserProperties(),
       builder: this,
     });
-    return this;
+  }
+
+  buildSpreadsheetState(spreadsheetSource) {
+    const config = getSpreadsheetConfig();
+    this.appendState({
+      spreadsheet: {
+        id: config.id,
+        name: config.name,
+        ref: SpreadsheetSource.getActive ? SpreadsheetApp.getActiveSpreadsheet() : SpreadsheetApp.openById(config.id)
+      }
+    });
   }
 
   buildSheetState() {
@@ -65,7 +82,7 @@ class StateBuilder {
   }
 
   getActiveSheet() {
-    const activeSheetName = state.spreadsheet.getActiveSheet().getName();
+    const activeSheetName = state.spreadsheet.ref.getActiveSheet().getName();
     return state.sheets.find(sheet => sheet.name === activeSheetName) || new Sheet({ name: activeSheetName });
   }
 

@@ -22,12 +22,12 @@ class UserInterface {
   }
 
   saveActiveSheetName(sheetName=false) {
-    this.activeSheetName = sheetName || state.spreadsheet.getActiveSheet().getName();
+    this.activeSheetName = sheetName || state.spreadsheet.ref.getActiveSheet().getName();
     state.userProperties.setProperty(this.userPropertyKey_ActiveSheetName, this.activeSheetName);
   }
 
   detectSheetChange() {
-    var currentActiveSheetName = state.spreadsheet.getActiveSheet().getName();
+    var currentActiveSheetName = state.spreadsheet.ref.getActiveSheet().getName();
     var lastKnownActiveSheetName = state.userProperties.getProperty(this.userPropertyKey_ActiveSheetName);
 
     if(currentActiveSheetName !== lastKnownActiveSheetName) {

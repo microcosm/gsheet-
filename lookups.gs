@@ -1,3 +1,8 @@
+const SpreadsheetSource = {
+  openByID:  'openByID',
+  getActive: 'getActive'
+};
+
 const Event = {
   onSpreadsheetOpen:  'onSpreadsheetOpen',
   onSpreadsheetEdit:  'onSpreadsheetEdit',

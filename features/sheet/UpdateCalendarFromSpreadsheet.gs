@@ -67,14 +67,14 @@ class UpdateCalendarFromSpreadsheet extends Feature {
 
   deleteCalendarEvent(calendarEvent) {
     logCalendarEventDeleted(calendarEvent);
-    if(config.toggles.performDataUpdates) {
+    if(state.toggles.performDataUpdates) {
       calendarEvent.gcal.deleteEvent();
     }
   }
 
   createCalendarEvent(spreadsheetEvent, calendar) {
     logCalendarEventCreated(spreadsheetEvent);
-    if(config.toggles.performDataUpdates) {
+    if(state.toggles.performDataUpdates) {
       spreadsheetEvent.isAllDay ?
         calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
         calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
@@ -255,9 +255,9 @@ class EventsFromSheetStateBuilder {
 
     return 'This event is from the "' + this.currentWidget +
       '" widget' + (name ? ' for ' + name : '') +
-      '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + config.gsheet.id +
+      '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + state.spreadsheet.id +
       '/edit?usp=sharing' +
       (this.sheet.hasId ? '#gid=' + this.sheet.id : '') +
-      '">' + config.gsheet.name + '</a>&nbsp;&larr; Click here for more';
+      '">' + state.spreadsheet.name + '</a>&nbsp;&larr; Click here for more';
   }
 }

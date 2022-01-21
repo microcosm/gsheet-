@@ -1,7 +1,7 @@
 /* Installed Triggers */
 function onSpreadsheetOpen() {
   startEventResponse(Event.onSpreadsheetOpen);
-  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.onSpreadsheetOpen();
   endEventResponse();
@@ -9,7 +9,7 @@ function onSpreadsheetOpen() {
 
 function onSpreadsheetEdit(eventData) {
   startEventResponse(Event.onSpreadsheetEdit);
-  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onSpreadsheetEdit, eventData);
   endEventResponse();
@@ -17,7 +17,7 @@ function onSpreadsheetEdit(eventData) {
 
 function onCalendarEdit() {
   startEventResponse(Event.onCalendarEdit);
-  const stateBuilder = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
+  const stateBuilder = new StateBuilder(SpreadsheetSource.openById);
   stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onCalendarEdit);
   endEventResponse();
@@ -25,7 +25,7 @@ function onCalendarEdit() {
 
 function onOvernightTimer() {
   startEventResponse(Event.onOvernightTimer);
-  const stateBuilder = new StateBuilder(SpreadsheetApp.openById(config.gsheet.id));
+  const stateBuilder = new StateBuilder(SpreadsheetSource.openById);
   stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onOvernightTimer);
   endEventResponse();
@@ -34,7 +34,7 @@ function onOvernightTimer() {
 /* Simple Triggers */
 function onSelectionChange() {
   startEventResponse(Event.onSelectionChange);
-  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.onSelectionChange();
   endEventResponse();
@@ -43,7 +43,7 @@ function onSelectionChange() {
 /* Callbacks */
 function onShowSidebar() {
   startEventResponse(Event.onShowSidebar);
-  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.sidebar.onShowSidebar();
   endEventResponse();
@@ -51,7 +51,7 @@ function onShowSidebar() {
 
 function onSidebarSubmit(eventData) {
   startEventResponse(Event.onSidebarSubmit, eventData);
-  const stateBuilder = new StateBuilder(SpreadsheetApp.getActiveSpreadsheet());
+  const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUserInterfaceState();
   executeFeaturesForEvent(Event.onSidebarSubmit, eventData);
   endEventResponse();
