@@ -16,14 +16,6 @@ class StateBuilder {
 
   buildInitialState() {
     this.appendState({
-      users: [],
-      sheets: [],
-      valuesSheet: null,
-      features: {
-        classes: featureClasses,
-        registered: [],
-        executions: []
-      },
       texts: {
         errorLabel: 'Custom script failed: ',
         workDateLabel: 'Work date'
@@ -47,18 +39,49 @@ class StateBuilder {
   }
 
   buildSheetState() {
-    buildSheets();
+    this.buildValuesSheetState();
+    this.buildFeatureSheetStates();
     this.appendState({
       activeSheet: this.getActiveSheet()
     });
     return this;
   }
 
+  buildValuesSheetState() {
+    var sheet = new ValuesSheet(getValuesSheetConfig());
+    state.valuesSheet = sheet;
+    return sheet;
+  }
+
+  buildFeatureSheetStates() {
+    state.sheets = [];
+    state.features = {
+      classes: featureClasses,
+      registered: [],
+      executions: []
+    };
+    let featureSheetConfigs = getFeatureSheetConfigs();
+    for(const featureSheetConfig of featureSheetConfigs) {
+      this.buildFeatureSheetState(featureSheetConfig)
+    }
+  }
+
+  buildFeatureSheetState(featureSheetConfig) {
+    const sheet = new FeatureSheet(featureSheetConfig);
+    state.sheets.push(sheet);
+    this.appendFeatures(
+      featureSheetConfig.featureClasses.map((feature) => {
+        return new feature(sheet)
+      })
+    );
+    return sheet;
+  }
+
   buildUsersState() {
     const usersColumnIndex = state.valuesSheet.config.usersColumnIndex;
     const values = state.valuesSheet.getValuesOf(usersColumnIndex);
-
     const numValuesPerUser = 3;
+    state.users = [];
 
     for(var i = 0; i < values.length; i += numValuesPerUser) {
       if(values[i] && values[i + 1]){

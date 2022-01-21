@@ -64,24 +64,6 @@ function onGetActiveSheetID() {
   return activeSheetID;
 }
 
-/* Sheet Registration */
-function registerValuesSheet(config) {
-  var sheet = new ValuesSheet(config);
-  state.valuesSheet = sheet;
-  return sheet;
-}
-
-function registerFeatureSheet(config) {
-  const sheet = new FeatureSheet(config);
-  state.sheets.push(sheet);
-  state.builder.appendFeatures(
-    config.featureClasses.map((feature) => {
-      return new feature(sheet)
-    })
-  );
-  return sheet;
-}
-
 /* Execution */
 function executeFeaturesForEvent(event, eventData=false) {
   logString('Searching registered features for valid responses...');
