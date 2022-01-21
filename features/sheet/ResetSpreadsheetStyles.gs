@@ -18,6 +18,10 @@ class ResetSpreadsheetStyles extends Feature {
     }
   }
 
+  isValidProperty(config, propertyName) {
+    return config.hasOwnProperty(propertyName) && config[propertyName] != null;
+  }
+
   setMultipleRangeStyles(ranges, config) {
     for(const range of ranges) {
       this.setSingleRangeStyle(range, config);
@@ -25,10 +29,10 @@ class ResetSpreadsheetStyles extends Feature {
   }
 
   setSingleRangeStyle(range, config) {
-    if(config.hasOwnProperty('fontFamily')) range.setFontFamily(config.fontFamily);
-    if(config.hasOwnProperty('fontSize'))   range.setFontSize  (config.fontSize);
-    if(config.hasOwnProperty('fontColor'))  range.setFontColor (config.fontColor);
-    if(config.hasOwnProperty('border'))     range.setBorder    (config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
+    if(this.isValidProperty(config, 'fontFamily')) range.setFontFamily(config.fontFamily);
+    if(this.isValidProperty(config, 'fontSize'  )) range.setFontSize  (config.fontSize);
+    if(this.isValidProperty(config, 'fontColor' )) range.setFontColor (config.fontColor);
+    if(this.isValidProperty(config, 'border'    )) range.setBorder    (config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
   }
 
   setMultipleRangeHeights(ranges, config) {
@@ -38,7 +42,7 @@ class ResetSpreadsheetStyles extends Feature {
   }
 
   setSingleRangeHeights(range, config) {
-    if(config.hasOwnProperty('rowHeight')) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
+    if(this.isValidProperty(config, 'rowHeight')) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
   }
 
   setLookups() {
