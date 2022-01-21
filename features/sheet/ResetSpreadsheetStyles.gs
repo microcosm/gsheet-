@@ -1,3 +1,7 @@
+const propertyOverrides = {
+  IGNORE: 'ignore'
+};
+
 class ResetSpreadsheetStyles extends Feature {
   constructor(sheet) {
     super(sheet, 'Reset Spreadsheet Styles', featureInitiators.sheet);
@@ -19,7 +23,7 @@ class ResetSpreadsheetStyles extends Feature {
   }
 
   isValidProperty(config, propertyName) {
-    return config.hasOwnProperty(propertyName) && config[propertyName] != null;
+    return config.hasOwnProperty(propertyName) && config[propertyName] != propertyOverrides.IGNORE;
   }
 
   setMultipleRangeStyles(ranges, config) {
