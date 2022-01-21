@@ -12,9 +12,9 @@ class ResetSpreadsheetStyles extends Feature {
 
     for(const section of this.config.sections) {
       const lookup = this.lookups[section];
-      const range = this.sheet[lookup.rangeGetter]();
+      const range = lookup.sendConfigToRangeGetter ? this.sheet[lookup.rangeGetter](lookup.config) : this.sheet[lookup.rangeGetter]();
       this[lookup.styleSetter](range, lookup.config);
-      this[lookup.heightSetter](range, lookup.config);
+      if(lookup.heightSetter) this[lookup.heightSetter](range, lookup.config);
     }
   }
 
@@ -25,6 +25,12 @@ class ResetSpreadsheetStyles extends Feature {
   setMultipleRangeStyles(ranges, config) {
     for(const range of ranges) {
       this.setSingleRangeStyle(range, config);
+    }
+  }
+
+  setMultipleRangeStylesDifferently(ranges, config) {
+    for(let i = 0; i < ranges.length; i++) {
+      this.setSingleRangeStyle(ranges[i], config[i]);
     }
   }
 
@@ -47,23 +53,26 @@ class ResetSpreadsheetStyles extends Feature {
 
   setLookups() {
     this.lookups = {
-      titles:           this.getLookup(this.config.titles,           'getTitleSectionRanges',           'setMultipleRangeStyles', 'setMultipleRangeHeights'),
-      titlesAboveBelow: this.getLookup(this.config.titlesAboveBelow, 'getTitleAboveBelowSectionRanges', 'setMultipleRangeStyles', 'setMultipleRangeHeights'),
-      hiddenValues:     this.getLookup(this.config.hiddenValues,     'getHiddenValuesRowRange',         'setSingleRangeStyle',    'setSingleRangeHeights'  ),
-      headers:          this.getLookup(this.config.headers,          'getHeaderSectionRanges',          'setMultipleRangeStyles', 'setMultipleRangeHeights'),
-      main:             this.getLookup(this.config.contents,         'getMainSectionRange',             'setSingleRangeStyle',    'setSingleRangeHeights'  ),
-      done:             this.getLookup(this.config.contents,         'getDoneSectionRange',             'setSingleRangeStyle',    'setSingleRangeHeights'  ),
-      underMain:        this.getLookup(this.config.underContents,    'getUnderMainSectionRange',        'setSingleRangeStyle',    'setSingleRangeHeights'  ),
-      underDone:        this.getLookup(this.config.underContents,    'getUnderDoneSectionRange',        'setSingleRangeStyle',    'setSingleRangeHeights'  )
+      titles:           this.getLookup(this.config.titles,            'getTitleSectionRanges',           'setMultipleRangeStyles',           'setMultipleRangeHeights'),
+      titlesAboveBelow: this.getLookup(this.config.titlesAboveBelow,  'getTitleAboveBelowSectionRanges', 'setMultipleRangeStyles',           'setMultipleRangeHeights'),
+      hiddenValues:     this.getLookup(this.config.hiddenValues,      'getHiddenValuesRowRange',         'setSingleRangeStyle',              'setSingleRangeHeights'  ),
+      headers:          this.getLookup(this.config.headers,           'getHeaderSectionRanges',          'setMultipleRangeStyles',           'setMultipleRangeHeights'),
+      main:             this.getLookup(this.config.contents,          'getMainSectionRange',             'setSingleRangeStyle',              'setSingleRangeHeights'  ),
+      done:             this.getLookup(this.config.contents,          'getDoneSectionRange',             'setSingleRangeStyle',              'setSingleRangeHeights'  ),
+      mainSubRanges:    this.getLookup(this.config.contentsSubRanges, 'getMainSubRanges',                'setMultipleRangeStylesDifferently'),
+      doneSubRanges:    this.getLookup(this.config.contentsSubRanges, 'getDoneSubRanges',                'setMultipleRangeStylesDifferently'),
+      underMain:        this.getLookup(this.config.underContents,     'getUnderMainSectionRange',        'setSingleRangeStyle',               'setSingleRangeHeights'  ),
+      underDone:        this.getLookup(this.config.underContents,     'getUnderDoneSectionRange',        'setSingleRangeStyle',               'setSingleRangeHeights'  )
     };
   }
 
-  getLookup(config, rangeGetter, styleSetter, heightSetter) {
+  getLookup(config, rangeGetter, styleSetter, heightSetter=false) {
     return {
-      config:       config,
-      rangeGetter:  rangeGetter,
-      styleSetter:  styleSetter,
-      heightSetter: heightSetter
+      config:                  config,
+      rangeGetter:             rangeGetter,
+      styleSetter:             styleSetter,
+      heightSetter:            heightSetter,
+      sendConfigToRangeGetter: styleSetter === 'setMultipleRangeStylesDifferently'
     };
   }
 }

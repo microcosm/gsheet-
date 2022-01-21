@@ -173,6 +173,30 @@ class Sheet {
     return this.cache.doneSectionRange;
   }
 
+  getMainSubRanges(columnOffsetsAndNumColumnPairs) {
+    const ranges = [];
+    for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
+      const beginRow = this.getMainSectionBeginRow();
+      const numRows = this.getMainSectionEndRow() - beginRow + 1;
+      const beginColumn = this.getContentSectionsBeginColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
+      const numColumns = columnOffsetsAndNumColumnPair.numColumns;
+      ranges.push(this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns));
+    }
+    return ranges;
+  }
+
+  getDoneSubRanges(columnOffsetsAndNumColumnPairs) {
+    const ranges = [];
+    for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
+      const beginRow = this.getDoneSectionBeginRow();
+      const numRows = this.getDoneSectionEndRow() - beginRow + 1;
+      const beginColumn = this.getContentSectionsBeginColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
+      const numColumns = columnOffsetsAndNumColumnPair.numColumns;
+      ranges.push(this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns));
+    }
+    return ranges;
+  }
+
   getHiddenValuesSectionRow() {
     if(!this.cache.hiddenValuesSectionRow) {
       this.cache.hiddenValuesSectionRow = this.lookupRowIndex(sectionMarkers.hiddenLeft);
