@@ -63,6 +63,12 @@ function toCamelCase(str) {
   }).replace(/\s+/g, '');
 }
 
+function pushIfNew(array, item) {
+  if(array.indexOf(item) === -1) {
+    array.push(item);
+  }
+}
+
 function isObject(value) {
   return !!(value && typeof value === "object" && !Array.isArray(value));
 }

@@ -14,16 +14,16 @@ const Event = {
   onGetActiveSheetID: 'onGetActiveSheetID'
 };
 
-const featureClasses = {
-  //Calendar initiated features
+const FeatureClasses = {
+  //Calendar initiated
   updateSpreadsheetFromCalendar:       UpdateSpreadsheetFromCalendar,
 
-  //Sheet initiated features
+  //Sheet initiated
   replicateSheetInExternalSpreadsheet: ReplicateSheetInExternalSpreadsheet,
   resetSpreadsheetStyles:              ResetSpreadsheetStyles,
   updateCalendarFromSpreadsheet:       UpdateCalendarFromSpreadsheet,
 
-  //Sidebar initiated features
+  //Sidebar initiated
   collapseDoneSection:                 CollapseDoneSection,
   moveMatchingRowsFromMainToDone:      MoveMatchingRowsFromMainToDone,
   orderMainSection:                    OrderMainSection,

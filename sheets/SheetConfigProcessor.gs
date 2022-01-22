@@ -98,18 +98,12 @@ class SheetConfigProcessor {
       const propertyValue = config[propertyName];
       if(propertyName === 'feature' || propertyName === 'features') {
         Object.keys(propertyValue).forEach(featureName => {
-          this.pushIfNew(this.config.featureClasses, state.features.classes[featureName]);
+          pushIfNew(this.config.featureClasses, FeatureClasses[featureName]);
         });
       }
       if(isObject(propertyValue)) {
         this.buildFeatureClassArraysFrom(propertyValue);
       }
-    }
-  }
-
-  pushIfNew(array, item) {
-    if(array.indexOf(item) === -1) {
-      array.push(item);
     }
   }
 

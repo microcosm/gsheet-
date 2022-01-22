@@ -56,7 +56,6 @@ class StateBuilder {
   buildFeatureSheetStates() {
     state.sheets = [];
     state.features = {
-      classes: featureClasses,
       registered: [],
       executions: []
     };
