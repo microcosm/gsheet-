@@ -6,7 +6,7 @@ function outputLog() {
 }
 
 function alertError(cause){
-  var output = state.texts.errorLabel + cause +
+  var output = 'Custom script failed: ' + cause +
     (cause.hasOwnProperty('stack') ? cause.stack : '');
 
   console.log(output);

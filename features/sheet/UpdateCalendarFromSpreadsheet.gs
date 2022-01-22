@@ -109,6 +109,8 @@ class EventsFromSheetStateBuilder {
   constructor(feature) {
     this.sheet = feature.sheet;
     this.config = feature.config;
+    this.workDateLabel = this.config.workDateLabel;
+    this.workDateLabelLength = this.config.workDateLabel.length;
     this.currentWidget = '';
     this.events = [];
     this.fillInTheBlanksDate = state.today;
@@ -140,7 +142,7 @@ class EventsFromSheetStateBuilder {
   }
 
   isWorkDateLabel(str) {
-    return typeof str == 'string' && str.substring(0, state.texts.workDateLabel.length) === state.texts.workDateLabel;
+    return typeof str == 'string' && str.substring(0, this.workDateLabelLength) === this.workDateLabel;
   }
 
   isValidEvent(row) {

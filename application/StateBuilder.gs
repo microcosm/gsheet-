@@ -16,10 +16,6 @@ class StateBuilder {
 
   buildInitialState() {
     this.appendState({
-      texts: {
-        errorLabel: 'Custom script failed: ',
-        workDateLabel: 'Work date'
-      },
       today: getTodaysDate(),
       execution: { lock: null, timeout: 60000 },
       userProperties: PropertiesService.getUserProperties(),
