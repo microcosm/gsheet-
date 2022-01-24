@@ -143,7 +143,7 @@ class SidebarHtmlBuilder {
     return `<!DOCTYPE html>
 <html>
   <head>
-    <base target='_top'>
+    <base target='_blank'>
     <style>
       .hidden {
         display: none;
