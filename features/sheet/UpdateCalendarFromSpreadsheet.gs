@@ -153,7 +153,7 @@ class EventsFromSheetStateBuilder {
       isVerbColValidString:     typeof row[this.columns.verb] == 'string' && row[this.columns.verb].length > 0,
       isValidDate:              this.widgetCategory.allowFillInTheBlanksDates || row[this.columns.workDate] instanceof Date,
       isValidUser:              !this.exclusionListNames.includes(row[this.columns.name]),
-      isCustomValidated:        typeof isValidCustomSheetEventData === "undefined" || isValidCustomSheetEventData(row, this.widgetCategory.columns)
+      isCustomValidated:        typeof isValidEventData === "undefined" || isValidEventData(row, this.widgetCategory.columns)
     };
     return Object.values(validity).every(check => check === true);
   }
