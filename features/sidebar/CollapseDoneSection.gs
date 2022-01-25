@@ -1,6 +1,6 @@
 class CollapseDoneSection extends Feature {
   constructor(sheet) {
-    super(sheet, 'Collapse Done Section', featureInitiators.sidebar);
+    super(sheet, 'Collapse Done Section');
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onSidebarSubmit);
     this.numRowGroupDepthsToDestroy = 3;

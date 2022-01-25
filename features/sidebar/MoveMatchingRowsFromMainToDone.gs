@@ -1,6 +1,6 @@
 class MoveMatchingRowsFromMainToDone extends Feature {
   constructor(sheet) {
-    super(sheet, 'Move Matching Rows From Main To Done', featureInitiators.sidebar);
+    super(sheet, 'Move Matching Rows From Main To Done');
     this.addResponseCapability(Event.onSidebarSubmit);
   }
 

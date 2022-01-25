@@ -1,8 +1,7 @@
 class Feature {
-  constructor(sheet, name, initiatior) {
+  constructor(sheet, name) {
     this.sheet = sheet;
     this.name = name;
-    this.initiatior = initiatior;
     this.responseCapabilities = [];
     this.camelCaseName = false;
     this.config = false;
@@ -40,7 +39,7 @@ class Feature {
 
   setConfig() {
     if(!this.config) {
-      this.config = this.initiatior === featureInitiators.sidebar && this.eventData ?
+      this.config = this.eventData && this.eventData.hasOwnProperty('sidebar') && this.eventData.sidebar ?
         this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()] :
         this.sheet.config.features[this.getCamelCaseName()];
     }

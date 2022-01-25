@@ -4,7 +4,7 @@ const propertyOverrides = {
 
 class ResetSpreadsheetStyles extends Feature {
   constructor(sheet) {
-    super(sheet, 'Reset Spreadsheet Styles', featureInitiators.sheet);
+    super(sheet, 'Reset Spreadsheet Styles');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);
