@@ -13,6 +13,7 @@ class MoveMatchingRowsFromMainToDone extends Feature {
     this.findTextMatchingRowsInMainSection();
     this.sortFoundRows();
     this.moveRowsToDone();
+    this.sheet.clearCache();
   }
 
   findTextMatchingRowsInMainSection() {

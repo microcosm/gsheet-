@@ -46,6 +46,10 @@ class Sheet {
     };
   }
 
+  clearCache() {
+    this.cache = this.initializeCache();
+  }
+
   getValues() {
     if(!this.cache.values) {
       this.cache.values = this.getDataRange().getValues();
