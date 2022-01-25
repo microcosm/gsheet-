@@ -51,7 +51,7 @@ class Feature {
   }
 
   isValidEventData(eventData) {
-    logStringVerbose('isValidEventData for feature \'' + this.name + '\' of sheet ' + this.sheet.name + '?');
+    logStringVerbose('isValidEventData for feature \'' + this.name + '\' of sheet \'' + this.sheet.name + '\'?');
     startLogBlockVerbose();
     if(!eventData) {
       logStringVerbose('isValidEventData is true because eventData is null');
