@@ -17,6 +17,7 @@ class CollapseDoneSection extends Feature {
   }
 
   createNewRowGroup() {
+    this.sheet.sheetRef.setRowGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
     const range = this.sheet.getDoneSectionRowsRange(this.config.numRowsToDisplay);
     range.shiftRowGroupDepth(1).collapseGroups();
   }
