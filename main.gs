@@ -57,7 +57,7 @@ function onSidebarSubmit(eventData) {
   endEventResponse();
 }
 
-function onGetActiveSheetID() {
+function onGetActiveSheetControlID() {
   startEventResponse(Event.onGetActiveSheetID);
   const activeSheetID = getHtmlSafeID(SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName());
   endEventResponse(activeSheetID);
