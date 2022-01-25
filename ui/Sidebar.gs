@@ -145,6 +145,12 @@ class SidebarHtmlBuilder {
       .waiting {
         pointer-events: all;
       }
+      .inline + .inline {
+        margin-left: 0;
+      }
+      input[type="button"] {
+        margin: 0 12px 12px 0;
+      }
     </style>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
