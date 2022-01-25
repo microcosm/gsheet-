@@ -67,6 +67,7 @@ function onGetActiveSheetControlID() {
 /* Execution */
 function executeFeaturesForEvent(event, eventData=false) {
   logString('Searching registered features for valid responses...');
+  logObjectVerbose('eventData is ', eventData);
   for(key in state.features.registered) {
     const feature = state.features.registered[key];
     if(feature.respondsTo(event, eventData)) {
@@ -78,7 +79,9 @@ function executeFeaturesForEvent(event, eventData=false) {
 }
 
 function executeFeatures() {
-  if(state.features.executions.length > 0) {
+  const numExecutableFeatures = state.features.executions.length;
+  logString((numExecutableFeatures === 0 ? 'No' : numExecutableFeatures) + ' executable features found');
+  if(numExecutableFeatures > 0) {
     if(!waitForLocks()){
       alertError('Could not lock script');
       return;
@@ -91,8 +94,6 @@ function executeFeatures() {
     } finally {
       releaseLock();
     }
-  } else {
-    logString('No executable features found');
   }
 }
 

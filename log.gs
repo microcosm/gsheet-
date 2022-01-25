@@ -9,7 +9,7 @@ function alertError(cause){
   var output = 'Custom script failed: ' + cause +
     (cause.hasOwnProperty('stack') ? cause.stack : '');
 
-  console.log(output);
+  logString(output);
   if(state.toggles.showLogAlert) SpreadsheetApp.getUi().alert(output);
 }
 
