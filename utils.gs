@@ -27,7 +27,7 @@ function isValidTimeString(candidate) {
 }
 
 function getHtmlSafeID(unsafe) {
-  return unsafe.replace(' ', '-');
+  return unsafe.replaceAll(' ', '-').replaceAll(':', '-');
 }
 
 function getTodaysDate() {

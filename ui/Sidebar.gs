@@ -37,7 +37,7 @@ class Sidebar {
 
 class SidebarHtmlBuilder {
   constructor(uiRef) {
-    this.itemHtmlBuilders = {
+    this.sheetControlItemHtmlBuilders = {
       text: 'buildTextItemHtml',
       buttons: 'buildButtonsItemHtml' 
     };
@@ -46,7 +46,7 @@ class SidebarHtmlBuilder {
     this.sidebarThirdPartyCSSClass = 'sidebar';
     this.formID = 'sidebar-form';
     this.defaultItemID = 'default-item';
-    this.activeSheetID = getHtmlSafeID(state.activeSheet.name);
+    this.activeSheetControlID = this.getElementID(state.activeSheet.name);
   }
 
   getFeatureArgumentStr(item) {
@@ -54,8 +54,10 @@ class SidebarHtmlBuilder {
     return Object.keys(item.features).join();
   }
 
-  getElementID(itemName, value) {
-    return itemName + `.` + getHtmlSafeID(value);
+  getElementID(parent, child=false) {
+    let unsafeElementID = parent;
+    unsafeElementID += child ? `.` + child : ``;
+    return getHtmlSafeID(unsafeElementID);
   }
 
   buildHtml() {
@@ -63,9 +65,10 @@ class SidebarHtmlBuilder {
     html += this.buildFormOpen();
     state.sheets.forEach((sheet) => {
       if(sheet.config.hasOwnProperty('sidebar')) {
-        html += this.buildSidebarOpen(sheet.name);
-        html += this.buildSidebarHtml(sheet.config.sidebar);
-        html += this.buildSidebarClose();
+        this.currentSheetControlId = this.getElementID(sheet.name);
+        html += this.buildSheetControlsOpen();
+        html += this.buildSheetControlsHtml(sheet.config.sidebar);
+        html += this.buildSheetControlsClose();
       }
     });
     html += this.buildDefaultSidebarHtml();
@@ -75,46 +78,50 @@ class SidebarHtmlBuilder {
 
   buildDefaultSidebarHtml() {
     var html = '';
-    html += this.buildSidebarOpen(this.defaultItemID);
-    html += this.buildSidebarHtml({ default: { type: 'text', title: 'Sorry', text: 'The sidebar has not been configured for this sheet.' }});
-    html += this.buildSidebarClose();
+    this.currentSheetControlId = this.getElementID(this.defaultItemID);
+    html += this.buildSheetControlsOpen();
+    html += this.buildSheetControlsHtml({ default: { type: 'text', title: 'Sorry', text: 'The sidebar has not been configured for this sheet.' }});
+    html += this.buildSheetControlsClose();
     return html;
   }
 
-  buildSidebarOpen(sheetName) {
-    const sheetID = getHtmlSafeID(sheetName);
-    const hidden = !(this.activeSheetID === sheetID);
+  buildSheetControlsOpen() {
+    const hidden = !(this.activeSheetControlID === this.currentSheetControlId);
     const hiddenHtml = hidden ? ` class='hidden'` : ``;
-    return `<div id='` + sheetID + `'` + hiddenHtml + `>`;
+    return `<div class='sheet-controls' id='` + this.currentSheetControlId + `'` + hiddenHtml + `>`;
   }
 
-  buildSidebarClose() {
+  buildSheetControlsClose() {
     return `</div>`;
   }
 
-  buildSidebarHtml(config) {
+  buildSheetControlsHtml(config) {
     this.config = config;
     var html = '';
-    for(const itemName in this.config) {
-      this.currentItemName = itemName;
-      const item = this.config[itemName];
-      if(item) html += this[this.itemHtmlBuilders[item.type]](item);
+    for(const sheetControlItemName in this.config) {
+      this.currentSheetControlItemName = sheetControlItemName;
+      this.currentSheetControlItemId = this.getElementID(this.currentSheetControlId, sheetControlItemName);
+      const sheetControlItemConfig = this.config[sheetControlItemName];
+      if(sheetControlItemConfig) {
+        let itemBuilderMethod = this.sheetControlItemHtmlBuilders[sheetControlItemConfig.type];
+        html += this[itemBuilderMethod](sheetControlItemConfig);
+      }
     }
     return html;
   }
 
-  buildTitleHtml(item) {
-    this.currentTitleID = getHtmlSafeID(item.title);
+  buildTitleItemHtml(item)  {
+    this.currentTitleID = this.getElementID(this.currentSheetControlItemId, item.title);
     return `<h1>` + item.title + `<span class='hidden spinner-parent' id='` + this.currentTitleID + `'>&nbsp;<i class='fas fa-spinner fa-spin'></i></span></h1>`;
   }
 
   buildTextItemHtml(item) {
-    return this.buildTitleHtml(item) + `<p>` + item.text + `</p>`;
+    return this.buildTitleItemHtml(item) + `<p>` + item.text + `</p>`;
   }
 
   buildButtonsItemHtml(item) {
     var html = '';
-    html += this.buildTitleHtml(item);
+    html += this.buildTitleItemHtml(item);
     for(const optionName in item.options) {
       const option = item.options[optionName];
       html += this.buildButtonHtml(item, option);
@@ -123,8 +130,8 @@ class SidebarHtmlBuilder {
   }
 
   buildButtonHtml(item, option) {
-    const elementID = this.getElementID(this.currentItemName, option);
-    return `<input type='button' class='inline' id='` + elementID + `' onclick="submitForm('` + this.getFeatureArgumentStr(item) + `', '` + this.currentItemName + `', '` + option + `', '` + elementID + `', '` + this.currentTitleID + `');" value='` + option + `'>`;
+    const elementID = this.getElementID(this.currentSheetControlItemId, option);
+    return `<input type='button' class='inline' id='` + elementID + `' onclick="submitForm('` + this.getFeatureArgumentStr(item) + `', '` + this.currentSheetControlItemName + `', '` + option + `', '` + elementID + `', '` + this.currentTitleID + `');" value='` + option + `'>`;
   }
 
   buildFormOpen() {
@@ -161,16 +168,16 @@ class SidebarHtmlBuilder {
     </style>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        var activeSheetIDGlobal = '` + this.activeSheetID + `';
+        var activeSheetControlIDGlobal = '` + this.activeSheetControlID + `';
         setInterval(checkForNewSheetID, ` + this.statusUpdateInterval + `);
         function checkForNewSheetID() {
           if(document.visibilityState == 'visible') {
-            google.script.run.withSuccessHandler(respondToActiveSheetSuccess).onGetActiveSheetID();
+            google.script.run.withSuccessHandler(respondToActiveSheetSuccess).onGetActiveSheetControlID();
           }
         }
         function respondToActiveSheetSuccess(sheetID) {
-          if(activeSheetIDGlobal !== sheetID) {
-            activeSheetIDGlobal = sheetID;
+          if(activeSheetControlIDGlobal !== sheetID) {
+            activeSheetControlIDGlobal = sheetID;
             showCurrentSheetSidebar();
           }
         }
@@ -178,7 +185,7 @@ class SidebarHtmlBuilder {
           let found = false;
           let sidebar = document.getElementById('` + this.formID + `');
           for(const item of sidebar.children) {
-            if(item.id === activeSheetIDGlobal) {
+            if(item.id === activeSheetControlIDGlobal) {
               item.classList.remove('hidden');
               found = true;
             } else {
