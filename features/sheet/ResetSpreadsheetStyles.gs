@@ -48,6 +48,7 @@ class ResetSpreadsheetStyles extends Feature {
     if(this.isValidProperty(config, 'fontFamily')) range.setFontFamily(config.fontFamily);
     if(this.isValidProperty(config, 'fontSize'  )) range.setFontSize  (config.fontSize);
     if(this.isValidProperty(config, 'fontColor' )) range.setFontColor (config.fontColor);
+    if(this.isValidProperty(config, 'background')) range.setBackground(config.background);
     if(this.isValidProperty(config, 'border'    )) range.setBorder    (config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
   }
 
