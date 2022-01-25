@@ -26,8 +26,9 @@ class Sheet {
     return {
       values: false,
       dataRange: false,
-      titleSectionRanges: false,
-      titleAboveBelowSectionRanges: false,
+      titleCellRanges: false,
+      titleRowRanges: false,
+      titleRowsAboveBelowRanges: false,
       headerSectionRanges: false,
       hiddenValuesRowRange: false,
       hiddenValuesSectionRow: false,
@@ -64,8 +65,8 @@ class Sheet {
     return this.cache.dataRange;
   }
 
-  getTitleSectionRanges() {
-    if(!this.cache.titleSectionRanges) {
+  getTitleCellRanges() {
+    if(!this.cache.titleCellRanges) {
       let ranges = [];
       const titleLeftMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.titleLeft).findAll();
       for(const titleLeftMarkerRange of titleLeftMarkerRanges) {
@@ -75,27 +76,27 @@ class Sheet {
         const numColumns = 1;
         ranges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
       }
-      this.cache.titleSectionRanges = ranges;
+      this.cache.titleCellRanges = ranges;
     }
-    return this.cache.titleSectionRanges;
+    return this.cache.titleCellRanges;
   }
 
-  getTitleAboveBelowSectionRanges() {
-    if(!this.cache.titleAboveBelowSectionRanges) {
-      const titleSectionRanges = this.getTitleSectionRanges();
+  getTitleRowsAboveBelowRanges() {
+    if(!this.cache.titleRowsAboveBelowRanges) {
+      const titleCellRanges = this.getTitleCellRanges();
       let ranges = [];
-      for(const titleSectionRange of titleSectionRanges) {
-        const aboveRow = titleSectionRange.getRow() - 1;
+      for(const titleCellRange of titleCellRanges) {
+        const aboveRow = titleCellRange.getRow() - 1;
         const belowRow = aboveRow + 2;
-        const column = titleSectionRange.getColumn();
+        const column = titleCellRange.getColumn();
         const numRows = 1;
-        const numColumns = titleSectionRange.getNumColumns();
+        const numColumns = this.getContentSectionsEndColumn() - column + 1;
         ranges.push(this.sheetRef.getRange(aboveRow, column, numRows, numColumns));
         ranges.push(this.sheetRef.getRange(belowRow, column, numRows, numColumns));
       }
-      this.cache.titleAboveBelowSectionRanges = ranges;
+      this.cache.titleRowsAboveBelowRanges = ranges;
     }
-    return this.cache.titleAboveBelowSectionRanges;
+    return this.cache.titleRowsAboveBelowRanges;
   }
 
   getHiddenValuesRowRange() {

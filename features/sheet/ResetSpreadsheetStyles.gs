@@ -57,16 +57,16 @@ class ResetSpreadsheetStyles extends Feature {
 
   setLookups() {
     this.lookups = {
-      titles:           this.getLookup(this.config.titles,            'getTitleSectionRanges',           'setMultipleRangeStyles',           'setMultipleRangeHeights'),
-      titlesAboveBelow: this.getLookup(this.config.titlesAboveBelow,  'getTitleAboveBelowSectionRanges', 'setMultipleRangeStyles',           'setMultipleRangeHeights'),
-      hiddenValues:     this.getLookup(this.config.hiddenValues,      'getHiddenValuesRowRange',         'setSingleRangeStyle',              'setSingleRangeHeights'  ),
-      headers:          this.getLookup(this.config.headers,           'getHeaderSectionRanges',          'setMultipleRangeStyles',           'setMultipleRangeHeights'),
-      main:             this.getLookup(this.config.contents,          'getMainSectionRange',             'setSingleRangeStyle',              'setSingleRangeHeights'  ),
-      done:             this.getLookup(this.config.contents,          'getDoneSectionRange',             'setSingleRangeStyle',              'setSingleRangeHeights'  ),
-      mainSubRanges:    this.getLookup(this.config.contentsSubRanges, 'getMainSubRanges',                'setMultipleRangeStylesDifferently'),
-      doneSubRanges:    this.getLookup(this.config.contentsSubRanges, 'getDoneSubRanges',                'setMultipleRangeStylesDifferently'),
-      underMain:        this.getLookup(this.config.underContents,     'getUnderMainSectionRange',        'setSingleRangeStyle',               'setSingleRangeHeights' ),
-      underDone:        this.getLookup(this.config.underContents,     'getUnderDoneSectionRange',        'setSingleRangeStyle',               'setSingleRangeHeights' )
+      titles:              this.getLookup(this.config.titles,              'getTitleCellRanges',           'setMultipleRangeStyles',            'setMultipleRangeHeights'),
+      titleRowsAboveBelow: this.getLookup(this.config.titleRowsAboveBelow, 'getTitleRowsAboveBelowRanges', 'setMultipleRangeStyles',            'setMultipleRangeHeights'),
+      hiddenValues:        this.getLookup(this.config.hiddenValues,        'getHiddenValuesRowRange',      'setSingleRangeStyle',               'setSingleRangeHeights'  ),
+      headers:             this.getLookup(this.config.headers,             'getHeaderSectionRanges',       'setMultipleRangeStyles',            'setMultipleRangeHeights'),
+      main:                this.getLookup(this.config.contents,            'getMainSectionRange',          'setSingleRangeStyle',               'setSingleRangeHeights'  ),
+      done:                this.getLookup(this.config.contents,            'getDoneSectionRange',          'setSingleRangeStyle',               'setSingleRangeHeights'  ),
+      mainSubRanges:       this.getLookup(this.config.contentsSubRanges,   'getMainSubRanges',             'setMultipleRangeStylesDifferently'),
+      doneSubRanges:       this.getLookup(this.config.contentsSubRanges,   'getDoneSubRanges',             'setMultipleRangeStylesDifferently'),
+      underMain:           this.getLookup(this.config.underContents,       'getUnderMainSectionRange',     'setSingleRangeStyle',                'setSingleRangeHeights' ),
+      underDone:           this.getLookup(this.config.underContents,       'getUnderDoneSectionRange',     'setSingleRangeStyle',                'setSingleRangeHeights' )
     };
   }
 
