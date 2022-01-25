@@ -28,7 +28,7 @@ class Sheet {
       dataRange: false,
       titleCellRanges: false,
       titleRowRanges: false,
-      titleRowsAboveBelowRanges: false,
+      titlesAboveBelowRanges: false,
       headerSectionRanges: false,
       hiddenValuesRowRange: false,
       hiddenValuesSectionRow: false,
@@ -42,6 +42,7 @@ class Sheet {
       doneSectionNumRows: false,
       contentSectionsBeginColumn: false,
       contentSectionsEndColumn: false,
+      contentSectionsNumColumns: false,
       underMainSectionRange: false,
       underDoneSectionRange: false
     };
@@ -81,8 +82,8 @@ class Sheet {
     return this.cache.titleCellRanges;
   }
 
-  getTitleRowsAboveBelowRanges() {
-    if(!this.cache.titleRowsAboveBelowRanges) {
+  getTitlesAboveBelowRanges() {
+    if(!this.cache.titlesAboveBelowRanges) {
       const titleCellRanges = this.getTitleCellRanges();
       let ranges = [];
       for(const titleCellRange of titleCellRanges) {
@@ -94,9 +95,9 @@ class Sheet {
         ranges.push(this.sheetRef.getRange(aboveRow, column, numRows, numColumns));
         ranges.push(this.sheetRef.getRange(belowRow, column, numRows, numColumns));
       }
-      this.cache.titleRowsAboveBelowRanges = ranges;
+      this.cache.titlesAboveBelowRanges = ranges;
     }
-    return this.cache.titleRowsAboveBelowRanges;
+    return this.cache.titlesAboveBelowRanges;
   }
 
   getHiddenValuesRowRange() {
@@ -104,7 +105,7 @@ class Sheet {
       const row = this.getHiddenValuesSectionRow();
       const numRows = 1;
       const beginColumn = this.getContentSectionsBeginColumn();
-      const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
+      const numColumns = this.getContentSectionsNumColumns();
       this.cache.hiddenValuesRowRange = this.sheetRef.getRange(row, beginColumn, numRows, numColumns);
     }
     return this.cache.hiddenValuesRowRange;
@@ -145,7 +146,7 @@ class Sheet {
       const beginRow = this.getMainSectionBeginRow();
       const numRows = this.getMainSectionEndRow() - beginRow + 1;
       const beginColumn = this.getContentSectionsBeginColumn();
-      const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
+      const numColumns = this.getContentSectionsNumColumns();
       this.cache.mainSectionRange = this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
     }
     return this.cache.mainSectionRange;
@@ -156,34 +157,50 @@ class Sheet {
       const beginRow = this.getDoneSectionBeginRow();
       const numRows = this.getDoneSectionEndRow() - beginRow + 1;
       const beginColumn = this.getContentSectionsBeginColumn();
-      const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
+      const numColumns = this.getContentSectionsNumColumns();
       this.cache.doneSectionRange = this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
     }
     return this.cache.doneSectionRange;
   }
 
+  getTitlesSubRanges(columnOffsetsAndNumColumnPairs) {
+    const multipleSubRanges = [];
+    for(const titleRow of this.getTitleCellRanges()) {
+      const subRanges = [];
+      for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
+        const row = titleRow.getRow();
+        const numRows = 1;
+        const column = this.getContentSectionsBeginColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
+        const numColumns = columnOffsetsAndNumColumnPair.numColumns || this.getContentSectionsNumColumns() - columnOffsetsAndNumColumnPair.beginColumnOffset;
+        subRanges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
+      }
+      multipleSubRanges.push(subRanges);
+    }
+    return multipleSubRanges;
+  }
+
   getMainSubRanges(columnOffsetsAndNumColumnPairs) {
-    const ranges = [];
+    const subRanges = [];
     for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
       const beginRow = this.getMainSectionBeginRow();
       const numRows = this.getMainSectionEndRow() - beginRow + 1;
       const beginColumn = this.getContentSectionsBeginColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
-      const numColumns = columnOffsetsAndNumColumnPair.numColumns;
-      ranges.push(this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns));
+      const numColumns = columnOffsetsAndNumColumnPair.numColumns || this.getContentSectionsNumColumns() - columnOffsetsAndNumColumnPair.beginColumnOffset;
+      subRanges.push(this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns));
     }
-    return ranges;
+    return subRanges;
   }
 
   getDoneSubRanges(columnOffsetsAndNumColumnPairs) {
-    const ranges = [];
+    const subRanges = [];
     for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
       const beginRow = this.getDoneSectionBeginRow();
       const numRows = this.getDoneSectionEndRow() - beginRow + 1;
       const beginColumn = this.getContentSectionsBeginColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
-      const numColumns = columnOffsetsAndNumColumnPair.numColumns;
-      ranges.push(this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns));
+      const numColumns = columnOffsetsAndNumColumnPair.numColumns || this.getContentSectionsNumColumns() - columnOffsetsAndNumColumnPair.beginColumnOffset;
+      subRanges.push(this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns));
     }
-    return ranges;
+    return subRanges;
   }
 
   getHiddenValuesSectionRow() {
@@ -247,6 +264,13 @@ class Sheet {
       this.cache.contentSectionsEndColumn = this.getDataRange().createTextFinder(sectionMarkers.headerRight).findNext().getColumn() - 1;
     }
     return this.cache.contentSectionsEndColumn;
+  }
+
+  getContentSectionsNumColumns() {
+    if(!this.cache.contentSectionsNumColumns) {
+      this.cache.contentSectionsNumColumns = this.getContentSectionsEndColumn() - this.getContentSectionsBeginColumn() + 1;
+    }
+    return this.cache.contentSectionsNumColumns;
   }
 
   getUnderMainSectionRange() {
