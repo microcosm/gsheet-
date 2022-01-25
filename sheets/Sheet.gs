@@ -44,7 +44,10 @@ class Sheet {
       contentSectionsEndColumn: false,
       contentSectionsNumColumns: false,
       underMainSectionRange: false,
-      underDoneSectionRange: false
+      underDoneSectionRange: false,
+      outsideColumnsRanges: false,
+      maxRows: false,
+      maxColumns: false
     };
   }
 
@@ -64,6 +67,35 @@ class Sheet {
       this.cache.dataRange = this.sheetRef.getDataRange()
     }
     return this.cache.dataRange;
+  }
+
+  getMaxRows() {
+    if(!this.cache.maxRows) {
+      this.cache.maxRows = this.sheetRef.getMaxRows()
+    }
+    return this.cache.maxRows;
+  }
+
+  getMaxColumns() {
+    if(!this.cache.maxColumns) {
+      this.cache.maxColumns = this.sheetRef.getMaxColumns()
+    }
+    return this.cache.maxColumns;
+  }
+
+  getOutsideColumnsRanges() {
+    if(!this.cache.outsideColumnsRanges) {
+      let ranges = [];
+      const row = 1;
+      const leftOutsideColumn = this.getContentSectionsBeginColumn() - 1;
+      const rightOutsideColumn = this.getContentSectionsEndColumn() + 1;
+      const numRows = this.getMaxRows();
+      const numColumns = 1;
+      ranges.push(this.sheetRef.getRange(row, leftOutsideColumn, numRows, numColumns));
+      ranges.push(this.sheetRef.getRange(row, rightOutsideColumn, numRows, numColumns));
+      this.cache.outsideColumnsRanges = ranges;
+    }
+    return this.cache.outsideColumnsRanges;
   }
 
   getTitleCellRanges() {
