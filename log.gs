@@ -84,7 +84,7 @@ function logFeatureEvaluation(feature, respondsToEvent, isValidEventData) {
 }
 
 function logFeatureExecution(feature) {
-  state.log += `Executing feature '` + feature.name + `' on Sheet ` + feature.sheet.name + ` (` + feature.getPriority() + `)\n`;
+  state.log += `Executing feature '` + feature.name + `' on Sheet '` + feature.sheet.name + `' (` + feature.getPriority() + `)\n`;
 }
 
 function logLockObtained() {
