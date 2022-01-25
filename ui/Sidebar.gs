@@ -65,6 +65,7 @@ class SidebarHtmlBuilder {
     html += this.buildFormOpen();
     state.sheets.forEach((sheet) => {
       if(sheet.config.hasOwnProperty('sidebar')) {
+        this.currentSheetControlName = sheet.name;
         this.currentSheetControlId = this.getElementID(sheet.name);
         html += this.buildSheetControlsOpen();
         html += this.buildSheetControlsHtml(sheet.config.sidebar);
@@ -78,6 +79,7 @@ class SidebarHtmlBuilder {
 
   buildDefaultSidebarHtml() {
     var html = '';
+    this.currentSheetControlName = this.defaultItemID;
     this.currentSheetControlId = this.getElementID(this.defaultItemID);
     html += this.buildSheetControlsOpen();
     html += this.buildSheetControlsHtml({ default: { type: 'text', title: 'Sorry', text: 'The sidebar has not been configured for this sheet.' }});
@@ -131,7 +133,7 @@ class SidebarHtmlBuilder {
 
   buildButtonHtml(item, option) {
     const elementID = this.getElementID(this.currentSheetControlItemId, option);
-    return `<input type='button' class='inline' id='` + elementID + `' onclick="submitForm('` + this.getFeatureArgumentStr(item) + `', '` + this.currentSheetControlItemName + `', '` + option + `', '` + elementID + `', '` + this.currentTitleID + `');" value='` + option + `'>`;
+    return `<input type='button' class='inline' id='` + elementID + `' onclick="submitForm('` + this.getFeatureArgumentStr(item) + `', '` + this.currentSheetControlName + `', '` + this.currentSheetControlItemName + `', '` + option + `', '` + elementID + `', '` + this.currentTitleID + `');" value='` + option + `'>`;
   }
 
   buildFormOpen() {
@@ -199,7 +201,7 @@ class SidebarHtmlBuilder {
         showCurrentSheetSidebar();
       });
 
-      function submitForm(features, configAccessor, value, elementID, spinnerParent) {
+      function submitForm(features, sheetName, configAccessor, value, elementID, spinnerParent) {
         try {
           updateToProcessingState(elementID, spinnerParent);
           google.script.run
@@ -207,7 +209,7 @@ class SidebarHtmlBuilder {
             .withFailureHandler(onSidebarSubmitFailure)
             .onSidebarSubmit({
               sidebar: true,
-              sheetName: '` + state.activeSheet.name + `',
+              sheetName: sheetName,
               configAccessor: configAccessor,
               features: features,
               value: value
