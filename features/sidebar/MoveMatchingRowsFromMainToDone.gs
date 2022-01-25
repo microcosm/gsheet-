@@ -6,7 +6,7 @@ class MoveMatchingRowsFromMainToDone extends Feature {
 
   execute() {
     super.execute();
-    this.matchText = this.config.matchText;
+    this.matchText = toArray(this.config.matchText);
     this.matchColumn = this.config.matchColumn.cardinalIndex;
     this.doneSectionIndex = this.sheet.getDoneSectionBeginRow();
     this.foundRows = [];
@@ -17,10 +17,12 @@ class MoveMatchingRowsFromMainToDone extends Feature {
   }
 
   findTextMatchingRowsInMainSection() {
-    const matchRanges = this.sheet.getMainSectionRowsRange().createTextFinder(this.matchText).findAll();
-    for(const range of matchRanges) {
-      if(range.getColumn() === this.matchColumn) {
-        this.foundRows.push(range.getRow());
+    for(const matcher of this.matchText) {
+      const matchRanges = this.sheet.getMainSectionRowsRange().createTextFinder(matcher).findAll();
+      for(const range of matchRanges) {
+        if(range.getColumn() === this.matchColumn) {
+          this.foundRows.push(range.getRow());
+        }
       }
     }
   }

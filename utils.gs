@@ -63,6 +63,10 @@ function toCamelCase(str) {
   }).replace(/\s+/g, '');
 }
 
+function toArray(val){
+  return isArray(val) ? val : [val];
+}
+
 function pushIfNew(array, item) {
   if(array.indexOf(item) === -1) {
     array.push(item);
