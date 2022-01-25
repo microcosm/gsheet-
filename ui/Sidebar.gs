@@ -1,25 +1,3 @@
-/* 
-SAMPLE CONFIG
-
-sidebar: {
-  guidance: {
-    type: 'text',
-    title: 'Usage Guidance',
-    text: 'This is guidance text on a sheet.'
-  },
-  color: {
-    type: 'buttons',
-    title: 'Color by',
-    options: ['Timing' , 'Work Stream']
-  },
-  order: {
-    type: 'buttons',
-    title: 'Order by',
-    options: ['Timing' , 'Work Stream']
-  }
-}
-*/
-
 class Sidebar {
   constructor(uiRef) {
     this.uiRef = uiRef;
