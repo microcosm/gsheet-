@@ -2,7 +2,8 @@ const sectionMarkers = {
   titleLeft:   'TITLE_LEFT',
   hiddenLeft:  'HIDDEN_LEFT',
   hiddenRight: 'HIDDEN_RIGHT',
-  headerLeft:  'HEADER_LEFT',
+  header:      'HEADER_MARKER',
+  headerLeft:  'HEADER_MARKER',
   headerRight: 'HEADER_RIGHT',
   mainBegin:   'MAIN_BEGIN',
   mainEnd:     'MAIN_END',
@@ -27,6 +28,7 @@ class Sheet {
       values: false,
       numColumns: false,
       numRows: false,
+      numContentColumns: false,
       dataRange: false,
       titleCellRanges: false,
       titleRowRanges: false,
@@ -171,31 +173,23 @@ class Sheet {
     return this.cache.numColumns;
   }
 
+  getNumContentColumns() {
+    if(!this.cache.numContentColumns) {
+      const values = this.getValues();
+      this.cache.numContentColumns = this.getNumColumns() - 2;
+    }
+    return this.cache.numContentColumns;
+  }
+
   getHeaderSectionRanges() {
     if(!this.cache.headerSectionRanges) {
       let ranges = [];
-      const leftMarkerRows = this.getMarkerRows(sectionMarkers.headerLeft);
-      const rightMarkerRows = this.getMarkerRows(sectionMarkers.headerRight, this.getNumColumns());
-
-      let leftMarkerRow = 1; let rightMarkerRow = 1; let leftColumn = 1; let rightColumn = 1; let row = 1; let numRows = 1; let numColumns = 1;
-
-      if(leftMarkerRows.length === rightMarkerRows.length) {
-        for(let i = 0; i < leftMarkerRows.length; i++) {
-          leftMarkerRow = leftMarkerRows[i];
-          rightMarkerRow = rightMarkerRows[i];
-
-          if(leftMarkerRow === rightMarkerRow) {
-            row = leftMarkerRow;
-            leftColumn = 2;
-            rightColumn = this.getNumColumns() - 1;
-            numColumns = rightColumn - leftColumn + 1;
-            ranges.push(this.sheetRef.getRange(row, leftColumn, numRows, numColumns));
-          } else {
-            logString('Header markers not aligned');
-          }
-        }
-      } else {
-        logString('Header markers not found in pairs');
+      const headerMarkerRows = this.getMarkerRows(sectionMarkers.header);
+      const leftColumn = 2;
+      const numRows = 1;
+      const numColumns = this.getNumContentColumns();
+      for(const headerMarkerRow of headerMarkerRows) {
+        ranges.push(this.sheetRef.getRange(headerMarkerRow, leftColumn, numRows, numColumns));
       }
       this.cache.headerSectionRanges = ranges;
     }
