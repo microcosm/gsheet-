@@ -25,6 +25,8 @@ class Sheet {
   initializeCache() {
     return {
       values: false,
+      numColumns: false,
+      numRows: false,
       dataRange: false,
       titleCellRanges: false,
       titleRowRanges: false,
@@ -143,30 +145,57 @@ class Sheet {
     return this.cache.hiddenValuesRowRange;
   }
 
+  getMarkerRows(marker, columnIndex=1) {
+    let markerRows = [];
+    const zeroBasedColumnIndex = columnIndex - 1;
+    const values = this.getValues();
+    for(let i = 0; i < values.length; i++) {
+      if(values[i][zeroBasedColumnIndex] === marker) markerRows.push(i + 1);
+    }
+    return markerRows;
+  }
+
+  getNumRows() {
+    if(!this.cache.numRows) {
+      const values = this.getValues();
+      this.cache.numRows = values.length;
+    }
+    return this.cache.numRows;
+  }
+
+  getNumColumns() {
+    if(!this.cache.numColumns) {
+      const values = this.getValues();
+      this.cache.numColumns = values[0].length;
+    }
+    return this.cache.numColumns;
+  }
+
   getHeaderSectionRanges() {
     if(!this.cache.headerSectionRanges) {
       let ranges = [];
-      const leftMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.headerLeft).findAll();
-      const rightMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.headerRight).findAll();
+      const leftMarkerRows = this.getMarkerRows(sectionMarkers.headerLeft);
+      const rightMarkerRows = this.getMarkerRows(sectionMarkers.headerRight, this.getNumColumns());
+
       let leftMarkerRow = 1; let rightMarkerRow = 1; let leftColumn = 1; let rightColumn = 1; let row = 1; let numRows = 1; let numColumns = 1;
 
-      if(leftMarkerRanges.length === rightMarkerRanges.length) {
-        for(let i = 0; i < leftMarkerRanges.length; i++) {
-          leftMarkerRow = leftMarkerRanges[i].getRow();
-          rightMarkerRow = rightMarkerRanges[i].getRow();
+      if(leftMarkerRows.length === rightMarkerRows.length) {
+        for(let i = 0; i < leftMarkerRows.length; i++) {
+          leftMarkerRow = leftMarkerRows[i];
+          rightMarkerRow = rightMarkerRows[i];
 
           if(leftMarkerRow === rightMarkerRow) {
             row = leftMarkerRow;
-            leftColumn = leftMarkerRanges[i].getColumn() + 1;
-            rightColumn = rightMarkerRanges[i].getColumn() - 1;
+            leftColumn = 2;
+            rightColumn = this.getNumColumns() - 1;
             numColumns = rightColumn - leftColumn + 1;
             ranges.push(this.sheetRef.getRange(row, leftColumn, numRows, numColumns));
           } else {
-            logError('Header markers not aligned');
+            logString('Header markers not aligned');
           }
         }
       } else {
-        logError('Header markers not found in pairs');
+        logString('Header markers not found in pairs');
       }
       this.cache.headerSectionRanges = ranges;
     }
