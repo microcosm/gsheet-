@@ -65,7 +65,6 @@ class ResetSpreadsheetStyles extends Feature {
 
   setLookups() {
     this.lookups = {
-      titles:           this.getLookup(this.config.titles,            'getTitleCellRanges',        'setMultipleRangeStyles',                'setMultipleRangeHeights'),
       titlesSubRanges:  this.getLookup(this.config.titlesSubRanges,   'getTitlesSubRanges',        'setMultipleSubRangeStylesDifferently'),
       titlesAboveBelow: this.getLookup(this.config.titlesAboveBelow,  'getTitlesAboveBelowRanges', 'setMultipleRangeStyles',                'setMultipleRangeHeights'),
       hiddenValues:     this.getLookup(this.config.hiddenValues,      'getHiddenValuesRowRange',   'setSingleRangeStyle',                   'setSingleRangeHeights'  ),

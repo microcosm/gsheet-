@@ -1,8 +1,10 @@
 const sectionMarkers = {
-  titleLeft:   'TITLE_LEFT',
+  title:       'TITLE_MARKER',
+  header:      'HEADER_MARKER',
+
+  titleLeft:   'TITLE_MARKER',
   hiddenLeft:  'HIDDEN_LEFT',
   hiddenRight: 'HIDDEN_RIGHT',
-  header:      'HEADER_MARKER',
   headerLeft:  'HEADER_MARKER',
   headerRight: 'HEADER_RIGHT',
   mainBegin:   'MAIN_BEGIN',
@@ -29,6 +31,9 @@ class Sheet {
       numColumns: false,
       numRows: false,
       numContentColumns: false,
+      firstContentColumn: false,
+      lastContentColumn: false,
+
       dataRange: false,
       titleCellRanges: false,
       titleRowRanges: false,
@@ -87,66 +92,6 @@ class Sheet {
     return this.cache.maxColumns;
   }
 
-  getOutsideColumnsRanges() {
-    if(!this.cache.outsideColumnsRanges) {
-      let ranges = [];
-      const row = 1;
-      const leftOutsideColumn = this.getContentSectionsBeginColumn() - 1;
-      const rightOutsideColumn = this.getContentSectionsEndColumn() + 1;
-      const numRows = this.getMaxRows();
-      const numColumns = 1;
-      ranges.push(this.sheetRef.getRange(row, leftOutsideColumn, numRows, numColumns));
-      ranges.push(this.sheetRef.getRange(row, rightOutsideColumn, numRows, numColumns));
-      this.cache.outsideColumnsRanges = ranges;
-    }
-    return this.cache.outsideColumnsRanges;
-  }
-
-  getTitleCellRanges() {
-    if(!this.cache.titleCellRanges) {
-      let ranges = [];
-      const titleLeftMarkerRanges = this.getDataRange().createTextFinder(sectionMarkers.titleLeft).findAll();
-      for(const titleLeftMarkerRange of titleLeftMarkerRanges) {
-        const row = titleLeftMarkerRange.getRow();
-        const column = titleLeftMarkerRange.getColumn() + 1;
-        const numRows = 1;
-        const numColumns = 1;
-        ranges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
-      }
-      this.cache.titleCellRanges = ranges;
-    }
-    return this.cache.titleCellRanges;
-  }
-
-  getTitlesAboveBelowRanges() {
-    if(!this.cache.titlesAboveBelowRanges) {
-      const titleCellRanges = this.getTitleCellRanges();
-      let ranges = [];
-      for(const titleCellRange of titleCellRanges) {
-        const aboveRow = titleCellRange.getRow() - 1;
-        const belowRow = aboveRow + 2;
-        const column = titleCellRange.getColumn();
-        const numRows = 1;
-        const numColumns = this.getContentSectionsEndColumn() - column + 1;
-        ranges.push(this.sheetRef.getRange(aboveRow, column, numRows, numColumns));
-        ranges.push(this.sheetRef.getRange(belowRow, column, numRows, numColumns));
-      }
-      this.cache.titlesAboveBelowRanges = ranges;
-    }
-    return this.cache.titlesAboveBelowRanges;
-  }
-
-  getHiddenValuesRowRange() {
-    if(!this.cache.hiddenValuesRowRange) {
-      const row = this.getHiddenValuesSectionRow();
-      const numRows = 1;
-      const beginColumn = this.getContentSectionsBeginColumn();
-      const numColumns = this.getContentSectionsNumColumns();
-      this.cache.hiddenValuesRowRange = this.sheetRef.getRange(row, beginColumn, numRows, numColumns);
-    }
-    return this.cache.hiddenValuesRowRange;
-  }
-
   getMarkerRows(marker, columnIndex=1) {
     let markerRows = [];
     const zeroBasedColumnIndex = columnIndex - 1;
@@ -181,15 +126,89 @@ class Sheet {
     return this.cache.numContentColumns;
   }
 
+  getFirstContentColumn() {
+    if(!this.cache.firstContentColumn) {
+      this.cache.firstContentColumn = 2;
+    }
+    return this.cache.firstContentColumn;
+  }
+
+  getLastContentColumn() {
+    if(!this.cache.lastContentColumn) {
+      this.cache.lastContentColumn = this.getFirstContentColumn() + this.getNumContentColumns() - 1;
+    }
+    return this.cache.lastContentColumn;
+  }
+
+  getOutsideColumnsRanges() {
+    if(!this.cache.outsideColumnsRanges) {
+      let ranges = [];
+      const row = 1;
+      const leftOutsideColumn = this.getContentSectionsBeginColumn() - 1;
+      const rightOutsideColumn = this.getContentSectionsEndColumn() + 1;
+      const numRows = this.getMaxRows();
+      const numColumns = 1;
+      ranges.push(this.sheetRef.getRange(row, leftOutsideColumn, numRows, numColumns));
+      ranges.push(this.sheetRef.getRange(row, rightOutsideColumn, numRows, numColumns));
+      this.cache.outsideColumnsRanges = ranges;
+    }
+    return this.cache.outsideColumnsRanges;
+  }
+
+  getTitlesAboveBelowRanges() {
+    if(!this.cache.titlesAboveBelowRanges) {
+      const titleMarkerRows = this.getMarkerRows(sectionMarkers.title);
+      const column = this.getFirstContentColumn();
+      const numRows = 1;
+      const numColumns = this.getNumContentColumns();
+      let ranges = [];
+      for(const titleMarkerRow of titleMarkerRows) {
+        ranges.push(this.sheetRef.getRange(titleMarkerRow + 1, column, numRows, numColumns));
+        ranges.push(this.sheetRef.getRange(titleMarkerRow - 1, column, numRows, numColumns));
+      }
+      this.cache.titlesAboveBelowRanges = ranges;
+    }
+    return this.cache.titlesAboveBelowRanges;
+  }
+
+  getTitlesSubRanges(columnOffsetsAndNumColumnPairs) {
+    const multipleSubRanges = [];
+    const titleMarkerRows = this.getMarkerRows(sectionMarkers.title);
+    const numRows = 1;
+    for(const titleMarkerRow of titleMarkerRows) {
+      const subRanges = [];
+      for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
+        const column = this.getFirstContentColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
+        const numColumns = columnOffsetsAndNumColumnPair.numColumns || this.getNumContentColumns() - columnOffsetsAndNumColumnPair.beginColumnOffset;
+        subRanges.push(this.sheetRef.getRange(titleMarkerRow, column, numRows, numColumns));
+      }
+      multipleSubRanges.push(subRanges);
+    }
+    return multipleSubRanges;
+  }
+
+  getHiddenValuesRowRange() {
+    if(!this.cache.hiddenValuesRowRange) {
+      const row = this.getHiddenValuesSectionRow();
+      const numRows = 1;
+      const beginColumn = this.getContentSectionsBeginColumn();
+      const numColumns = this.getContentSectionsNumColumns();
+      this.cache.hiddenValuesRowRange = this.sheetRef.getRange(row, beginColumn, numRows, numColumns);
+    }
+    return this.cache.hiddenValuesRowRange;
+  }
+
+
+
   getHeaderSectionRanges() {
     if(!this.cache.headerSectionRanges) {
       let ranges = [];
       const headerMarkerRows = this.getMarkerRows(sectionMarkers.header);
-      const leftColumn = 2;
+      const column = 2;
       const numRows = 1;
       const numColumns = this.getNumContentColumns();
       for(const headerMarkerRow of headerMarkerRows) {
-        ranges.push(this.sheetRef.getRange(headerMarkerRow, leftColumn, numRows, numColumns));
+        ranges.push(this.sheetRef.getRange(headerMarkerRow, column, numRows, numColumns));
       }
       this.cache.headerSectionRanges = ranges;
     }
@@ -216,22 +235,6 @@ class Sheet {
       this.cache.doneSectionRange = this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
     }
     return this.cache.doneSectionRange;
-  }
-
-  getTitlesSubRanges(columnOffsetsAndNumColumnPairs) {
-    const multipleSubRanges = [];
-    for(const titleRow of this.getTitleCellRanges()) {
-      const subRanges = [];
-      for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
-        const row = titleRow.getRow();
-        const numRows = 1;
-        const column = this.getContentSectionsBeginColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
-        const numColumns = columnOffsetsAndNumColumnPair.numColumns || this.getContentSectionsNumColumns() - columnOffsetsAndNumColumnPair.beginColumnOffset;
-        subRanges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
-      }
-      multipleSubRanges.push(subRanges);
-    }
-    return multipleSubRanges;
   }
 
   getMainSubRanges(columnOffsetsAndNumColumnPairs) {
