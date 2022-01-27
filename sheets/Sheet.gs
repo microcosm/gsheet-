@@ -241,6 +241,23 @@ class Sheet {
     }
   }
 
+  getMatchingRowsFromMainContent(findText, column) {
+    const columnZeroIndex = column - 1;
+    const values = this.getValues();
+
+    const beginMarker = sectionMarkers.main;
+    const endMarker = contentMarkers[sectionMarkers.main];
+    let activeRange = false;
+    let indices = [];
+
+    for(let i = 0; i < values.length; i++) {
+      if(values[i][0].startsWith(endMarker)) return indices;
+      if(activeRange && values[i][columnZeroIndex].endsWith(findText)) indices.push(i + 1);
+      if(values[i][0].startsWith(beginMarker)) activeRange = true;
+    }
+    return indices;
+  }
+
   getSingleRowRangeLookups(marker) {
     let lookups = [];
     const values = this.getValues();

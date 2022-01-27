@@ -11,30 +11,26 @@ class MoveMatchingRowsFromMainToDone extends Feature {
     this.doneSectionIndex = this.sheet.getDoneSectionBeginRow();
     this.foundRows = [];
     this.findTextMatchingRowsInMainSection();
-    this.sortFoundRows();
     this.moveRowsToDone();
     this.sheet.clearCache();
   }
 
   findTextMatchingRowsInMainSection() {
     for(const matcher of this.matchText) {
-      const matchRanges = this.sheet.getMainSectionRowsRange().createTextFinder(matcher).findAll();
-      for(const range of matchRanges) {
-        if(range.getColumn() === this.matchColumn) {
-          this.foundRows.push(range.getRow());
-        }
-      }
+      const matchingRows = this.sheet.getMatchingRowsFromMainContent(matcher, this.matchColumn);
+      this.foundRows = this.foundRows.concat(matchingRows, this.foundRows);
     }
-  }
-
-  sortFoundRows() {
-    this.foundRows.sort().reverse();
   }
 
   moveRowsToDone() {
-    for(const row of this.foundRows) {
+    const sortedRows = this.getFoundRowsSortedByNumberDescending();
+    for(const row of sortedRows) {
       const range = this.sheet.getRangeOfRow(row);
       this.sheet.sheetRef.moveRows(range, this.doneSectionIndex);
     }
+  }
+
+  getFoundRowsSortedByNumberDescending() {
+    return this.foundRows.sort((a, b) => { return (+b) - (+a) })
   }
 }
