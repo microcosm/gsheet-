@@ -245,7 +245,7 @@ class Sheet {
         const beginColumnOffset = rangeConfig.beginColumnOffset || this.getFirstContentColumn();
         const column = this.getFirstContentColumn() + beginColumnOffset;
         const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
-        subRanges.push(this.sheetRef.getRange(lookup.begin, column, lookup.numRows, numColumns));
+        subRanges.push(this.sheetRef.getRange(lookup.row, column, lookup.numRows, numColumns));
       }
       multipleSubRanges.push(subRanges);
     }
@@ -274,8 +274,8 @@ class Sheet {
       const numColumns = this.getNumContentColumns();
       let ranges = [];
       for(const lookup of lookups) {
-        ranges.push(this.sheetRef.getRange(lookup.begin + 1, column, lookup.numRows, numColumns));
-        ranges.push(this.sheetRef.getRange(lookup.begin - 1, column, lookup.numRows, numColumns));
+        ranges.push(this.sheetRef.getRange(lookup.row + 1, column, lookup.numRows, numColumns));
+        ranges.push(this.sheetRef.getRange(lookup.row - 1, column, lookup.numRows, numColumns));
       }
       this.cache.titlesAboveBelowRanges = ranges;
     }
@@ -306,7 +306,7 @@ class Sheet {
     let lookups = [];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].endsWith(marker)) lookups.push({ begin: i + 1, numRows: 1 });
+      if(values[i][0].endsWith(marker)) lookups.push({ row: i + 1, numRows: 1 });
     }
     return lookups;
   }
@@ -320,7 +320,7 @@ class Sheet {
       if(val === marker) {
         start = i;
       } else if(val === endMarker) {
-        lookups.push({ begin: start + 2, numRows: i - start - 1 });
+        lookups.push({ row: start + 2, numRows: i - start - 1 });
       }
     }
     return lookups;
