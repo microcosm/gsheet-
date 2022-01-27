@@ -43,7 +43,9 @@ class Sheet {
       numColumns: false,
       firstRow: false,
       firstMainRow: false,
+      lastMainRow: false,
       firstDoneRow: false,
+      lastDoneRow: false,
       firstColumn: false,
       numContentColumns: false,
       firstContentColumn: false,
@@ -142,6 +144,13 @@ class Sheet {
     return this.cache.firstMainRow;
   }
 
+  getLastMainRow() {
+    if(!this.cache.lastMainRow) {
+      this.cache.lastMainRow = this.getLastContentRow(sectionMarkers.main);
+    }
+    return this.cache.lastMainRow;
+  }
+
   getFirstDoneRow() {
     if(!this.cache.firstDoneRow) {
       this.cache.firstDoneRow = this.getFirstContentRow(sectionMarkers.done);
@@ -149,10 +158,26 @@ class Sheet {
     return this.cache.firstDoneRow;
   }
 
+  getLastDoneRow() {
+    if(!this.cache.lastDoneRow) {
+      this.cache.lastDoneRow = this.getLastContentRow(sectionMarkers.done);
+    }
+    return this.cache.lastDoneRow;
+  }
+
   getFirstContentRow(marker) {
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].startsWith(marker)) return i + 2;
+      if(values[i][0] === marker) return i + 2;
+    }
+    return -1;
+  }
+
+  getLastContentRow(marker) {
+    const endMarker = contentMarkers[marker];
+    const values = this.getValues();
+    for(let i = 0; i < values.length; i++) {
+      if(values[i][0] === marker) return i;
     }
     return -1;
   }
@@ -271,7 +296,7 @@ class Sheet {
     const endMarker = contentMarkers[sectionMarkers.main];
     let indices = [];
     for(let i = this.getFirstMainRow() - 1; i < values.length; i++) {
-      if(values[i][0].startsWith(endMarker)) return indices;
+      if(values[i][0] === endMarker) return indices;
       if(values[i][columnZeroIndex].endsWith(findText)) indices.push(i + 1);
     }
     return indices;
