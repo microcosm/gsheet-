@@ -198,8 +198,6 @@ class Sheet {
     return this.cache.hiddenValuesRowRange;
   }
 
-
-
   getHeaderSectionRanges() {
     if(!this.cache.headerSectionRanges) {
       let ranges = [];
