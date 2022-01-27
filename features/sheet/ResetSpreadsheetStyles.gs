@@ -45,15 +45,15 @@ class ResetSpreadsheetStyles extends Feature {
 
   setLookups() {
     this.lookups = {
-      titlesSubRanges:  { config:this.config.titlesSubRanges,   rangeGetter:'getTitlesSubRanges'        },
-      titlesAboveBelow: { config:this.config.titlesAboveBelow,  rangeGetter:'getTitlesAboveBelowRanges' },
-      hiddenValues:     { config:this.config.hiddenValues,      rangeGetter:'getHiddenValuesSubRanges'      },
-      headers:          { config:this.config.headers,           rangeGetter:'getHeaderSubRanges'    },
-      main:             { config:this.config.contents,          rangeGetter:'getMainSubRanges'          },
-      done:             { config:this.config.contents,          rangeGetter:'getDoneSubRanges'          },
-      underMain:        { config:this.config.underContents,     rangeGetter:'getUnderMainSectionRange'  },
-      underDone:        { config:this.config.underContents,     rangeGetter:'getUnderDoneSectionRange'  },
-      outsides:         { config:this.config.outsides,          rangeGetter:'getOutsideColumnsRanges'   }
+      titles:           { config:this.config.titles        ,   rangeGetter:'getTitlesSubRanges'        },
+      titlesAboveBelow: { config:this.config.titlesAboveBelow, rangeGetter:'getTitlesAboveBelowRanges' },
+      hiddenValues:     { config:this.config.hiddenValues,     rangeGetter:'getHiddenValuesSubRanges'  },
+      headers:          { config:this.config.headers,          rangeGetter:'getHeaderSubRanges'        },
+      main:             { config:this.config.contents,         rangeGetter:'getMainSubRanges'          },
+      done:             { config:this.config.contents,         rangeGetter:'getDoneSubRanges'          },
+      underMain:        { config:this.config.underContents,    rangeGetter:'getUnderMainSubRanges'     },
+      underDone:        { config:this.config.underContents,    rangeGetter:'getUnderDoneSubRanges'     },
+      outsides:         { config:this.config.outsides,         rangeGetter:'getOutsideColumnsRanges'   }
     };
   }
 }

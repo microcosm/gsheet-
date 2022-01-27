@@ -47,10 +47,9 @@ class Sheet {
       firstContentColumn: false,
       lastContentColumn: false,
       outsideColumnsRanges: false,
-
-
-
       titlesAboveBelowRanges: false,
+
+
 
       mainSectionRange: false,
       mainSectionBeginRow: false,
@@ -178,6 +177,14 @@ class Sheet {
 
   getDoneSubRanges(rangeConfigs) {
     return this.getContentColumnSubRanges(sectionMarkers.done, rangeConfigs);
+  }
+
+  getUnderMainSubRanges(rangeConfigs) {
+    return this.getContentColumnSubRanges(contentMarkers[sectionMarkers.main], rangeConfigs);
+  }
+
+  getUnderDoneSubRanges(rangeConfigs) {
+    return this.getContentColumnSubRanges(contentMarkers[sectionMarkers.done], rangeConfigs);
   }
 
   getContentColumnSubRanges(marker, rangeConfigs=[{}]) {
@@ -322,28 +329,6 @@ class Sheet {
       this.cache.contentSectionsNumColumns = this.getContentSectionsEndColumn() - this.getContentSectionsBeginColumn() + 1;
     }
     return this.cache.contentSectionsNumColumns;
-  }
-
-  getUnderMainSectionRange() {
-    if(!this.cache.underMainSectionRange) {
-      this.cache.underMainSectionRange = this.getUnderContentSectionRange(sectionMarkers.mainEnd);
-    }
-    return this.cache.underMainSectionRange;
-  }
-
-  getUnderDoneSectionRange() {
-    if(!this.cache.underDoneSectionRange) {
-      this.cache.underDoneSectionRange = this.getUnderContentSectionRange(sectionMarkers.doneEnd);
-    }
-    return this.cache.underDoneSectionRange;
-  }
-
-  getUnderContentSectionRange(marker) {
-    const contentSectionEndMarkerRow = this.lookupRowIndex(marker);
-    const numRows = 1;
-    const beginColumn = this.getContentSectionsBeginColumn();
-    const numColumns = this.getContentSectionsEndColumn() - beginColumn + 1;
-    return this.sheetRef.getRange(contentSectionEndMarkerRow, beginColumn, numRows, numColumns);
   }
 
   getMainSectionRowsRange(beginOffset=0, endOffset=0) {
