@@ -1,6 +1,8 @@
 const sectionMarkers = {
   title:       'TITLE_MARKER',
   header:      'HEADER_MARKER',
+  main:        'MAIN_HEADER_MARKER',
+  done:        'DONE_HEADER_MARKER',
 
   titleLeft:   'TITLE_MARKER',
   hiddenLeft:  'HIDDEN_LEFT',
@@ -12,6 +14,11 @@ const sectionMarkers = {
   doneBegin:   'DONE_BEGIN',
   doneEnd:     'DONE_END'
 }
+
+const contentMarkers = {
+  MAIN_HEADER_MARKER: 'MAIN_FOOTER_MARKER',
+  DONE_HEADER_MARKER: 'DONE_FOOTER_MARKER'
+};
 
 class Sheet {
   constructor(config) {
@@ -92,14 +99,36 @@ class Sheet {
     return this.cache.maxColumns;
   }
 
-  getMarkerRows(marker, columnIndex=1) {
-    let markerRows = [];
-    const zeroBasedColumnIndex = columnIndex - 1;
+  getRangeIndices(marker) {
+    if(Object.keys(contentMarkers).includes(marker)) {
+      return this.getContentRangeIndices(marker);
+    } else {
+      return this.getRowRangeIndices(marker);
+    }
+  }
+
+  getRowRangeIndices(marker) {
+    let indices = [];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      if(values[i][zeroBasedColumnIndex] === marker) markerRows.push(i + 1);
+      if(values[i][0].endsWith(marker)) indices.push({ begin: i + 1, numRows: 1 });
     }
-    return markerRows;
+    return indices;
+  }
+
+  getContentRangeIndices(marker) {
+    let indices = [], start = 0;
+    const endMarker = contentMarkers[marker];
+    const values = this.getValues();
+    for(let i = 0; i < values.length; i++) {
+      const val = values[i][0];
+      if(val === marker) {
+        start = i;
+      } else if(val === endMarker) {
+        indices.push({ begin: start + 2, numRows: i - start - 1 });
+      }
+    }
+    return indices;
   }
 
   getNumRows() {
@@ -157,30 +186,41 @@ class Sheet {
 
   getTitlesAboveBelowRanges() {
     if(!this.cache.titlesAboveBelowRanges) {
-      const titleMarkerRows = this.getMarkerRows(sectionMarkers.title);
+      const indices = this.getRangeIndices(sectionMarkers.title);
       const column = this.getFirstContentColumn();
-      const numRows = 1;
       const numColumns = this.getNumContentColumns();
       let ranges = [];
-      for(const titleMarkerRow of titleMarkerRows) {
-        ranges.push(this.sheetRef.getRange(titleMarkerRow + 1, column, numRows, numColumns));
-        ranges.push(this.sheetRef.getRange(titleMarkerRow - 1, column, numRows, numColumns));
+      for(const index of indices) {
+        ranges.push(this.sheetRef.getRange(index.begin + 1, column, index.numRows, numColumns));
+        ranges.push(this.sheetRef.getRange(index.begin - 1, column, index.numRows, numColumns));
       }
       this.cache.titlesAboveBelowRanges = ranges;
     }
     return this.cache.titlesAboveBelowRanges;
   }
 
-  getTitlesSubRanges(columnOffsetsAndNumColumnPairs) {
+  getTitlesSubRanges(rangeConfigs) {
+    return this.getContentColumnSubRanges(sectionMarkers.title, rangeConfigs);
+  }
+
+  getMainSubRanges(rangeConfigs) {
+    return this.getContentColumnSubRanges(sectionMarkers.main, rangeConfigs);
+  }
+
+  getDoneSubRanges(rangeConfigs) {
+    return this.getContentColumnSubRanges(sectionMarkers.done, rangeConfigs);
+  }
+
+  getContentColumnSubRanges(marker, rangeConfigs) {
     const multipleSubRanges = [];
-    const titleMarkerRows = this.getMarkerRows(sectionMarkers.title);
-    const numRows = 1;
-    for(const titleMarkerRow of titleMarkerRows) {
+    const indices = this.getRangeIndices(marker);
+    for(const index of indices) {
       const subRanges = [];
-      for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
-        const column = this.getFirstContentColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
-        const numColumns = columnOffsetsAndNumColumnPair.numColumns || this.getNumContentColumns() - columnOffsetsAndNumColumnPair.beginColumnOffset;
-        subRanges.push(this.sheetRef.getRange(titleMarkerRow, column, numRows, numColumns));
+      for(const rangeConfig of rangeConfigs) {
+        const beginColumnOffset = rangeConfig.beginColumnOffset || 0;
+        const column = this.getFirstContentColumn() + beginColumnOffset;
+        const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
+        subRanges.push(this.sheetRef.getRange(index.begin, column, index.numRows, numColumns));
       }
       multipleSubRanges.push(subRanges);
     }
@@ -201,12 +241,11 @@ class Sheet {
   getHeaderSectionRanges() {
     if(!this.cache.headerSectionRanges) {
       let ranges = [];
-      const headerMarkerRows = this.getMarkerRows(sectionMarkers.header);
+      const indices = this.getRangeIndices(sectionMarkers.header);
       const column = 2;
-      const numRows = 1;
       const numColumns = this.getNumContentColumns();
-      for(const headerMarkerRow of headerMarkerRows) {
-        ranges.push(this.sheetRef.getRange(headerMarkerRow, column, numRows, numColumns));
+      for(const index of indices) {
+        ranges.push(this.sheetRef.getRange(index.begin, column, index.numRows, numColumns));
       }
       this.cache.headerSectionRanges = ranges;
     }
@@ -233,30 +272,6 @@ class Sheet {
       this.cache.doneSectionRange = this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
     }
     return this.cache.doneSectionRange;
-  }
-
-  getMainSubRanges(columnOffsetsAndNumColumnPairs) {
-    const subRanges = [];
-    for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
-      const beginRow = this.getMainSectionBeginRow();
-      const numRows = this.getMainSectionEndRow() - beginRow + 1;
-      const beginColumn = this.getContentSectionsBeginColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
-      const numColumns = columnOffsetsAndNumColumnPair.numColumns || this.getContentSectionsNumColumns() - columnOffsetsAndNumColumnPair.beginColumnOffset;
-      subRanges.push(this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns));
-    }
-    return subRanges;
-  }
-
-  getDoneSubRanges(columnOffsetsAndNumColumnPairs) {
-    const subRanges = [];
-    for(const columnOffsetsAndNumColumnPair of columnOffsetsAndNumColumnPairs) {
-      const beginRow = this.getDoneSectionBeginRow();
-      const numRows = this.getDoneSectionEndRow() - beginRow + 1;
-      const beginColumn = this.getContentSectionsBeginColumn() + columnOffsetsAndNumColumnPair.beginColumnOffset;
-      const numColumns = columnOffsetsAndNumColumnPair.numColumns || this.getContentSectionsNumColumns() - columnOffsetsAndNumColumnPair.beginColumnOffset;
-      subRanges.push(this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns));
-    }
-    return subRanges;
   }
 
   getHiddenValuesSectionRow() {
