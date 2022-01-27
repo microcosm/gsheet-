@@ -242,8 +242,7 @@ class Sheet {
     for(const lookup of lookups) {
       const subRanges = [];
       for(const rangeConfig of rangeConfigs) {
-        const beginColumnOffset = rangeConfig.beginColumnOffset || this.getFirstContentColumn();
-        const column = this.getFirstContentColumn() + beginColumnOffset;
+        const column = this.getFirstContentColumn() + (rangeConfig.beginColumnOffset || 0);
         const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
         subRanges.push(this.sheetRef.getRange(lookup.row, column, lookup.numRows, numColumns));
       }
