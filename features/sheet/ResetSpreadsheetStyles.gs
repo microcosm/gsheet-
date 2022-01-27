@@ -17,9 +17,8 @@ class ResetSpreadsheetStyles extends Feature {
 
     for(const section of this.config.sections) {
       const lookup = this.lookups[section];
-      const rangeValue = lookup.sendConfigToRangeGetter ? this.sheet[lookup.rangeGetter](lookup.config) : this.sheet[lookup.rangeGetter]();
-      this[lookup.styleSetter](rangeValue, lookup.config);
-      if(lookup.heightSetter) this[lookup.heightSetter](rangeValue, lookup.config);
+      const ranges = toArray(this.sheet[lookup.rangeGetter](lookup.config));
+      this.setRangeStyles(ranges, lookup.config);
     }
   }
 
@@ -27,8 +26,7 @@ class ResetSpreadsheetStyles extends Feature {
     return config.hasOwnProperty(propertyName) && config[propertyName] != propertyOverrides.IGNORE;
   }
 
-  //When the range value is a single, uniformly-styled range
-  setSingleRangeStyle(range, config) {
+  setRangeStyle(range, config) {
     if(this.isValidProperty(config, 'fontFamily')) range.setFontFamily(config.fontFamily);
     if(this.isValidProperty(config, 'fontSize'  )) range.setFontSize  (config.fontSize);
     if(this.isValidProperty(config, 'fontColor' )) range.setFontColor (config.fontColor);
@@ -37,49 +35,25 @@ class ResetSpreadsheetStyles extends Feature {
     if(this.isValidProperty(config, 'rowHeight')) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
   }
 
-  //When the range value is multiple, uniformly-styled ranges
-  setMultipleRangeStyles(ranges, config) {
-    for(const range of ranges) {
-      this.setSingleRangeStyle(range, config);
-    }
-  }
-
-  //When the range value is vertically divided into differently styled sub-ranges
-  setSubRangeStylesDifferently(subRanges, config) {
-    for(let i = 0; i < subRanges.length; i++) {
-      this.setSingleRangeStyle(subRanges[i], config[i]);
-    }
-  }
-
-  //When the range value is multiple, uniformly-styled ranges which are vertically divided into differently styled sub-ranges
-  setMultipleSubRangeStylesDifferently(multipleSubRanges, config) {
-    for(const subRange of multipleSubRanges) {
-      this.setSubRangeStylesDifferently(subRange, config);
+  setRangeStyles(ranges, config) {
+    for(let i = 0; i < ranges.length; i++) {
+      const val = ranges[i];
+      if(isArray(val)) this.setRangeStyles(val, config);
+      else this.setRangeStyle(val, config[i % config.length]);
     }
   }
 
   setLookups() {
     this.lookups = {
-      titlesSubRanges:  this.getLookup(this.config.titlesSubRanges,   'getTitlesSubRanges',        'setMultipleSubRangeStylesDifferently'),
-      titlesAboveBelow: this.getLookup(this.config.titlesAboveBelow,  'getTitlesAboveBelowRanges', 'setMultipleRangeStyles'),
-      hiddenValues:     this.getLookup(this.config.hiddenValues,      'getHiddenValuesRowRange',   'setSingleRangeStyle'),
-      headers:          this.getLookup(this.config.headers,           'getHeaderSectionRanges',    'setMultipleRangeStyles'),
-      main:             this.getLookup(this.config.contents,          'getMainSectionRange',       'setSingleRangeStyle'),
-      done:             this.getLookup(this.config.contents,          'getDoneSectionRange',       'setSingleRangeStyle'),
-      mainSubRanges:    this.getLookup(this.config.contentsSubRanges, 'getMainSubRanges',          'setSubRangeStylesDifferently'),
-      doneSubRanges:    this.getLookup(this.config.contentsSubRanges, 'getDoneSubRanges',          'setSubRangeStylesDifferently'),
-      underMain:        this.getLookup(this.config.underContents,     'getUnderMainSectionRange',  'setSingleRangeStyle'),
-      underDone:        this.getLookup(this.config.underContents,     'getUnderDoneSectionRange',  'setSingleRangeStyle'),
-      outsides:         this.getLookup(this.config.outsides,          'getOutsideColumnsRanges',   'setMultipleRangeStyles')
-    };
-  }
-
-  getLookup(config, rangeGetter, styleSetter) {
-    return {
-      config:                  config,
-      rangeGetter:             rangeGetter,
-      styleSetter:             styleSetter,
-      sendConfigToRangeGetter: styleSetter === 'setSubRangeStylesDifferently' || styleSetter === 'setMultipleSubRangeStylesDifferently'
+      titlesSubRanges:  { config:this.config.titlesSubRanges,   rangeGetter:'getTitlesSubRanges'        },
+      titlesAboveBelow: { config:this.config.titlesAboveBelow,  rangeGetter:'getTitlesAboveBelowRanges' },
+      hiddenValues:     { config:this.config.hiddenValues,      rangeGetter:'getHiddenValuesRowRange'   },
+      headers:          { config:this.config.headers,           rangeGetter:'getHeaderSectionRanges'    },
+      main:             { config:this.config.contents,          rangeGetter:'getMainSubRanges'          },
+      done:             { config:this.config.contents,          rangeGetter:'getDoneSubRanges'          },
+      underMain:        { config:this.config.underContents,     rangeGetter:'getUnderMainSectionRange'  },
+      underDone:        { config:this.config.underContents,     rangeGetter:'getUnderDoneSectionRange'  },
+      outsides:         { config:this.config.outsides,          rangeGetter:'getOutsideColumnsRanges'   }
     };
   }
 }
