@@ -52,22 +52,7 @@ class Sheet {
       lastContentColumn: false,
       outsideColumnsRanges: false,
       titlesAboveBelowRanges: false,
-
-
-
-      mainSectionRange: false,
-      mainSectionBeginRow: false,
-      mainSectionEndRow: false,
-      mainSectionNumRows: false,
-      doneSectionRange: false,
-      doneSectionBeginRow: false,
-      doneSectionEndRow: false,
-      doneSectionNumRows: false,
-      contentSectionsBeginColumn: false,
-      contentSectionsEndColumn: false,
-      contentSectionsNumColumns: false,
-      underMainSectionRange: false,
-      underDoneSectionRange: false
+      mainSectionRange: false
     };
   }
 
@@ -363,98 +348,6 @@ class Sheet {
       }
     }
     return lookups;
-  }
-
-
-  /* =============================== */
-
-  getMainSectionBeginRow() {
-    if(!this.cache.mainSectionBeginRow) {
-      this.cache.mainSectionBeginRow = this.lookupRowIndex(sectionMarkers.mainBegin, 2);
-    }
-    return this.cache.mainSectionBeginRow;
-  }
-
-  getMainSectionEndRow() {
-    if(!this.cache.mainSectionEndRow) {
-      this.cache.mainSectionEndRow = this.lookupRowIndex(sectionMarkers.mainEnd, -1);
-    }
-    return this.cache.mainSectionEndRow;
-  }
-
-  getMainSectionNumRows() {
-    if(!this.cache.mainSectionNumRows) {
-      this.cache.mainSectionNumRows = this.getMainSectionEndRow() - this.getMainSectionBeginRow() + 1;
-    }
-    return this.cache.mainSectionNumRows;
-  }
-
-  getDoneSectionBeginRow() {
-    if(!this.cache.doneSectionBeginRow) {
-      this.cache.doneSectionBeginRow = this.lookupRowIndex(sectionMarkers.doneBegin, 2);
-    }
-    return this.cache.doneSectionBeginRow;
-  }
-
-  getDoneSectionEndRow() {
-    if(!this.cache.doneSectionEndRow) {
-      this.cache.doneSectionEndRow = this.lookupRowIndex(sectionMarkers.doneEnd, -1);
-    }
-    return this.cache.doneSectionEndRow;
-  }
-
-  getDoneSectionNumRows() {
-    if(!this.cache.doneSectionNumRows) {
-      this.cache.doneSectionNumRows = this.getDoneSectionEndRow() - this.getDoneSectionBeginRow() + 1;
-    }
-    return this.cache.doneSectionNumRows;
-  }
-
-  getContentSectionsBeginColumn() {
-    if(!this.cache.contentSectionsBeginColumn) {
-      this.cache.contentSectionsBeginColumn = this.getDataRange().createTextFinder(sectionMarkers.headerLeft).findNext().getColumn() + 1;
-    }
-    return this.cache.contentSectionsBeginColumn;
-  }
-
-  getContentSectionsEndColumn() {
-    if(!this.cache.contentSectionsEndColumn) {
-      this.cache.contentSectionsEndColumn = this.getDataRange().createTextFinder(sectionMarkers.headerRight).findNext().getColumn() - 1;
-    }
-    return this.cache.contentSectionsEndColumn;
-  }
-
-  getContentSectionsNumColumns() {
-    if(!this.cache.contentSectionsNumColumns) {
-      this.cache.contentSectionsNumColumns = this.getContentSectionsEndColumn() - this.getContentSectionsBeginColumn() + 1;
-    }
-    return this.cache.contentSectionsNumColumns;
-  }
-
-  getMainSectionRowsRange(beginOffset=0, endOffset=0) {
-    return this.getRangeOfRows(this.getMainSectionBeginRow() + beginOffset, this.getMainSectionEndRow() + endOffset);
-  }
-
-  getDoneSectionRowsRange(beginOffset=0, endOffset=0) {
-    return this.getRangeOfRows(this.getDoneSectionBeginRow() + beginOffset, this.getDoneSectionEndRow() + endOffset);
-  }
-
-  lookupRowIndex(marker, offset=0) {
-    return this.getDataRange().createTextFinder(marker).findNext().getRow() + offset;
-  }
-
-  getRangeOfRow(row) {
-    const beginColumn = 1;
-    const numRows = 1;
-    const numColumns = this.getDataRange().getNumColumns();
-    return this.sheetRef.getRange(row, beginColumn, numRows, numColumns);
-  }
-
-  getRangeOfRows(beginRow, endRow) {
-    const beginColumn = 1;
-    const numRows = endRow - beginRow + 1;
-    const numColumns = this.getDataRange().getNumColumns();
-    return this.sheetRef.getRange(beginRow, beginColumn, numRows, numColumns);
   }
 
   validate() {
