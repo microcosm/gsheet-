@@ -3,17 +3,7 @@ const sectionMarkers = {
   hiddenValues: 'HIDDEN_MARKER',
   headers:      'HEADER_MARKER',
   main:         'MAIN_HEADER_MARKER',
-  done:         'DONE_HEADER_MARKER',
-
-  titleLeft:   'TITLE_MARKER',
-  hiddenLeft:  'HIDDEN_MARKER',
-  hiddenRight: 'HIDDEN_RIGHT',
-  headerLeft:  'HEADER_MARKER',
-  headerRight: 'HEADER_RIGHT',
-  mainBegin:   'MAIN_BEGIN',
-  mainEnd:     'MAIN_END',
-  doneBegin:   'DONE_BEGIN',
-  doneEnd:     'DONE_END'
+  done:         'DONE_HEADER_MARKER'
 }
 
 const contentMarkers = {
