@@ -268,6 +268,22 @@ class Sheet {
     return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.done], rangeConfigs);
   }
 
+/* -------------------------------------------------------------------- */
+/* getContentSectionsSubRanges singular accessors                       */
+/* -------------------------------------------------------------------- */
+/* Methods which break down and cache simplified access to the the      */
+/* array structure return values from getContentSectionsSubRanges       */
+/* -------------------------------------------------------------------- */
+
+  getMainSectionRange() {
+    if(!this.cache.mainSectionRange) {
+      this.cache.mainSectionRange = this.getMainSectionsSubRanges()[0][0];
+    }
+    return this.cache.mainSectionRange;
+  }
+
+/* -------------------------------------------------------------------- */
+
   getOutsideColumnsRanges() {
     if(!this.cache.outsideColumnsRanges) {
       let ranges = [];
