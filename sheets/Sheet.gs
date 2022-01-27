@@ -208,31 +208,31 @@ class Sheet {
     return this.cache.lastContentColumn;
   }
 
-  getTitlesSubRanges(rangeConfigs) {
+  getTitlesSubRanges(rangeConfigs=[{}]) {
     return this.getContentColumnSubRanges(sectionMarkers.title, rangeConfigs);
   }
 
-  getHiddenValuesSubRanges(rangeConfigs) {
+  getHiddenValuesSubRanges(rangeConfigs=[{}]) {
     return this.getContentColumnSubRanges(sectionMarkers.hiddenValues, rangeConfigs);
   }
 
-  getHeaderSubRanges(rangeConfigs) {
+  getHeaderSubRanges(rangeConfigs=[{}]) {
     return this.getContentColumnSubRanges(sectionMarkers.headers, rangeConfigs);
   }
 
-  getMainSubRanges(rangeConfigs) {
+  getMainSubRanges(rangeConfigs=[{}]) {
     return this.getContentColumnSubRanges(sectionMarkers.main, rangeConfigs);
   }
 
-  getDoneSubRanges(rangeConfigs) {
+  getDoneSubRanges(rangeConfigs=[{}]) {
     return this.getContentColumnSubRanges(sectionMarkers.done, rangeConfigs);
   }
 
-  getUnderMainSubRanges(rangeConfigs) {
+  getUnderMainSubRanges(rangeConfigs=[{}]) {
     return this.getContentColumnSubRanges(contentMarkers[sectionMarkers.main], rangeConfigs);
   }
 
-  getUnderDoneSubRanges(rangeConfigs) {
+  getUnderDoneSubRanges(rangeConfigs=[{}]) {
     return this.getContentColumnSubRanges(contentMarkers[sectionMarkers.done], rangeConfigs);
   }
 
@@ -242,7 +242,7 @@ class Sheet {
     for(const lookup of lookups) {
       const subRanges = [];
       for(const rangeConfig of rangeConfigs) {
-        const beginColumnOffset = rangeConfig.beginColumnOffset || 0;
+        const beginColumnOffset = rangeConfig.beginColumnOffset || this.getFirstContentColumn();
         const column = this.getFirstContentColumn() + beginColumnOffset;
         const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
         subRanges.push(this.sheetRef.getRange(lookup.begin, column, lookup.numRows, numColumns));
