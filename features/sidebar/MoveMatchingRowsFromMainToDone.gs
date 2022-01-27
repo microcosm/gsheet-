@@ -8,7 +8,7 @@ class MoveMatchingRowsFromMainToDone extends Feature {
     super.execute();
     this.matchText = toArray(this.config.matchText);
     this.matchColumn = this.config.matchColumn.cardinalIndex;
-    this.doneSectionIndex = this.sheet.getDoneSectionBeginRow();
+    this.doneSectionIndex = this.sheet.getFirstDoneRow();
     this.foundRows = [];
     this.findTextMatchingRowsInMainSection();
     this.moveRowsToDone();

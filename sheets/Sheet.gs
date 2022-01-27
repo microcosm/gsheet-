@@ -42,6 +42,8 @@ class Sheet {
       numRows: false,
       numColumns: false,
       firstRow: false,
+      firstMainRow: false,
+      firstDoneRow: false,
       firstColumn: false,
       numContentColumns: false,
       firstContentColumn: false,
@@ -131,6 +133,28 @@ class Sheet {
       this.cache.firstColumn = 1;
     }
     return this.cache.firstColumn;
+  }
+
+  getFirstMainRow() {
+    if(!this.cache.firstMainRow) {
+      this.cache.firstMainRow = this.getFirstContentRow(sectionMarkers.main);
+    }
+    return this.cache.firstMainRow;
+  }
+
+  getFirstDoneRow() {
+    if(!this.cache.firstDoneRow) {
+      this.cache.firstDoneRow = this.getFirstContentRow(sectionMarkers.done);
+    }
+    return this.cache.firstDoneRow;
+  }
+
+  getFirstContentRow(marker) {
+    const values = this.getValues();
+    for(let i = 0; i < values.length; i++) {
+      if(values[i][0].startsWith(marker)) return i + 2;
+    }
+    return -1;
   }
 
   getLastColumn() {
@@ -244,16 +268,11 @@ class Sheet {
   getMatchingRowsFromMainContent(findText, column) {
     const columnZeroIndex = column - 1;
     const values = this.getValues();
-
-    const beginMarker = sectionMarkers.main;
     const endMarker = contentMarkers[sectionMarkers.main];
-    let activeRange = false;
     let indices = [];
-
-    for(let i = 0; i < values.length; i++) {
+    for(let i = this.getFirstMainRow() - 1; i < values.length; i++) {
       if(values[i][0].startsWith(endMarker)) return indices;
-      if(activeRange && values[i][columnZeroIndex].endsWith(findText)) indices.push(i + 1);
-      if(values[i][0].startsWith(beginMarker)) activeRange = true;
+      if(values[i][columnZeroIndex].endsWith(findText)) indices.push(i + 1);
     }
     return indices;
   }
