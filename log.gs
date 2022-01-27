@@ -57,6 +57,17 @@ function logStringVerbose(str) {
   if(state.toggles.verboseLogging) logString(str);
 }
 
+function logArray(str, arr) {
+  state.log += indentLog(str) + (isArray(arr) ? JSON.stringify(arr) : `[not an array]`) + `\n`;
+}
+
+function logArrayVerbose(str, arr) {
+  if(state.toggles.verboseLogging) {
+    logArray(str, arr);
+    logString('');
+  }
+}
+
 function logObject(str, obj) {
   state.log += indentLog(str) + (isObject(obj) ? JSON.stringify(obj, null, 2) : `[not an object]`) + `\n`;
 }
