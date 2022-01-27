@@ -18,7 +18,7 @@ class MoveMatchingRowsFromMainToDone extends Feature {
   findTextMatchingRowsInMainSection() {
     for(const matcher of this.matchText) {
       const matchingRows = this.sheet.getMatchingRowsFromMainContent(matcher, this.matchColumn);
-      this.foundRows = this.foundRows.concat(matchingRows, this.foundRows);
+      this.foundRows = this.foundRows.concat(matchingRows);
     }
   }
 
