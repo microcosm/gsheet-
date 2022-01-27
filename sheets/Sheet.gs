@@ -282,14 +282,21 @@ class Sheet {
     return this.cache.mainSectionRange;
   }
 
+  getRowRange(row) {
+    const column = 1;
+    const numRows = 1;
+    const numColumns = this.getNumColumns();
+    return this.sheetRef.getRange(row, column, numRows, numColumns);
+  }
+
 /* -------------------------------------------------------------------- */
 
   getOutsideColumnsRanges() {
     if(!this.cache.outsideColumnsRanges) {
       let ranges = [];
       const row = 1;
-      const leftOutsideColumn = this.getContentSectionsBeginColumn() - 1;
-      const rightOutsideColumn = this.getContentSectionsEndColumn() + 1;
+      const leftOutsideColumn = this.getFirstColumn();
+      const rightOutsideColumn = this.getLastColumn();
       const numRows = this.getMaxRows();
       const numColumns = 1;
       ranges.push(this.sheetRef.getRange(row, leftOutsideColumn, numRows, numColumns));

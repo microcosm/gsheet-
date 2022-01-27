@@ -25,7 +25,7 @@ class MoveMatchingRowsFromMainToDone extends Feature {
   moveRowsToDone() {
     const sortedRows = this.getFoundRowsSortedByNumberDescending();
     for(const row of sortedRows) {
-      const range = this.sheet.getRangeOfRow(row);
+      const range = this.sheet.getRowRange(row);
       this.sheet.sheetRef.moveRows(range, this.doneSectionIndex);
     }
   }
