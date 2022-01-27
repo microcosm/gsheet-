@@ -189,14 +189,14 @@ class Sheet {
 
   getContentColumnSubRanges(marker, rangeConfigs=[{}]) {
     const multipleSubRanges = [];
-    const indices = this.getRangeIndices(marker);
-    for(const index of indices) {
+    const lookups = this.getRangeLookups(marker);
+    for(const lookup of lookups) {
       const subRanges = [];
       for(const rangeConfig of rangeConfigs) {
         const beginColumnOffset = rangeConfig.beginColumnOffset || 0;
         const column = this.getFirstContentColumn() + beginColumnOffset;
         const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
-        subRanges.push(this.sheetRef.getRange(index.begin, column, index.numRows, numColumns));
+        subRanges.push(this.sheetRef.getRange(lookup.begin, column, lookup.numRows, numColumns));
       }
       multipleSubRanges.push(subRanges);
     }
@@ -220,38 +220,38 @@ class Sheet {
 
   getTitlesAboveBelowRanges() {
     if(!this.cache.titlesAboveBelowRanges) {
-      const indices = this.getRangeIndices(sectionMarkers.title);
+      const lookups = this.getRangeLookups(sectionMarkers.title);
       const column = this.getFirstContentColumn();
       const numColumns = this.getNumContentColumns();
       let ranges = [];
-      for(const index of indices) {
-        ranges.push(this.sheetRef.getRange(index.begin + 1, column, index.numRows, numColumns));
-        ranges.push(this.sheetRef.getRange(index.begin - 1, column, index.numRows, numColumns));
+      for(const lookup of lookups) {
+        ranges.push(this.sheetRef.getRange(lookup.begin + 1, column, lookup.numRows, numColumns));
+        ranges.push(this.sheetRef.getRange(lookup.begin - 1, column, lookup.numRows, numColumns));
       }
       this.cache.titlesAboveBelowRanges = ranges;
     }
     return this.cache.titlesAboveBelowRanges;
   }
 
-  getRangeIndices(marker) {
+  getRangeLookups(marker) {
     if(Object.keys(contentMarkers).includes(marker)) {
-      return this.getContentRangeIndices(marker);
+      return this.getContentRangeLookups(marker);
     } else {
-      return this.getRowRangeIndices(marker);
+      return this.getSingleRowRangeLookups(marker);
     }
   }
 
-  getRowRangeIndices(marker) {
-    let indices = [];
+  getSingleRowRangeLookups(marker) {
+    let lookups = [];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].endsWith(marker)) indices.push({ begin: i + 1, numRows: 1 });
+      if(values[i][0].endsWith(marker)) lookups.push({ begin: i + 1, numRows: 1 });
     }
-    return indices;
+    return lookups;
   }
 
-  getContentRangeIndices(marker) {
-    let indices = [], start = 0;
+  getContentRangeLookups(marker) {
+    let lookups = [], start = 0;
     const endMarker = contentMarkers[marker];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
@@ -259,10 +259,10 @@ class Sheet {
       if(val === marker) {
         start = i;
       } else if(val === endMarker) {
-        indices.push({ begin: start + 2, numRows: i - start - 1 });
+        lookups.push({ begin: start + 2, numRows: i - start - 1 });
       }
     }
-    return indices;
+    return lookups;
   }
 
 
