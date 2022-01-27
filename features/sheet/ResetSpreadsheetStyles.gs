@@ -45,15 +45,15 @@ class ResetSpreadsheetStyles extends Feature {
 
   setLookups() {
     this.lookups = {
-      titles:           { config:this.config.titles        ,   rangeGetter:'getTitlesSubRanges'        },
-      titlesAboveBelow: { config:this.config.titlesAboveBelow, rangeGetter:'getTitlesAboveBelowRanges' },
-      hiddenValues:     { config:this.config.hiddenValues,     rangeGetter:'getHiddenValuesSubRanges'  },
-      headers:          { config:this.config.headers,          rangeGetter:'getHeaderSubRanges'        },
-      main:             { config:this.config.contents,         rangeGetter:'getMainSubRanges'          },
-      done:             { config:this.config.contents,         rangeGetter:'getDoneSubRanges'          },
-      underMain:        { config:this.config.underContents,    rangeGetter:'getUnderMainSubRanges'     },
-      underDone:        { config:this.config.underContents,    rangeGetter:'getUnderDoneSubRanges'     },
-      outsides:         { config:this.config.outsides,         rangeGetter:'getOutsideColumnsRanges'   }
+      titles:           { config:this.config.titles        ,   rangeGetter:'getTitlesSectionsSubRanges'       },
+      titlesAboveBelow: { config:this.config.titlesAboveBelow, rangeGetter:'getTitlesAboveBelowRanges'        },
+      hiddenValues:     { config:this.config.hiddenValues,     rangeGetter:'getHiddenValuesSectionsSubRanges' },
+      headers:          { config:this.config.headers,          rangeGetter:'getHeaderSectionsSubRanges'       },
+      main:             { config:this.config.contents,         rangeGetter:'getMainSectionsSubRanges'         },
+      done:             { config:this.config.contents,         rangeGetter:'getDoneSectionsSubRanges'         },
+      underMain:        { config:this.config.underContents,    rangeGetter:'getUnderMainSectionsSubRanges'    },
+      underDone:        { config:this.config.underContents,    rangeGetter:'getUnderDoneSectionsSubRanges'    },
+      outsides:         { config:this.config.outsides,         rangeGetter:'getOutsideColumnsRanges'          }
     };
   }
 }

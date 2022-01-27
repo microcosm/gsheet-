@@ -208,47 +208,64 @@ class Sheet {
     return this.cache.lastContentColumn;
   }
 
-  getTitlesSubRanges(rangeConfigs=[{}]) {
-    return this.getContentColumnSubRanges(sectionMarkers.title, rangeConfigs);
-  }
-
-  getHiddenValuesSubRanges(rangeConfigs=[{}]) {
-    return this.getContentColumnSubRanges(sectionMarkers.hiddenValues, rangeConfigs);
-  }
-
-  getHeaderSubRanges(rangeConfigs=[{}]) {
-    return this.getContentColumnSubRanges(sectionMarkers.headers, rangeConfigs);
-  }
-
-  getMainSubRanges(rangeConfigs=[{}]) {
-    return this.getContentColumnSubRanges(sectionMarkers.main, rangeConfigs);
-  }
-
-  getDoneSubRanges(rangeConfigs=[{}]) {
-    return this.getContentColumnSubRanges(sectionMarkers.done, rangeConfigs);
-  }
-
-  getUnderMainSubRanges(rangeConfigs=[{}]) {
-    return this.getContentColumnSubRanges(contentMarkers[sectionMarkers.main], rangeConfigs);
-  }
-
-  getUnderDoneSubRanges(rangeConfigs=[{}]) {
-    return this.getContentColumnSubRanges(contentMarkers[sectionMarkers.done], rangeConfigs);
-  }
-
-  getContentColumnSubRanges(marker, rangeConfigs=[{}]) {
+/* -------------------------------------------------------------------- */
+/* getContentSectionsSubRanges (and its accessors)                      */
+/* -------------------------------------------------------------------- */
+/* The return array contains 1 item for each of the ranges identified   */
+/* by the marker argument (which may be only 1).                        */
+/*                                                                      */
+/* The rangeConfigs argument takes the form:                            */
+/*        [{ beginColumnOffset: 0, numColumns: 2 },                     */
+/*         { beginColumnOffset: 2, numColumns: 3 }]  //etc              */
+/*                                                                      */
+/* Each element in the return array is an array of ranges matching the  */
+/* specifications of rangeConfigs.                                      */
+/* -------------------------------------------------------------------- */
+  getContentSectionsSubRanges(marker, rangeConfigs=[{}]) {
     const multipleSubRanges = [];
     const lookups = this.getRangeLookups(marker);
     for(const lookup of lookups) {
       const subRanges = [];
       for(const rangeConfig of rangeConfigs) {
-        const column = this.getFirstContentColumn() + (rangeConfig.beginColumnOffset || 0);
+        const beginColumnOffset = rangeConfig.beginColumnOffset || 0;
+        const beginRowOffset = rangeConfig.beginRowOffset || 0;
+        const row = lookup.row + beginRowOffset;
+        const column = this.getFirstContentColumn() + beginColumnOffset;
+        const numRows = lookup.numRows - beginRowOffset;
         const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
-        subRanges.push(this.sheetRef.getRange(lookup.row, column, lookup.numRows, numColumns));
+        subRanges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
       }
       multipleSubRanges.push(subRanges);
     }
     return multipleSubRanges;
+  }
+
+  getTitlesSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(sectionMarkers.title, rangeConfigs);
+  }
+
+  getHiddenValuesSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(sectionMarkers.hiddenValues, rangeConfigs);
+  }
+
+  getHeaderSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(sectionMarkers.headers, rangeConfigs);
+  }
+
+  getMainSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(sectionMarkers.main, rangeConfigs);
+  }
+
+  getDoneSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(sectionMarkers.done, rangeConfigs);
+  }
+
+  getUnderMainSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.main], rangeConfigs);
+  }
+
+  getUnderDoneSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.done], rangeConfigs);
   }
 
   getOutsideColumnsRanges() {
