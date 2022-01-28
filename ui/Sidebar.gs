@@ -1,7 +1,7 @@
 class Sidebar {
   constructor(uiRef) {
     this.uiRef = uiRef;
-    this.title = 'Controls';
+    this.title = 'Dashboard';
     this.htmlBuilder = new SidebarHtmlBuilder(uiRef);
   }
 
