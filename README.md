@@ -2,9 +2,13 @@ gsheet—
 =======
 _Pronounce: "gsheet-dash"_
 
-Extends a Google Spreadsheet into an activity management dashboard. To use, combine the [Google Apps Script](https://developers.google.com/apps-script/guides/sheets) in this repo with some [data validation](https://support.google.com/docs/answer/186103) and [conditional formatting](https://support.google.com/docs/answer/78413).
+Extends a Google Spreadsheet into an activity management dashboard. To use, combine the [Google Apps Script](https://developers.google.com/apps-script/guides/sheets) in this repo with some [data validation](https://support.google.com/docs/answer/186103) and [conditional formatting](https://support.google.com/docs/answer/78413). This approach allows you to leverage the extensability and simplicity of customizable Google Sheets, tailoring it to various specific task-management contexts.
 
-This approach allows you to leverage the extensability and simplicity of customizable Google Sheets, tailoring it to various specific task-management contexts. You need someone with spreadsheet skills and/or scripting skills to look after it, but the benefit is simplicity, independence and custom extensibility.
+There are specific caveats on the usefulness of this approach:
+1. Editing doesn't scale well past a couple of heavy users (for viewers however there is no upper bound)
+2. You need at least one person with spreadsheet and/or scripting skills to look after it
+
+However the benefit is the ability to administrate in one place different contextual domains that often otherwise have entire systems associated with them, like timeline planning or personnel, task or interaction management. Using a spreadsheet as a dashboard allows relative platform independence and customisable feature configuration and extensibility.
 
 Features
 ---
@@ -13,92 +17,110 @@ TODO:
 
 How to use
 ===
-To implement this dashboard for a spreadsheet, create a new repo and add this repo [as a submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules). Create a `.gs` file which for custom configuration, and create a `var` called `config` like so:
+To implement this dashboard for a spreadsheet, create a new repo and add this repo [as a submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules). Create a `.gs` file which for custom configuration, and create standard functions like so:
 
 ```javascript
-var config = {
-  gsheet: {
+function getSpreadsheetConfig() {
+  return {
     name: 'the name of your implementation',
     id: 'the spreadsheet ID you are attaching it to'
-  },
-  toggles: {
-    performDataUpdates: true|false, //whether to actually apply any data updates to target sheets, calendars etc
-    verboseLogging: true|false, //whether logging should be verbose
-    showLogAlert: true|false  //whether to show the log as a UI alert when a user event is initiated via a spreadsheet 
-  }
+  };
 }
 ```
 
-Below that, create the method `buildSheets()` which will be called by the dashboard. From there you can define customn methods to build features for each sheet you need.
+Below that, create the methods which define which values sheets and feature sheets will be in use by the dashboard:
 
 ```javascript
-function buildSheets() {
-  buildValuesSheet();
-  buildProjectsSheet();
-}
-
-function buildValuesSheet() {
-  registerValuesSheet({
+function getValuesSheetConfig() {
+  return {
     name: 'Values', //the name of the sheet
     range: 'A3:A5',
     usersColumnIndex: 0 //the index within the range which contains user information
-  });
-}
-
-function buildProjectsSheet() {
-  const config = {
-    name: 'Projects',
-    destinationSpreadsheetID: 'destination spreadsheet id',
-    destinationSheetName: 'destination sheet name'
-    features: [ReplicateSheetInExternalSpreadsheet] //this feature copies the entire sheet to an external sheet whenever the it is edited
   };
-  registerFeatureSheet(config);
 }
 
-```
+function getFeatureSheetConfigs() {
+  return [
+    this.getProjectsSheet(),
+    this.getTasksSheet(),
+    this.getTimelineSheet()
+  ];
+}
 
-You assign a feature to a sheet by adding it to the `features` array in a `config` object and passing it to `registerFeatureSheet()`.
+function getProjectsSheet() {
+  return {
+    name: 'Projects',
+    features: { //this feature copies a entire sheet to an external sheet whenever the it is edited
+      replicateSheetInExternalSpreadsheet: {
+        destinationSpreadsheetID: 'destination spreadsheet id',
+        destinationSheetName: 'destination sheet name'
+        //other config
+      }
+    }
+  };
+}
+
+function getTasksSheet() {
+  return {
+    name: 'Tasks',
+    sidebar: { //this shows a sidebar allowing custom interactions with the sheet through features
+      guidance: {
+        type: 'text', title: 'Usage Guidance',
+        text: 'Guidance text for users'
+      },
+      arrange: {
+        type: 'buttons', title: 'Arrange by',
+        features: {
+          orderMainSection: { //this feature reorders the main content section of the sheet
+            by: {
+              timing: [{ column: 'D', direction: 'ascending' }, { column: 'B', direction: 'ascending' }],
+              workStream: [{ column: 'B', direction: 'ascending' }, { column: 'D', direction: 'ascending' }]
+            }
+          }
+          //other config
+        }
+      }
+    }
+  };
+}
+
+function getTimelineSheet() {
+  return {
+    name: 'Timeline',
+    features: { //this feature updates a sheet from a specified google calendar
+      updateSpreadsheetFromCalendar: {
+        fromDate: 'March 29, 2021',
+        dateColumn: 'C'
+        //other config
+      }
+    }
+  };
+}
+```
 
 How it runs
 ===
-Google Apps Script is stateless, meaning ([almost](https://developers.google.com/apps-script/guides/properties)) all the state exists on the file. Executions are triggered by user events, like opening or editing a file in a browser, or by system events like [timers](https://developers.google.com/apps-script/guides/triggers/installable).
+Google Apps Script is stateless, meaning ([almost](https://developers.google.com/apps-script/guides/properties)) all the state exists as data on the spreadsheet. Executions are triggered by user events, like opening or editing a file in a browser, by system events like [timers](https://developers.google.com/apps-script/guides/triggers/installable), or by button clicks on the sidebar.
 
 Events are handled by event handler methods in `main.gs`, all of which take the following form:
 
 1. Build relevant state
 2. Execute relevant features
 
-Building state
----
-State is built in sections, with only the relevant state sections built by each handler. Part of state building is pulling in your config values, via a call to `buildSheets()`.
+State is built in chunks, with only the relevant state built by each event handler. Part of state building is pulling in config values, via a call to `getFeatureSheetConfigs()`.
 
-Your configuration sets up associations between sheets and features via `registerFeatureSheet()`. When this method is called, it:
+Features are bound 1:1 to sheets, meaning there are often two or more instances of the same feature with each interacting with different sheets. Each feature registers itself as capable of responding to a subset of events for which they make sense. For example:
 
-1. Creates a new `FeatureSheet` object, which accesses the spreadsheet and finds the sheet identified by `name`. No data is read from he sheet at this stage, only when a featue execution demands it -- this saves on costly calls to the API. If the sheet can't be found an Exception is thrown.
+- The `ReplicateSheetInExternalSpreadsheet` feature syncs changes from a source sheet to a target sheet -- therefore it is capable of responding to `onSpreadsheetEdit`
+- The `UpdateSheetHiddenValue` feature updates a hidden cell, typically triggering a UI change, typically requiring a human input -- therefore it is capable of responding to `onSidebarSubmit`
 
-2. Creates a new `Feature` object for each named in the `features` array, and assigns the new `FeatureSheet` to each of them.
+Event handlers methods in `main.gs` compile a list of "registered" features based on these capabilities, and send event data to each of them to assess whether they should be marked for execution.
 
-Once all sheets are registered via this process, the dashboard state contains an array of all `FeatureSheet` objects, and an array of all `Feature` objects. If the two sheets both declare the same feature, that feature will exist in the `state.features.registered` array twice - once for each sheet.
+Part of the event data sent for assessment is the triggering sheet name, i.e. when a user clicks a sheet-relative sidebar button or edits a sheet's cell. In these instances each registered feature compares the event data sheet name against its 1:1 sheet property to determine if it should execute. It then inspects the remaining event data to determine if it is valid for an execution.
 
-The rest of the config values are stored in the new `FeatureSheet` object for access later during feature execution.
+Features that respond positively for execution are added to an execution list, sorted into priority order, and then executed.
 
-Feature execution
----
-Each feature is designed to respond to a specific set of events for which they make sense. For example:
-
-- The `ReplicateSheetInExternalSpreadsheet` feature syncs changes from a source sheet to a target sheet -- therefore it responds to `onSpreadsheetEdit`
-- The `UpdateSheetHiddenValue` feature updates a hidden cell, typically triggering a UI change -- therefore it responds to `onSidebarSubmit` (from where a user has requested that UI change)
-
-After the relevant state is built, two categories of values are evaluated to determine which feature(s) should execute:
-
-| Category | Required? | Description |
-| --- | --- | --- |
-| Event | Required | The events a feature responds to are hard coded into each `Feature` class definition. |
-| Event Data | Optional | Values passed by Apps Script to each event are parsed to determine if a feature should execute in response. Examples include `onSpreadsheetOpen`, `onSpreadsheetEdit`, `onOvernightTimer` and `onSidebarSubmit`. |
-
-Event Data values could include things like the active sheet name, the cells, rows or columns selected or edited, the ID of a button a user clicked, and so on.
-
-In the case of timed triggers, there is no Event Data. In the case of events like `onSpreadsheetOpen`, no event data is checked for as it is not relevant -- event data is only referenced by event handlers when it is necessary to determine whether a feature should execute.
+Timed events have no event data and therefore the registration list is the execution list, with features executing across multiple sheets as part of the same run.
 
 Glossary
 ===
