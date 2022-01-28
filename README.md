@@ -98,6 +98,8 @@ function getTimelineSheet() {
 }
 ```
 
+Features specified under `features` at the top level of the config are set up for responding to sheet edits or timed events. Features specified under `sidebar.controlName.features` are set up for sidebar user interaction events.
+
 How it runs
 ===
 Google Apps Script is stateless, meaning ([almost](https://developers.google.com/apps-script/guides/properties)) all the state exists as data on the spreadsheet. Executions are triggered by user events, like opening or editing a file in a browser, by system events like [timers](https://developers.google.com/apps-script/guides/triggers/installable), or by button clicks on the sidebar.
