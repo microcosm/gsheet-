@@ -3,12 +3,14 @@ const sectionMarkers = {
   hiddenValues: 'HIDDEN_MARKER',
   headers:      'HEADER_MARKER',
   main:         'MAIN_HEADER_MARKER',
-  done:         'DONE_HEADER_MARKER'
+  done:         'DONE_HEADER_MARKER',
+  generic:      'GENERIC_HEADER_MARKER'
 }
 
 const contentMarkers = {
-  MAIN_HEADER_MARKER: 'MAIN_FOOTER_MARKER',
-  DONE_HEADER_MARKER: 'DONE_FOOTER_MARKER'
+  MAIN_HEADER_MARKER:    'MAIN_FOOTER_MARKER',
+  DONE_HEADER_MARKER:    'DONE_FOOTER_MARKER',
+  GENERIC_HEADER_MARKER: 'GENERIC_FOOTER_MARKER'
 };
 
 class Sheet {
@@ -216,12 +218,20 @@ class Sheet {
     return this.getContentSectionsSubRanges(sectionMarkers.done, rangeConfigs);
   }
 
+  getGenericSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(sectionMarkers.generic, rangeConfigs);
+  }
+
   getUnderMainSectionsSubRanges(rangeConfigs=[{}]) {
     return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.main], rangeConfigs);
   }
 
   getUnderDoneSectionsSubRanges(rangeConfigs=[{}]) {
     return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.done], rangeConfigs);
+  }
+
+  getUnderGenericSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.generic], rangeConfigs);
   }
 
 /* -------------------------------------------------------------------- */
@@ -292,7 +302,7 @@ class Sheet {
     let indices = [];
     for(let i = this.getFirstMainRow() - 1; i < values.length; i++) {
       if(values[i][0] === endMarker) return indices;
-      if(values[i][columnZeroIndex].endsWith(findText)) indices.push(i + 1);
+      if(values[i][columnZeroIndex].includes(findText)) indices.push(i + 1);
     }
     return indices;
   }
@@ -301,7 +311,7 @@ class Sheet {
     let lookups = [];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].endsWith(marker)) lookups.push({ row: i + 1, numRows: 1 });
+      if(values[i][0].includes(marker)) lookups.push({ row: i + 1, numRows: 1 });
     }
     return lookups;
   }
@@ -312,10 +322,11 @@ class Sheet {
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
       const val = values[i][0];
-      if(val === marker) {
-        start = i;
-      } else if(val === endMarker) {
+      if(val.includes(endMarker)) {
         lookups.push({ row: start + 2, numRows: i - start - 1 });
+      }
+      if(val.includes(marker)) {
+        start = i;
       }
     }
     return lookups;

@@ -45,14 +45,16 @@ class ResetSpreadsheetStyles extends Feature {
 
   setLookups() {
     this.lookups = {
-      titles:           { config:this.config.titles        ,   rangeGetter:'getTitlesSectionsSubRanges'       },
+      titles:           { config:this.config.titles,           rangeGetter:'getTitlesSectionsSubRanges'       },
       titlesAboveBelow: { config:this.config.titlesAboveBelow, rangeGetter:'getTitlesAboveBelowRanges'        },
       hiddenValues:     { config:this.config.hiddenValues,     rangeGetter:'getHiddenValuesSectionsSubRanges' },
       headers:          { config:this.config.headers,          rangeGetter:'getHeaderSectionsSubRanges'       },
       main:             { config:this.config.contents,         rangeGetter:'getMainSectionsSubRanges'         },
       done:             { config:this.config.contents,         rangeGetter:'getDoneSectionsSubRanges'         },
+      generic:          { config:this.config.contents,         rangeGetter:'getGenericSectionsSubRanges'      },
       underMain:        { config:this.config.underContents,    rangeGetter:'getUnderMainSectionsSubRanges'    },
       underDone:        { config:this.config.underContents,    rangeGetter:'getUnderDoneSectionsSubRanges'    },
+      underGeneric:     { config:this.config.underContents,    rangeGetter:'getUnderGenericSectionsSubRanges' },
       outsides:         { config:this.config.outsides,         rangeGetter:'getOutsideColumnsRanges'          }
     };
   }
