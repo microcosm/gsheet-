@@ -26,9 +26,7 @@ class Sheet {
   initializeCache() {
     return {
       values: false,
-      dataRange: false,
-      maxRows: false,
-      maxColumns: false,
+      sheetRange: false,
       numRows: false,
       numColumns: false,
       firstRow: false,
@@ -52,44 +50,28 @@ class Sheet {
 
   getValues() {
     if(!this.cache.values) {
-      this.cache.values = this.getDataRange().getValues();
+      this.cache.values = this.getSheetRange().getValues();
     }
     return this.cache.values;
   }
 
-  getDataRange() {
-    if(!this.cache.dataRange) {
-      this.cache.dataRange = this.sheetRef.getDataRange()
+  getSheetRange() {
+    if(!this.cache.sheetRange) {
+      this.cache.sheetRange = this.sheetRef.getRange(1, 1, this.getNumRows(), this.getNumColumns());
     }
-    return this.cache.dataRange;
-  }
-
-  getMaxRows() {
-    if(!this.cache.maxRows) {
-      this.cache.maxRows = this.sheetRef.getMaxRows()
-    }
-    return this.cache.maxRows;
-  }
-
-  getMaxColumns() {
-    if(!this.cache.maxColumns) {
-      this.cache.maxColumns = this.sheetRef.getMaxColumns()
-    }
-    return this.cache.maxColumns;
+    return this.cache.sheetRange;
   }
 
   getNumRows() {
     if(!this.cache.numRows) {
-      const values = this.getValues();
-      this.cache.numRows = values.length;
+      this.cache.numRows = this.sheetRef.getMaxRows();
     }
     return this.cache.numRows;
   }
 
   getNumColumns() {
     if(!this.cache.numColumns) {
-      const values = this.getValues();
-      this.cache.numColumns = values[0].length;
+      this.cache.numColumns = this.sheetRef.getMaxColumns();
     }
     return this.cache.numColumns;
   }
@@ -163,7 +145,6 @@ class Sheet {
 
   getNumContentColumns() {
     if(!this.cache.numContentColumns) {
-      const values = this.getValues();
       this.cache.numContentColumns = this.getNumColumns() - 2;
     }
     return this.cache.numContentColumns;
@@ -272,7 +253,7 @@ class Sheet {
       const row = 1;
       const leftOutsideColumn = this.getFirstColumn();
       const rightOutsideColumn = this.getLastColumn();
-      const numRows = this.getMaxRows();
+      const numRows = this.getNumRows();
       const numColumns = 1;
       ranges.push(this.sheetRef.getRange(row, leftOutsideColumn, numRows, numColumns));
       ranges.push(this.sheetRef.getRange(row, rightOutsideColumn, numRows, numColumns));

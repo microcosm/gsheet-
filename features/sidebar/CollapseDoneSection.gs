@@ -13,7 +13,7 @@ class CollapseDoneSection extends Feature {
   }
 
   destroyAllExistingRowGroups() {
-    this.sheet.getDataRange().shiftRowGroupDepth(-this.numRowGroupDepthsToDestroy);
+    this.sheet.getSheetRange().shiftRowGroupDepth(-this.numRowGroupDepthsToDestroy);
   }
 
   createNewRowGroup() {
