@@ -40,6 +40,7 @@ class Sheet {
       numContentColumns: false,
       firstContentColumn: false,
       lastContentColumn: false,
+      outsideRowsRanges: false,
       outsideColumnsRanges: false,
       titlesAboveBelowRanges: false,
       mainSectionRange: false
@@ -256,6 +257,21 @@ class Sheet {
   }
 
 /* -------------------------------------------------------------------- */
+
+  getOutsideRowsRanges() {
+    if(!this.cache.outsideRowsRanges) {
+      let ranges = [];
+      const topOutsideRow = this.getFirstRow();
+      const bottomOutsideRow = this.getLastRow();
+      const column = 1;
+      const numRows = 1;
+      const numColumns = this.getNumColumns();
+      ranges.push(this.sheetRef.getRange(topOutsideRow, column, numRows, numColumns));
+      ranges.push(this.sheetRef.getRange(bottomOutsideRow, column, numRows, numColumns));
+      this.cache.outsideRowsRanges = ranges;
+    }
+    return this.cache.outsideRowsRanges;
+  }
 
   getOutsideColumnsRanges() {
     if(!this.cache.outsideColumnsRanges) {

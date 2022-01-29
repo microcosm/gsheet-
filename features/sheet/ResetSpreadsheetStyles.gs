@@ -27,13 +27,14 @@ class ResetSpreadsheetStyles extends Feature {
   }
 
   setRangeStyle(range, config) {
-    if(this.isValidProperty(config, 'fontFamily')) range.setFontFamily(config.fontFamily);
-    if(this.isValidProperty(config, 'fontSize'  )) range.setFontSize  (config.fontSize);
-    if(this.isValidProperty(config, 'fontColor' )) range.setFontColor (config.fontColor);
-    if(this.isValidProperty(config, 'background')) range.setBackground(config.background);
-    if(this.isValidProperty(config, 'border'    )) this.setBorders    ([config.border], range);
-    if(this.isValidProperty(config, 'borders'   )) this.setBorders    (config.borders, range);
-    if(this.isValidProperty(config, 'rowHeight' )) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
+    if(this.isValidProperty(config, 'fontFamily' )) range.setFontFamily(config.fontFamily);
+    if(this.isValidProperty(config, 'fontSize'   )) range.setFontSize  (config.fontSize);
+    if(this.isValidProperty(config, 'fontColor'  )) range.setFontColor (config.fontColor);
+    if(this.isValidProperty(config, 'background' )) range.setBackground(config.background);
+    if(this.isValidProperty(config, 'border'     )) this.setBorders    ([config.border], range);
+    if(this.isValidProperty(config, 'borders'    )) this.setBorders    (config.borders, range);
+    if(this.isValidProperty(config, 'rowHeight'  )) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
+    if(this.isValidProperty(config, 'columnWidth')) this.sheet.sheetRef.setColumnWidths(range.getColumn(), range.getNumColumns(), config.columnWidth);
   }
 
   setRangeStyles(ranges, config) {
@@ -62,7 +63,8 @@ class ResetSpreadsheetStyles extends Feature {
       underMain:        { config:this.config.underContents,    rangeGetter:'getUnderMainSectionsSubRanges'    },
       underDone:        { config:this.config.underContents,    rangeGetter:'getUnderDoneSectionsSubRanges'    },
       underGeneric:     { config:this.config.underContents,    rangeGetter:'getUnderGenericSectionsSubRanges' },
-      outsides:         { config:this.config.outsides,         rangeGetter:'getOutsideColumnsRanges'          }
+      rowsOutside:      { config:this.config.rowsOutside,      rangeGetter:'getOutsideRowsRanges'             },
+      columnsOutside:   { config:this.config.columnsOutside,   rangeGetter:'getOutsideColumnsRanges'          }
     };
   }
 }
