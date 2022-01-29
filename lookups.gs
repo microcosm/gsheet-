@@ -36,6 +36,10 @@ const priorities = {
 };
 
 const borderStyles = {
-  SOLID:       SpreadsheetApp.BorderStyle.SOLID,
-  SOLID_THICK: SpreadsheetApp.BorderStyle.SOLID_THICK
+  SOLID:        SpreadsheetApp.BorderStyle.SOLID,
+  SOLID_MEDIUM: SpreadsheetApp.BorderStyle.SOLID_MEDIUM,
+  SOLID_THICK:  SpreadsheetApp.BorderStyle.SOLID_THICK,
+  DOTTED:       SpreadsheetApp.BorderStyle.DOTTED,
+  DASHED:       SpreadsheetApp.BorderStyle.DASHED,
+  DOUBLE:       SpreadsheetApp.BorderStyle.DOUBLE
 };
