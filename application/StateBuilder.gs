@@ -55,21 +55,20 @@ class StateBuilder {
       registered: [],
       executions: []
     };
-    let featureSheetConfigs = getFeatureSheetConfigs();
-    for(const featureSheetConfig of featureSheetConfigs) {
-      this.buildFeatureSheetState(featureSheetConfig)
+    let configs = getFeatureSheetConfigs();
+    for(const config of configs) {
+      this.buildFeatureSheetState(config)
     }
   }
 
-  buildFeatureSheetState(featureSheetConfig) {
-    const sheet = new FeatureSheet(featureSheetConfig);
+  buildFeatureSheetState(config) {
+    const sheet = new FeatureSheet(config);
     state.sheets.push(sheet);
     this.appendFeatures(
-      featureSheetConfig.featureClasses.map((feature) => {
-        return new feature(sheet)
+      config.featureClasses.map((featureClass) => {
+        return new featureClass(sheet)
       })
     );
-    return sheet;
   }
 
   buildUsersState() {
