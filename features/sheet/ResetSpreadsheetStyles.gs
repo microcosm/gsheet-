@@ -31,8 +31,9 @@ class ResetSpreadsheetStyles extends Feature {
     if(this.isValidProperty(config, 'fontSize'  )) range.setFontSize  (config.fontSize);
     if(this.isValidProperty(config, 'fontColor' )) range.setFontColor (config.fontColor);
     if(this.isValidProperty(config, 'background')) range.setBackground(config.background);
-    if(this.isValidProperty(config, 'border'    )) range.setBorder    (config.border.top, config.border.left, config.border.bottom, config.border.right, config.border.vertical, config.border.horizontal, config.border.color, borderStyles[config.border.style]);
-    if(this.isValidProperty(config, 'rowHeight')) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
+    if(this.isValidProperty(config, 'border'    )) this.setBorders    ([config.border], range);
+    if(this.isValidProperty(config, 'borders'   )) this.setBorders    (config.borders, range);
+    if(this.isValidProperty(config, 'rowHeight' )) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
   }
 
   setRangeStyles(ranges, config) {
@@ -40,6 +41,12 @@ class ResetSpreadsheetStyles extends Feature {
       const val = ranges[i];
       if(isArray(val)) this.setRangeStyles(val, config);
       else this.setRangeStyle(val, config[i % config.length]);
+    }
+  }
+
+  setBorders(configs, range) {
+    for(const config of configs) {
+      range.setBorder(config.top, config.left, config.bottom, config.right, config.vertical, config.horizontal, config.color, borderStyles[config.style]);
     }
   }
 
