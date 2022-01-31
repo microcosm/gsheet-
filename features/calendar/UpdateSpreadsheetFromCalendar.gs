@@ -12,7 +12,7 @@ class UpdateSpreadsheetFromCalendar extends Feature {
 
   getCalendar() {
     const calendarId = state.valuesSheet.getValueOf(state.valuesSheet.config.eventsCalendarIdRowIndex, state.valuesSheet.config.eventsCalendarIdColumnIndex);
-    logString('Opening google calendar ' + calendarId);
+    logStringVerbose('Opening google calendar ' + calendarId);
     return CalendarApp.getCalendarById(calendarId);
   }
 
@@ -29,7 +29,7 @@ class UpdateSpreadsheetFromCalendar extends Feature {
         isAllDay: event.isAllDayEvent()
       });
     });
-    logString('Got ' + this.calendarEvents.length + ' events from calendar between [' + fromDate + '] and [' + toDate + ']');
+    logStringVerbose('Got ' + this.calendarEvents.length + ' events from calendar between [' + fromDate + '] and [' + toDate + ']');
   }
 
   updateSheet(sheet) {
