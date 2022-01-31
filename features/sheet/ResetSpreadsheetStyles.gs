@@ -13,58 +13,58 @@ class ResetSpreadsheetStyles extends Feature {
 
   execute() {
     super.execute();
+    this.styles = this.config.styles;
     this.setLookups();
-
-    for(const section of this.config.sections) {
+    for(const section of this.styles.sections) {
       const lookup = this.lookups[section];
-      const ranges = toArray(this.sheet[lookup.rangeGetter](lookup.config));
-      this.setRangeStyles(ranges, lookup.config);
+      const ranges = toArray(this.sheet[lookup.rangeGetter](lookup.styles));
+      this.setRangeStyles(ranges, lookup.styles);
     }
   }
 
-  isValidProperty(config, propertyName) {
-    return config.hasOwnProperty(propertyName) && config[propertyName] != propertyOverrides.IGNORE;
+  isValidProperty(styles, propertyName) {
+    return styles.hasOwnProperty(propertyName) && styles[propertyName] != propertyOverrides.IGNORE;
   }
 
-  setRangeStyle(range, config) {
-    if(this.isValidProperty(config, 'fontFamily' )) range.setFontFamily(config.fontFamily);
-    if(this.isValidProperty(config, 'fontSize'   )) range.setFontSize  (config.fontSize);
-    if(this.isValidProperty(config, 'fontColor'  )) range.setFontColor (config.fontColor);
-    if(this.isValidProperty(config, 'background' )) range.setBackground(config.background);
-    if(this.isValidProperty(config, 'border'     )) this.setBorders    ([config.border], range);
-    if(this.isValidProperty(config, 'borders'    )) this.setBorders    (config.borders, range);
-    if(this.isValidProperty(config, 'rowHeight'  )) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), config.rowHeight);
-    if(this.isValidProperty(config, 'columnWidth')) this.sheet.sheetRef.setColumnWidths(range.getColumn(), range.getNumColumns(), config.columnWidth);
+  setRangeStyle(range, styles) {
+    if(this.isValidProperty(styles, 'fontFamily' )) range.setFontFamily(styles.fontFamily);
+    if(this.isValidProperty(styles, 'fontSize'   )) range.setFontSize  (styles.fontSize);
+    if(this.isValidProperty(styles, 'fontColor'  )) range.setFontColor (styles.fontColor);
+    if(this.isValidProperty(styles, 'background' )) range.setBackground(styles.background);
+    if(this.isValidProperty(styles, 'border'     )) this.setBorders    ([styles.border], range);
+    if(this.isValidProperty(styles, 'borders'    )) this.setBorders    (styles.borders, range);
+    if(this.isValidProperty(styles, 'rowHeight'  )) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), styles.rowHeight);
+    if(this.isValidProperty(styles, 'columnWidth')) this.sheet.sheetRef.setColumnWidths(range.getColumn(), range.getNumColumns(), styles.columnWidth);
   }
 
-  setRangeStyles(ranges, config) {
+  setRangeStyles(ranges, styles) {
     for(let i = 0; i < ranges.length; i++) {
       const val = ranges[i];
-      if(isArray(val)) this.setRangeStyles(val, config);
-      else this.setRangeStyle(val, config[i % config.length]);
+      if(isArray(val)) this.setRangeStyles(val, styles);
+      else this.setRangeStyle(val, styles[i % styles.length]);
     }
   }
 
-  setBorders(configs, range) {
-    for(const config of configs) {
-      range.setBorder(config.top, config.left, config.bottom, config.right, config.vertical, config.horizontal, config.color, borderStyles[config.style]);
+  setBorders(borders, range) {
+    for(const border of borders) {
+      range.setBorder(border.top, border.left, border.bottom, border.right, border.vertical, border.horizontal, border.color, borderStyles[border.style]);
     }
   }
 
   setLookups() {
     this.lookups = {
-      titles:           { config:this.config.titles,           rangeGetter:'getTitlesSectionsSubRanges'       },
-      titlesAboveBelow: { config:this.config.titlesAboveBelow, rangeGetter:'getTitlesAboveBelowRanges'        },
-      hiddenValues:     { config:this.config.hiddenValues,     rangeGetter:'getHiddenValuesSectionsSubRanges' },
-      headers:          { config:this.config.headers,          rangeGetter:'getHeaderSectionsSubRanges'       },
-      main:             { config:this.config.contents,         rangeGetter:'getMainSectionsSubRanges'         },
-      done:             { config:this.config.contents,         rangeGetter:'getDoneSectionsSubRanges'         },
-      generic:          { config:this.config.contents,         rangeGetter:'getGenericSectionsSubRanges'      },
-      underMain:        { config:this.config.underContents,    rangeGetter:'getUnderMainSectionsSubRanges'    },
-      underDone:        { config:this.config.underContents,    rangeGetter:'getUnderDoneSectionsSubRanges'    },
-      underGeneric:     { config:this.config.underContents,    rangeGetter:'getUnderGenericSectionsSubRanges' },
-      rowsOutside:      { config:this.config.rowsOutside,      rangeGetter:'getOutsideRowsRanges'             },
-      columnsOutside:   { config:this.config.columnsOutside,   rangeGetter:'getOutsideColumnsRanges'          }
+      titles:           { styles:this.styles.titles,           rangeGetter:'getTitlesSectionsSubRanges'       },
+      titlesAboveBelow: { styles:this.styles.titlesAboveBelow, rangeGetter:'getTitlesAboveBelowRanges'        },
+      hiddenValues:     { styles:this.styles.hiddenValues,     rangeGetter:'getHiddenValuesSectionsSubRanges' },
+      headers:          { styles:this.styles.headers,          rangeGetter:'getHeaderSectionsSubRanges'       },
+      main:             { styles:this.styles.contents,         rangeGetter:'getMainSectionsSubRanges'         },
+      done:             { styles:this.styles.contents,         rangeGetter:'getDoneSectionsSubRanges'         },
+      generic:          { styles:this.styles.contents,         rangeGetter:'getGenericSectionsSubRanges'      },
+      underMain:        { styles:this.styles.underContents,    rangeGetter:'getUnderMainSectionsSubRanges'    },
+      underDone:        { styles:this.styles.underContents,    rangeGetter:'getUnderDoneSectionsSubRanges'    },
+      underGeneric:     { styles:this.styles.underContents,    rangeGetter:'getUnderGenericSectionsSubRanges' },
+      rowsOutside:      { styles:this.styles.rowsOutside,      rangeGetter:'getOutsideRowsRanges'             },
+      columnsOutside:   { styles:this.styles.columnsOutside,   rangeGetter:'getOutsideColumnsRanges'          }
     };
   }
 }
