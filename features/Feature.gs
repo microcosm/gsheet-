@@ -2,15 +2,14 @@ class Feature {
   constructor(sheet, name) {
     this.sheet = sheet;
     this.name = name;
-    this.responseCapabilities = [];
     this.camelCaseName = false;
-    this.config = false;
     this.priority = false;
+    this.responseCapabilities = [];
     this.methods = {
-      onSpreadsheetEdit: { configSetter: 'setConfigStandard', eventDataValidator: 'isValidStandardEventData'},
-      onCalendarEdit:    { configSetter: 'setConfigStandard', eventDataValidator: 'isValidStandardEventData'},
-      onOvernightTimer:  { configSetter: 'setConfigStandard', eventDataValidator: 'isValidStandardEventData'},
-      onSidebarSubmit:   { configSetter: 'setConfigSidebar',  eventDataValidator: 'isValidSidebarEventData' }
+      onSpreadsheetEdit: { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
+      onCalendarEdit:    { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
+      onOvernightTimer:  { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
+      onSidebarSubmit:   { configValidator: 'isValidSidebarSheetConfig',  eventDataValidator: 'isValidSidebarEventData' }
     };
   }
 
@@ -24,21 +23,13 @@ class Feature {
     }
   }
 
-  hasResponseCapability() {
-    return this.responseCapabilities.includes(this.event);
-  }
-
-  hasResponseRequest() {
-    return this.config ? toArray(this.config.events).includes(this.event) : false;
-  }
-
   respondsTo(event, eventData=false) {
     this.event = event;
     this.eventData = eventData;
-    this.setConfig();
-    this.assessResponseValidity();
-    const respondsTo = this.hasCapability && this.hasRequest && this.isValidEventData;
-    logStringVerbose('respondsTo is ' + respondsTo + ' because hasCapability is ' +  this.hasCapability + ', hasRequest is ' +  this.hasRequest + ', and isValidEventData is ' + this.isValidEventData + '.');
+    logStringVerbose(`Investigating sheet '` + this.sheet.name + `' for feature ` + this.getCamelCaseName());
+    startLogBlockVerbose();
+    const respondsTo = this.getResponseValidity();
+    logStringVerbose((respondsTo ? '**' : '') + 'Feature does ' + (respondsTo ? '' : 'not ') + 'respond to event.' + (respondsTo ? '**' : ''));
     endLogBlockVerbose();
     return respondsTo;
   }
@@ -49,28 +40,44 @@ class Feature {
   }
 
   getPriority() {
-    if(!this.priority) this.priority = this.config.hasOwnProperty('priority') ? priorities[this.config.priority] : priorities.LOW_PRIORITY;
+    if(!this.priority) this.priority = this.sheet.config.hasOwnProperty('priority') ? priorities[this.sheet.config.priority] : priorities.LOW_PRIORITY;
     return this.priority;
   }
 
-  setConfig() {
-    const configSetter = this.methods[this.event].configSetter;
-    this[configSetter]();
-  }
-
-  setConfigStandard() {
-    this.config = this.sheet.config.features[this.getCamelCaseName()];
-  }
-
-  setConfigSidebar() {
-    this.config = this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()];
-  }
-
-  assessResponseValidity() {
+  getResponseValidity() {
+    const configValidator = this.methods[this.event].configValidator;
     const eventDataValidator = this.methods[this.event].eventDataValidator;
-    this.hasCapability = this.hasResponseCapability();
-    this.hasRequest = this.hasResponseRequest();
-    this.isValidEventData = this[eventDataValidator]();
+    this.hasValidSheetConfig = this[configValidator]();  if(!this.hasValidSheetConfig) return false;
+    this.hasCapability = this.hasResponseCapability();   if(!this.hasCapability)       return false;
+    this.hasRequest = this.hasResponseRequest();         if(!this.hasRequest)          return false;
+    this.hasValidEventData = this[eventDataValidator](); if(!this.hasValidEventData)   return false;
+    return true;
+  }
+
+  isValidStandardSheetConfig() {
+    const isValid = isObject(this.sheet.config) && isObject(this.sheet.config.features) && isObject(this.sheet.config.features[this.getCamelCaseName()]);
+    if(isValid) this.config = this.sheet.config.features[this.getCamelCaseName()];
+    logStringVerbose(`isValidStandardSheetConfig is ` + isValid + `.`);
+    return isValid;
+  }
+
+  isValidSidebarSheetConfig() {
+    const isValid = isObject(this.sheet.config) && isObject(this.sheet.config.sidebar) && isObject(this.sheet.config.sidebar[this.eventData.configAccessor]) && isObject(this.sheet.config.sidebar[this.eventData.configAccessor].features) && isObject(this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()]);
+    if(isValid) this.config = this.sheet.config.sidebar[this.eventData.configAccessor].features[this.getCamelCaseName()];
+    logStringVerbose(`isValidSidebarSheetConfig is ` + isValid + `.`);
+    return isValid;
+  }
+
+  hasResponseCapability() {
+    const hasCapability = this.responseCapabilities.includes(this.event);
+    logStringVerbose(`hasResponseCapability for ` + this.event + ` is ` + hasCapability + `.`);
+    return hasCapability;
+  }
+
+  hasResponseRequest() {
+    const hasRequest = toArray(this.config.events).includes(this.event);
+    logStringVerbose(`hasResponseRequest for ` + this.event + ` is ` + hasRequest + `.`);
+    return hasRequest;
   }
 
   isValidStandardEventData() {
