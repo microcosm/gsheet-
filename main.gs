@@ -68,10 +68,8 @@ function onGetActiveSheetControlID() {
 function executeFeaturesForEvent(event, eventData=false) {
   logString('Searching registered features for valid responses...');
   logObjectVerbose('eventData is ', eventData);
-  for(key in state.features.registered) {
-    const feature = state.features.registered[key];
+  for(const feature of state.features.registered) {
     if(feature.respondsTo(event, eventData)) {
-      feature.setEventData(eventData);
       state.features.executions.push(feature);
     }
   }

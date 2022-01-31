@@ -86,14 +86,6 @@ function logEventExecution(event, eventData=false) {
   if(eventData) logObjectVerbose(`Event data:\n`, eventData);
 }
 
-function logFeatureEvaluation(feature, respondsToEvent, isValidEventData) {
-  if(state.toggles.verboseLogging) {
-    state.log += ((respondsToEvent && isValidEventData) ? `* ` : ``) + `Feature '` + feature.name + `' with Sheet '` + feature.sheet.name + `' DOES` + (respondsToEvent ? `` : ` NOT`) + ` respond to event and HAS` + (isValidEventData ? `` : ` NOT`) + ` received valid event data\n\n`;
-  } else if(respondsToEvent && isValidEventData) {
-    state.log += `Feature '` + feature.name + `' with Sheet '` + feature.sheet.name + `' DOES respond to event and HAS received valid event data\n`;
-  }
-}
-
 function logFeatureExecution(feature) {
   state.log += `Executing feature '` + feature.name + `' on Sheet '` + feature.sheet.name + `' (` + feature.getPriority() + `)\n`;
 }

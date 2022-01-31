@@ -55,17 +55,17 @@ class StateBuilder {
       registered: [],
       executions: []
     };
-    let configs = getFeatureSheetConfigs();
-    for(const config of configs) {
-      this.buildFeatureSheetState(config)
+    let sheetConfigs = getFeatureSheetConfigs();
+    for(const sheetConfig of sheetConfigs) {
+      this.buildFeatureSheetState(sheetConfig)
     }
   }
 
-  buildFeatureSheetState(config) {
-    const sheet = new FeatureSheet(config);
+  buildFeatureSheetState(sheetConfig) {
+    const sheet = new FeatureSheet(sheetConfig);
     state.sheets.push(sheet);
     this.appendFeatures(
-      config.featureClasses.map((featureClass) => {
+      sheetConfig.featureClasses.map((featureClass) => {
         return new featureClass(sheet)
       })
     );
