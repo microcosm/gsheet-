@@ -22,31 +22,29 @@ function alert(text){
 let logIndentation = false;
 
 function startLogBlock() {
-  logString('[');
   logIndentation = true;
 }
 
 function startLogBlockVerbose() {
-  logStringVerbose('[');
   logIndentation = true;
 }
 
 function endLogBlock() {
   logIndentation = false;
-  logString(']');
+  logString('');
 }
 
 function endLogBlockVerbose() {
   logIndentation = false;
-  logStringVerbose(']');
+  logStringVerbose('');
 }
 
 function indentLog(str) {
-  return logIndentation ? `  ` + indentLogNewlines(str) : str;
+  return logIndentation ? `- ` + indentLogNewlines(str) : str;
 }
 
 function indentLogNewlines(str) {
-  return str.replaceAll(`\n`, `\n  `);
+  return str.replaceAll(`\n`, `\n    `);
 }
 
 function logString(str) {
