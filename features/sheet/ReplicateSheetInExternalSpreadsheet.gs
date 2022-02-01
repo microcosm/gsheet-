@@ -1,7 +1,10 @@
 class ReplicateSheetInExternalSpreadsheet extends Feature {
   constructor(sheet) {
     super(sheet, 'Replicate Sheet In External Spreadsheet');
+    this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
+    this.addResponseCapability(Event.onOvernightTimer);
+    this.addResponseCapability(Event.onSidebarSubmit);
   }
 
   execute() {
