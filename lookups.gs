@@ -14,7 +14,7 @@ const Event = {
   onGetActiveSheetID: 'onGetActiveSheetID'
 };
 
-const FeatureClasses = {
+const FeatureClass = {
   //calendar
   calendarEventsToSheet: CalendarEventsToSheet,
   //flexible
@@ -28,12 +28,16 @@ const FeatureClasses = {
   setHiddenValue:        SetHiddenValue
 };
 
-const priorities = {
+const PropertyOverride = {
+  IGNORE: 'ignore'
+};
+
+const Priority = {
   HIGH_PRIORITY: 'HIGH_PRIORITY',
   LOW_PRIORITY:  'LOW_PRIORITY'
 };
 
-const borderStyles = {
+const BorderStyle = {
   SOLID:        SpreadsheetApp.BorderStyle.SOLID,
   SOLID_MEDIUM: SpreadsheetApp.BorderStyle.SOLID_MEDIUM,
   SOLID_THICK:  SpreadsheetApp.BorderStyle.SOLID_THICK,

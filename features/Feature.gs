@@ -40,7 +40,7 @@ class Feature {
   }
 
   getPriority() {
-    if(!this.priority) this.priority = this.sheet.config.hasOwnProperty('priority') ? priorities[this.sheet.config.priority] : priorities.LOW_PRIORITY;
+    if(!this.priority) this.priority = this.sheet.config.hasOwnProperty('priority') ? priorities[this.sheet.config.priority] : Priority.LOW_PRIORITY;
     return this.priority;
   }
 

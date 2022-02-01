@@ -1,4 +1,4 @@
-const sectionMarkers = {
+const SectionMarker = {
   title:        'TITLE_MARKER',
   hiddenValues: 'HIDDEN_MARKER',
   headers:      'HEADER_MARKER',
@@ -7,7 +7,7 @@ const sectionMarkers = {
   generic:      'GENERIC_HEADER_MARKER'
 }
 
-const contentMarkers = {
+const ContentMarker = {
   MAIN_HEADER_MARKER:    'MAIN_FOOTER_MARKER',
   DONE_HEADER_MARKER:    'DONE_FOOTER_MARKER',
   GENERIC_HEADER_MARKER: 'GENERIC_FOOTER_MARKER'
@@ -99,28 +99,28 @@ class Sheet {
 
   getFirstMainRow() {
     if(!this.cache.firstMainRow) {
-      this.cache.firstMainRow = this.getFirstContentRow(sectionMarkers.main);
+      this.cache.firstMainRow = this.getFirstContentRow(SectionMarker.main);
     }
     return this.cache.firstMainRow;
   }
 
   getLastMainRow() {
     if(!this.cache.lastMainRow) {
-      this.cache.lastMainRow = this.getLastContentRow(sectionMarkers.main);
+      this.cache.lastMainRow = this.getLastContentRow(SectionMarker.main);
     }
     return this.cache.lastMainRow;
   }
 
   getFirstDoneRow() {
     if(!this.cache.firstDoneRow) {
-      this.cache.firstDoneRow = this.getFirstContentRow(sectionMarkers.done);
+      this.cache.firstDoneRow = this.getFirstContentRow(SectionMarker.done);
     }
     return this.cache.firstDoneRow;
   }
 
   getLastDoneRow() {
     if(!this.cache.lastDoneRow) {
-      this.cache.lastDoneRow = this.getLastContentRow(sectionMarkers.done);
+      this.cache.lastDoneRow = this.getLastContentRow(SectionMarker.done);
     }
     return this.cache.lastDoneRow;
   }
@@ -134,7 +134,7 @@ class Sheet {
   }
 
   getLastContentRow(marker) {
-    const endMarker = contentMarkers[marker];
+    const endMarker = ContentMarker[marker];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
       if(values[i][0] === marker) return i;
@@ -200,39 +200,39 @@ class Sheet {
   }
 
   getTitlesSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(sectionMarkers.title, rangeConfigs);
+    return this.getContentSectionsSubRanges(SectionMarker.title, rangeConfigs);
   }
 
   getHiddenValuesSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(sectionMarkers.hiddenValues, rangeConfigs);
+    return this.getContentSectionsSubRanges(SectionMarker.hiddenValues, rangeConfigs);
   }
 
   getHeaderSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(sectionMarkers.headers, rangeConfigs);
+    return this.getContentSectionsSubRanges(SectionMarker.headers, rangeConfigs);
   }
 
   getMainSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(sectionMarkers.main, rangeConfigs);
+    return this.getContentSectionsSubRanges(SectionMarker.main, rangeConfigs);
   }
 
   getDoneSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(sectionMarkers.done, rangeConfigs);
+    return this.getContentSectionsSubRanges(SectionMarker.done, rangeConfigs);
   }
 
   getGenericSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(sectionMarkers.generic, rangeConfigs);
+    return this.getContentSectionsSubRanges(SectionMarker.generic, rangeConfigs);
   }
 
   getUnderMainSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.main], rangeConfigs);
+    return this.getContentSectionsSubRanges(ContentMarker[SectionMarker.main], rangeConfigs);
   }
 
   getUnderDoneSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.done], rangeConfigs);
+    return this.getContentSectionsSubRanges(ContentMarker[SectionMarker.done], rangeConfigs);
   }
 
   getUnderGenericSectionsSubRanges(rangeConfigs=[{}]) {
-    return this.getContentSectionsSubRanges(contentMarkers[sectionMarkers.generic], rangeConfigs);
+    return this.getContentSectionsSubRanges(ContentMarker[SectionMarker.generic], rangeConfigs);
   }
 
 /* -------------------------------------------------------------------- */
@@ -290,7 +290,7 @@ class Sheet {
 
   getTitlesAboveBelowRanges() {
     if(!this.cache.titlesAboveBelowRanges) {
-      const lookups = this.getRangeLookups(sectionMarkers.title);
+      const lookups = this.getRangeLookups(SectionMarker.title);
       const column = this.getFirstContentColumn();
       const numColumns = this.getNumContentColumns();
       let ranges = [];
@@ -304,7 +304,7 @@ class Sheet {
   }
 
   getRangeLookups(marker) {
-    if(Object.keys(contentMarkers).includes(marker)) {
+    if(Object.keys(ContentMarker).includes(marker)) {
       return this.getContentRangeLookups(marker);
     } else {
       return this.getSingleRowRangeLookups(marker);
@@ -314,7 +314,7 @@ class Sheet {
   getMatchingRowsFromMainContent(findText, column) {
     const columnZeroIndex = column - 1;
     const values = this.getValues();
-    const endMarker = contentMarkers[sectionMarkers.main];
+    const endMarker = ContentMarker[SectionMarker.main];
     let indices = [];
     for(let i = this.getFirstMainRow() - 1; i < values.length; i++) {
       if(values[i][0] === endMarker) return indices;
@@ -334,7 +334,7 @@ class Sheet {
 
   getContentRangeLookups(marker) {
     let lookups = [], start = 0;
-    const endMarker = contentMarkers[marker];
+    const endMarker = ContentMarker[marker];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
       const val = values[i][0];

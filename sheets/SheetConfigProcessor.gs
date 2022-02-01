@@ -98,7 +98,7 @@ class SheetConfigProcessor {
       const propertyValue = config[propertyName];
       if(propertyName === 'feature' || propertyName === 'features') {
         Object.keys(propertyValue).forEach(featureName => {
-          pushIfNew(this.config.featureClasses, FeatureClasses[featureName]);
+          pushIfNew(this.config.featureClasses, FeatureClass[featureName]);
         });
       }
       if(isObject(propertyValue)) {

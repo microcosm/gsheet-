@@ -1,7 +1,3 @@
-const propertyOverrides = {
-  IGNORE: 'ignore'
-};
-
 class SetSheetStyles extends Feature {
   constructor(sheet) {
     super(sheet, 'Set Sheet Styles');
@@ -23,7 +19,7 @@ class SetSheetStyles extends Feature {
   }
 
   isValidProperty(styles, propertyName) {
-    return styles.hasOwnProperty(propertyName) && styles[propertyName] != propertyOverrides.IGNORE;
+    return styles.hasOwnProperty(propertyName) && styles[propertyName] != PropertyOverride.IGNORE;
   }
 
   setRangeStyle(range, styles) {
@@ -47,7 +43,7 @@ class SetSheetStyles extends Feature {
 
   setBorders(borders, range) {
     for(const border of borders) {
-      range.setBorder(border.top, border.left, border.bottom, border.right, border.vertical, border.horizontal, border.color, borderStyles[border.style]);
+      range.setBorder(border.top, border.left, border.bottom, border.right, border.vertical, border.horizontal, border.color, BorderStyle[border.style]);
     }
   }
 
