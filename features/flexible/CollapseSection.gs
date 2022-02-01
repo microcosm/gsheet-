@@ -9,8 +9,14 @@ class CollapseSection extends Feature {
 
   execute() {
     super.execute();
+    this.initialize();
     this.destroyAllExistingRowGroups();
     this.createNewRowGroup();
+  }
+
+  initialize() {
+    this.sheet.sheetRef.setRowGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
+    this.hasExclusion = !!(this.config.exclusion);
   }
 
   destroyAllExistingRowGroups() {
@@ -18,13 +24,19 @@ class CollapseSection extends Feature {
   }
 
   createNewRowGroup() {
-    this.sheet.sheetRef.setRowGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
     const sections = this.sheet.getContentSectionsSubRanges(this.config.section, [{
       beginRowOffset: this.config.numRowsToDisplay || 0
     }]);
+
     for(const section of sections) {
       const range = section[0];
-      range.shiftRowGroupDepth(1).collapseGroups();
+      range.shiftRowGroupDepth(1);
+      if(!this.getIsExcluded(range)) range.collapseGroups();
     }
+  }
+
+  getIsExcluded(range) {
+    if(!this.hasExclusion) return false;
+    return range.getValues()[this.config.exclusion.x][this.config.exclusion.y].includes(this.config.exclusion.text);
   }
 }
