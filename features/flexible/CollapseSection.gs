@@ -1,6 +1,6 @@
-class CollapseDoneSection extends Feature {
+class CollapseSection extends Feature {
   constructor(sheet) {
-    super(sheet, 'Collapse Done Section');
+    super(sheet, 'Collapse Section');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onSidebarSubmit);
@@ -19,10 +19,12 @@ class CollapseDoneSection extends Feature {
 
   createNewRowGroup() {
     this.sheet.sheetRef.setRowGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
-    const rangeConfig = [{
-      beginRowOffset: this.config.numRowsToDisplay
-    }];
-    const range = this.sheet.getDoneSectionsSubRanges(rangeConfig)[0][0]
-    range.shiftRowGroupDepth(1).collapseGroups();
+    const sections = this.sheet.getContentSectionsSubRanges(this.config.section, [{
+      beginRowOffset: this.config.numRowsToDisplay || 0
+    }]);
+    for(const section of sections) {
+      const range = section[0];
+      range.shiftRowGroupDepth(1).collapseGroups();
+    }
   }
 }
