@@ -51,7 +51,7 @@ function getProjectsSheet() {
   return {
     name: 'Projects',
     features: { //this feature copies a entire sheet to an external sheet whenever the it is edited
-      replicateSheetInExternalSpreadsheet: {
+      sheetToExternalSheet: {
         destinationSpreadsheetID: 'destination spreadsheet id',
         destinationSheetName: 'destination sheet name'
         //other config
@@ -88,7 +88,7 @@ function getTimelineSheet() {
   return {
     name: 'Timeline',
     features: { //this feature updates a sheet from a specified google calendar
-      updateSpreadsheetFromCalendar: {
+      CalendarEventsToSheet: {
         fromDate: 'March 29, 2021',
         dateColumn: 'C'
         //other config

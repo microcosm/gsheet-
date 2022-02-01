@@ -1,6 +1,6 @@
-class UpdateCalendarFromSpreadsheet extends Feature {
+class SheetEventsToCalendar extends Feature {
   constructor(sheet) {
-    super(sheet, 'Update Calendar From Spreadsheet');
+    super(sheet, 'Sheet Events To Calendar');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);

@@ -2,9 +2,9 @@ const propertyOverrides = {
   IGNORE: 'ignore'
 };
 
-class ResetSpreadsheetStyles extends Feature {
+class SetSheetStyles extends Feature {
   constructor(sheet) {
-    super(sheet, 'Reset Spreadsheet Styles');
+    super(sheet, 'Set Sheet Styles');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);

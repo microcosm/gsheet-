@@ -1,6 +1,6 @@
-class MoveMatchingRowsFromMainToDone extends Feature {
+class MoveFromMainToDone extends Feature {
   constructor(sheet) {
-    super(sheet, 'Move Matching Rows From Main To Done');
+    super(sheet, 'Move From Main To Done');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);

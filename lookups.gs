@@ -15,19 +15,17 @@ const Event = {
 };
 
 const FeatureClasses = {
-  //Calendar initiated
-  updateSpreadsheetFromCalendar:       UpdateSpreadsheetFromCalendar,
-
-  //Sheet initiated
-  replicateSheetInExternalSpreadsheet: ReplicateSheetInExternalSpreadsheet,
-  resetSpreadsheetStyles:              ResetSpreadsheetStyles,
-  updateCalendarFromSpreadsheet:       UpdateCalendarFromSpreadsheet,
-
-  //Sidebar initiated
-  collapseDoneSection:                 CollapseDoneSection,
-  moveMatchingRowsFromMainToDone:      MoveMatchingRowsFromMainToDone,
-  orderMainSection:                    OrderMainSection,
-  updateSheetHiddenValue:              UpdateSheetHiddenValue
+  //calendar
+  calendarEventsToSheet: CalendarEventsToSheet,
+  //flexible
+  collapseDoneSection:   CollapseDoneSection,
+  moveFromMainToDone:    MoveFromMainToDone,
+  setSheetStyles:        SetSheetStyles,
+  sheetEventsToCalendar: SheetEventsToCalendar,
+  sheetToExternalSheet:  SheetToExternalSheet,
+  //sidebar
+  orderMainSection:      OrderMainSection,
+  setHiddenValue:        SetHiddenValue
 };
 
 const priorities = {
