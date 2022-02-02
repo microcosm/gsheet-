@@ -30,6 +30,14 @@ function getHtmlSafeID(unsafe) {
   return unsafe.replaceAll(' ', '-').replaceAll(':', '-');
 }
 
+function getMondayThisWeek() {
+  var date = getTodaysDate();
+  date = setToMidnight(date);
+  var day = date.getDay();
+  var difference = date.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(date.setDate(difference));
+}
+
 function getTodaysDate() {
   var date = new Date();
   return setToMidnight(date);

@@ -18,6 +18,7 @@ const FeatureClass = {
   //calendar
   calendarEventsToSheet: CalendarEventsToSheet,
   //flexible
+  activateCell:          ActivateCell,
   collapseSection:       CollapseSection,
   moveFromMainToDone:    MoveFromMainToDone,
   setSheetStyles:        SetSheetStyles,
