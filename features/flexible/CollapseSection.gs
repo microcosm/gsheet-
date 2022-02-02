@@ -16,7 +16,7 @@ class CollapseSection extends Feature {
 
   initialize() {
     this.sheet.sheetRef.setRowGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
-    this.hasExclusion = !!(this.config.exclusion);
+    this.hasUncollapse = !!(this.config.uncollapse);
   }
 
   destroyAllExistingRowGroups() {
@@ -31,12 +31,17 @@ class CollapseSection extends Feature {
     for(const section of sections) {
       const range = section[0];
       range.shiftRowGroupDepth(1);
-      if(!this.getIsExcluded(range)) range.collapseGroups();
+      if(this.getIsUncollapsed(range)) {
+        range.expandGroups();
+      } else {
+        range.collapseGroups();
+      }
     }
   }
 
-  getIsExcluded(range) {
-    if(!this.hasExclusion) return false;
-    return range.getValues()[this.config.exclusion.x][this.config.exclusion.y].includes(this.config.exclusion.text);
+  getIsUncollapsed(range) {
+    if(!this.hasUncollapse) return false;
+    const uncollapseValueCheckCell = range.getValues()[this.config.uncollapse.x][this.config.uncollapse.y];
+    return uncollapseValueCheckCell.includes(this.config.uncollapse.text);
   }
 }
