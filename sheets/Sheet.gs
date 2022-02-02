@@ -259,7 +259,7 @@ class Sheet {
   getMatchingGenericSectionRanges(rangeConfigs) {
     let ranges = [];
     for(const rangeConfig of rangeConfigs) {
-      const rows = this.getMatchingRowsFromContentSection(rangeConfig.matcher.value, rangeConfig.matcher.column.cardinalIndex, SectionMarker.generic);
+      const rows = this.getMatchingRowsFromContentSection(rangeConfig.match.value, rangeConfig.match.column.cardinalIndex, SectionMarker.generic);
       for(const row of rows) {
         rangeConfig.row = row;
         ranges.push(this.getContentSectionRange(rangeConfig));
