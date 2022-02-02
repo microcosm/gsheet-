@@ -28,8 +28,9 @@ const FeatureClass = {
   setHiddenValue:        SetHiddenValue
 };
 
-const PropertyOverride = {
-  IGNORE: 'ignore'
+const PropertyCommand = {
+  IGNORE: 'ignore',
+  MATCH:  'match'
 };
 
 const Priority = {

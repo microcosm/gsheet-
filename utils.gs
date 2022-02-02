@@ -26,8 +26,26 @@ function isValidTimeString(candidate) {
   return typeof candidate == 'string' && candidate.includes(':');
 }
 
+function isMatch(candidate, matcher) {
+  if(isDate(matcher)) {
+    return isDate(candidate) && candidate.getTime() === matcher.getTime();
+  }
+  if(isString(matcher)) {
+    return candidate.includes(matcher);
+  }
+  return candidate === matcher;
+}
+
 function getHtmlSafeID(unsafe) {
   return unsafe.replaceAll(' ', '-').replaceAll(':', '-');
+}
+
+function getMondayThisWeek() {
+  var date = getTodaysDate();
+  date = setToMidnight(date);
+  var day = date.getDay();
+  var difference = date.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(date.setDate(difference));
 }
 
 function getTodaysDate() {

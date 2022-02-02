@@ -20,7 +20,7 @@ class MoveFromMainToDone extends Feature {
 
   findTextMatchingRowsInMainSection() {
     for(const matcher of this.matchText) {
-      const matchingRows = this.sheet.getMatchingRowsFromMainContent(matcher, this.matchColumn);
+      const matchingRows = this.sheet.getMatchingRowsFromContentSection(matcher, this.matchColumn, SectionMarker.main);
       this.foundRows = this.foundRows.concat(matchingRows);
     }
   }

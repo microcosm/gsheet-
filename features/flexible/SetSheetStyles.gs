@@ -19,7 +19,7 @@ class SetSheetStyles extends Feature {
   }
 
   isValidProperty(styles, propertyName) {
-    return styles.hasOwnProperty(propertyName) && styles[propertyName] != PropertyOverride.IGNORE;
+    return styles.hasOwnProperty(propertyName) && styles[propertyName] != PropertyCommand.IGNORE;
   }
 
   setRangeStyle(range, styles) {
@@ -60,7 +60,8 @@ class SetSheetStyles extends Feature {
       underDone:        { styles:this.styles.underContents,    rangeGetter:'getUnderDoneSectionsSubRanges'    },
       underGeneric:     { styles:this.styles.underContents,    rangeGetter:'getUnderGenericSectionsSubRanges' },
       rowsOutside:      { styles:this.styles.rowsOutside,      rangeGetter:'getOutsideRowsRanges'             },
-      columnsOutside:   { styles:this.styles.columnsOutside,   rangeGetter:'getOutsideColumnsRanges'          }
+      columnsOutside:   { styles:this.styles.columnsOutside,   rangeGetter:'getOutsideColumnsRanges'          },
+      matchers:         { styles:this.styles.matchers,         rangeGetter:'getMatchingGenericSectionRanges'  }
     };
   }
 }
