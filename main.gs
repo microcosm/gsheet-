@@ -4,6 +4,7 @@ function onSpreadsheetOpen() {
   const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.onSpreadsheetOpen();
+  executeFeaturesForEvent(Event.onSpreadsheetOpen);
   endEventResponse();
 }
 
@@ -37,6 +38,7 @@ function onSelectionChange() {
   const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.onSelectionChange();
+  executeFeaturesForEvent(Event.onSelectionChange);
   endEventResponse();
 }
 

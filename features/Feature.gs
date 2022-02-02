@@ -6,7 +6,9 @@ class Feature {
     this.priority = false;
     this.responseCapabilities = [];
     this.methods = {
+      onSpreadsheetOpen: { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
       onSpreadsheetEdit: { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
+      onSelectionChange: { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
       onCalendarEdit:    { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
       onOvernightTimer:  { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
       onSidebarSubmit:   { configValidator: 'isValidSidebarSheetConfig',  eventDataValidator: 'isValidSidebarEventData' }
