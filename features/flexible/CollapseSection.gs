@@ -3,6 +3,7 @@ class CollapseSection extends Feature {
     super(sheet, 'Collapse Section');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onOvernightTimer);
+    this.addResponseCapability(Event.onHourTimer);
     this.addResponseCapability(Event.onSidebarSubmit);
     this.numRowGroupDepthsToDestroy = 3;
   }

@@ -4,6 +4,7 @@ class SetSheetStyles extends Feature {
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);
+    this.addResponseCapability(Event.onHourTimer);
     this.addResponseCapability(Event.onSidebarSubmit);
   }
 

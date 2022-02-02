@@ -32,6 +32,14 @@ function onOvernightTimer() {
   endEventResponse();
 }
 
+function onHourTimer() {
+  startEventResponse(Event.onHourTimer);
+  const stateBuilder = new StateBuilder(SpreadsheetSource.openById);
+  stateBuilder.buildSheetState().buildUsersState();
+  executeFeaturesForEvent(Event.onHourTimer);
+  endEventResponse();
+}
+
 /* Simple Triggers */
 function onSelectionChange() {
   startEventResponse(Event.onSelectionChange);

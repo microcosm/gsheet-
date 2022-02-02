@@ -8,6 +8,7 @@ const Event = {
   onSpreadsheetEdit:  'onSpreadsheetEdit',
   onCalendarEdit:     'onCalendarEdit',
   onOvernightTimer:   'onOvernightTimer',
+  onHourTimer:        'onHourTimer',
   onSelectionChange:  'onSelectionChange',
   onShowSidebar:      'onShowSidebar',
   onSidebarSubmit:    'onSidebarSubmit',
