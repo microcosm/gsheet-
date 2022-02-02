@@ -1,6 +1,6 @@
-class CollapseSection extends Feature {
+class CollapseSections extends Feature {
   constructor(sheet) {
-    super(sheet, 'Collapse Section');
+    super(sheet, 'Collapse Sections');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);
