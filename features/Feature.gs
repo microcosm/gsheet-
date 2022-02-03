@@ -11,6 +11,7 @@ class Feature {
       onSelectionChange: { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
       onCalendarEdit:    { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
       onOvernightTimer:  { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
+      onHourTimer:       { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
       onSidebarSubmit:   { configValidator: 'isValidSidebarSheetConfig',  eventDataValidator: 'isValidSidebarEventData' }
     };
   }
