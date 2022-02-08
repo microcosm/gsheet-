@@ -29,7 +29,7 @@ class StateBuilder {
       spreadsheet: {
         id: config.id,
         name: config.name,
-        ref: SpreadsheetSource.getActive ? SpreadsheetApp.getActiveSpreadsheet() : SpreadsheetApp.openById(config.id)
+        ref: spreadsheetSource === SpreadsheetSource.getActive ? SpreadsheetApp.getActiveSpreadsheet() : SpreadsheetApp.openById(config.id)
       }
     });
   }
