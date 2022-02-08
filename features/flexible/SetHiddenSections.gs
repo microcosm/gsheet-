@@ -5,7 +5,6 @@ class SetHiddenSections extends Feature {
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);
     this.addResponseCapability(Event.onSidebarSubmit);
-    this.configVisible = false;
   }
 
   execute() {
@@ -15,19 +14,18 @@ class SetHiddenSections extends Feature {
   }
 
   initialize() {
-    this.hasVisible = !!(this.config.visible);
+    this.hasVisibilityConfig = !!(this.config.visibleIfMatch);
     this.startRowOffset = this.config.startRowOffset || 0;
+    this.values = this.sheet.getValues();
   }
 
   hideAndShow() {
-    const sections = this.sheet.getContentSectionsSubRanges(this.config.section);
+    const sectionLookups = this.sheet.getSectionRangeLookups(this.config.section);
+    for(const sectionLookup of sectionLookups) {
+      const row = sectionLookup.row + this.startRowOffset;
+      const numRows = sectionLookup.numRows - this.startRowOffset;
 
-    for(const section of sections) {
-      const range = section[0];
-      const row = range.getRow() + this.startRowOffset;
-      const numRows = range.getNumRows() - this.startRowOffset;
-
-      if(this.getIsVisible(range)) {
+      if(this.getIsVisible(row)) {
         this.sheet.sheetRef.showRows(row, numRows);
       } else {
         this.sheet.sheetRef.hideRows(row, numRows);
@@ -35,21 +33,17 @@ class SetHiddenSections extends Feature {
     }
   }
 
-  getIsVisible(range) {
-    if(!this.hasVisible) return false;
-    const visible = this.getConfigVisible();
-    const cell = range.getValues()[visible.x][visible.y];
-    return cell.includes(visible.text);
+  getIsVisible(cardinalIndexRow) {
+    if(!this.hasVisibilityConfig) return false;
+    const visibilityMatcher = this.getVisibilityMatcher();
+    const cellValue = this.values[cardinalIndexRow - 1][visibilityMatcher.column.zeroBasedIndex].toString();
+    return cellValue.includes(visibilityMatcher.text);
   }
 
-  getConfigVisible() {
-    if(!this.configVisible) {
-      this.configVisible = {
-        x: this.config.visible.x,
-        y: this.config.visible.y,
-        text: this.config.visible.text === PropertyCommand.EVENT_DATA ? this.eventData.value : this.config.visible.text
-      };
-    }
-    return this.configVisible;
+  getVisibilityMatcher() {
+    return {
+      column: this.config.visibleIfMatch.column,
+      text: this.config.visibleIfMatch.text === PropertyCommand.EVENT_DATA ? this.eventData.value : this.config.visibleIfMatch.text
+    };
   }
 }
