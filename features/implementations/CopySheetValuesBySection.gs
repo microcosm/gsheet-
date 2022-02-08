@@ -1,6 +1,6 @@
-class CopyRowValues extends Feature {
+class CopySheetValuesBySection extends Feature {
   constructor(sheet) {
-    super(sheet, 'Copy Row Values');
+    super(sheet, 'Copy Sheet Values By Section');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);

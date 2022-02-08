@@ -1,6 +1,6 @@
-class SetSheetStyles extends Feature {
+class SetSheetStylesBySection extends Feature {
   constructor(sheet) {
-    super(sheet, 'Set Sheet Styles');
+    super(sheet, 'Set Sheet Styles By Section');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);

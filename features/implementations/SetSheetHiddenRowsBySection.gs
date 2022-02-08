@@ -1,6 +1,6 @@
-class SetHiddenSections extends Feature {
+class SetSheetHiddenRowsBySection extends Feature {
   constructor(sheet) {
-    super(sheet, 'Set Hidden Sections');
+    super(sheet, 'Set Sheet Hidden Rows By Section');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);

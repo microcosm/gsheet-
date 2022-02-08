@@ -1,6 +1,6 @@
-class SetSectionGroups extends Feature {
+class SetSheetGroupsBySection extends Feature {
   constructor(sheet) {
-    super(sheet, 'Set Section Groups');
+    super(sheet, 'Set Sheet Groups By Section');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);

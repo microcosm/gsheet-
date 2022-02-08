@@ -1,6 +1,6 @@
-class OrderMainSection extends Feature {
+class OrderSheetMainSection extends Feature {
   constructor(sheet) {
-    super(sheet, 'Order Main Section');
+    super(sheet, 'Order Sheet Main Section');
     this.addResponseCapability(Event.onSidebarSubmit);
     this.ascendingMarker = 'ascending';
   }

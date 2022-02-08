@@ -1,6 +1,6 @@
-class MoveRowsMainToDone extends Feature {
+class MoveSheetRowsMainToDone extends Feature {
   constructor(sheet) {
-    super(sheet, 'Move Rows Main To Done');
+    super(sheet, 'Move Sheet Rows Main To Done');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSpreadsheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);

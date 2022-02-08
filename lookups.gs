@@ -16,19 +16,16 @@ const Event = {
 };
 
 const FeatureClass = {
-  //calendar
-  copyEventsCalendarToSheet: CopyEventsCalendarToSheet,
-  //flexible
-  copyRowValues:             CopyRowValues,
+  copyCalendarEventsToSheet: CopyCalendarEventsToSheet,
   copySheetEventsToCalendar: CopySheetEventsToCalendar,
-  copySheetToExternalSheet:  CopySheetToExternalSheet,
-  moveRowsMainToDone:        MoveRowsMainToDone,
-  setHiddenSections:         SetHiddenSections,
-  setSectionGroups:          SetSectionGroups,
-  setSheetStyles:            SetSheetStyles,
-  //sidebar
-  orderMainSection:          OrderMainSection,
-  setHiddenValue:            SetHiddenValue
+  copySheetToExternalSpreadsheet: CopySheetToExternalSpreadsheet,
+  copySheetValuesBySection: CopySheetValuesBySection,
+  moveSheetRowsMainToDone: MoveSheetRowsMainToDone,
+  orderSheetMainSection: OrderSheetMainSection,
+  setSheetGroupsBySection: SetSheetGroupsBySection,
+  setSheetHiddenRowsBySection: SetSheetHiddenRowsBySection,
+  setSheetHiddenValue: SetSheetHiddenValue,
+  setSheetStylesBySection: SetSheetStylesBySection
 };
 
 const PropertyCommand = {

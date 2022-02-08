@@ -1,6 +1,6 @@
-class SetHiddenValue extends Feature {
+class SetSheetHiddenValue extends Feature {
   constructor(sheet) {
-    super(sheet, 'Set Hidden Value');
+    super(sheet, 'Set Sheet Hidden Value');
     this.addResponseCapability(Event.onSidebarSubmit);
   }
 
