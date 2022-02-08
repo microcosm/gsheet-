@@ -85,9 +85,16 @@ class Feature {
 
   isValidStandardEventData() {
     if(this.event === Event.onSpreadsheetEdit) {
+      let triggerColumnValidityStr = '';
+      let isValidColumn = true;
+      if(this.config.hasOwnProperty('triggerColumns')) {
+        isValidColumn = this.config.triggerColumns.cardinalIndices.includes(this.eventData.range.columnStart);
+        triggerColumnValidityStr = ` and triggering column is ` + this.eventData.range.columnStart;
+      }
       const sheetName = this.eventData.source.getActiveSheet().getName();
-      const isValid = this.sheet.isNamed(sheetName);
-      logStringVerbose(`isValidStandardEventData is ` + isValid + ` because feature is bound to sheet '` + sheetName + `'.`);
+      const isValidSheet = this.sheet.isNamed(sheetName);
+      const isValid = isValidSheet && isValidColumn;
+      logStringVerbose(`isValidStandardEventData is ` + isValid + ` because feature is bound to sheet '` + sheetName + `'` + triggerColumnValidityStr + `.`);
       return isValid;
     }
     logStringVerbose(`isValidStandardEventData is true because Event '` + this.event + `' requires no event data.`);
