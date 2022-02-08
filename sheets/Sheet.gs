@@ -335,7 +335,7 @@ class Sheet {
       return this.getContentSectionRangeLookups(marker);
     } else {
       return this.getSingleRowSectionRangeLookups(marker);
-``    }
+    }
   }
 
   getMatchingRowsFromContentSection(matcher, column, contentMarker) {
