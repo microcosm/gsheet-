@@ -27,6 +27,7 @@ class SetSheetHiddenRowsBySection extends Feature {
 
       if(this.getIsVisible(row)) {
         this.sheet.sheetRef.showRows(row, numRows);
+        this.sheet.sheetRef.setActiveSelection(this.config.visibleIfMatch.column.asConfig + row);
       } else {
         this.sheet.sheetRef.hideRows(row, numRows);
       }
