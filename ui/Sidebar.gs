@@ -131,14 +131,12 @@ class SidebarHtmlBuilder {
 <html>
   <head>
     <base target='_blank'>
-    <style>
-      .hidden {
-        display: none;
-      }
-    </style>
     <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'>
     <style type='text/css'>
+      .hidden {
+        display: none;
+      }
       .processing {
         pointer-events: none;
       }
@@ -150,6 +148,12 @@ class SidebarHtmlBuilder {
       }
       input[type="button"] {
         margin: 0 12px 12px 0;
+      }
+      table {
+        border: 1px solid #ebebeb;
+      }
+      td {
+        padding: 0;
       }
     </style>
     <script>
