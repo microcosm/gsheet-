@@ -268,6 +268,25 @@ class Sheet {
     return ranges;
   }
 
+  getMatchingRowsFromContentSection(matcher, column, contentMarker) {
+    const columnZeroIndex = column - 1;
+    const values = this.getValues();
+    let indices = [];
+
+    const firstContentRows = this.getFirstContentRows(contentMarker);
+    const lastContentRows = this.getLastContentRows(contentMarker);
+    if(firstContentRows.length !== lastContentRows.length) throw 'Content markers do not match.';
+
+    for(let i = 0; i < firstContentRows.length; i++) {
+      const firstContentRow = firstContentRows[i];
+      const lastContentRow = lastContentRows[i];
+      for(let j = firstContentRow - 1; j < lastContentRow; j++) {
+        if(isMatch(values[j][columnZeroIndex], matcher)) indices.push(j + 1);
+      }
+    }
+    return indices;
+  }
+
   getContentSectionRange(rangeConfig) {
     const beginColumnOffset = rangeConfig.beginColumnOffset || 0;
     const beginRowOffset = rangeConfig.beginRowOffset || 0;
@@ -336,25 +355,6 @@ class Sheet {
     } else {
       return this.getSingleRowSectionRangeLookups(marker);
     }
-  }
-
-  getMatchingRowsFromContentSection(matcher, column, contentMarker) {
-    const columnZeroIndex = column - 1;
-    const values = this.getValues();
-    let indices = [];
-
-    const firstContentRows = this.getFirstContentRows(contentMarker);
-    const lastContentRows = this.getLastContentRows(contentMarker);
-    if(firstContentRows.length !== lastContentRows.length) throw 'Content markers do not match.';
-
-    for(let i = 0; i < firstContentRows.length; i++) {
-      const firstContentRow = firstContentRows[i];
-      const lastContentRow = lastContentRows[i];
-      for(let j = firstContentRow - 1; j < lastContentRow; j++) {
-        if(isMatch(values[j][columnZeroIndex], matcher)) indices.push(j + 1);
-      }
-    }
-    return indices;
   }
 
   getSingleRowSectionRangeLookups(marker) {
