@@ -19,8 +19,8 @@ const FeatureClass = {
   //calendar
   calendarEventsToSheet: CalendarEventsToSheet,
   //flexible
-  collapseSections:      CollapseSections,
   moveFromMainToDone:    MoveFromMainToDone,
+  resetSectionGroups:    ResetSectionGroups,
   setSheetStyles:        SetSheetStyles,
   sheetEventsToCalendar: SheetEventsToCalendar,
   sheetToExternalSheet:  SheetToExternalSheet,
