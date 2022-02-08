@@ -5,6 +5,7 @@ class SetHiddenSections extends Feature {
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);
     this.addResponseCapability(Event.onSidebarSubmit);
+    this.configVisible = false;
   }
 
   execute() {
@@ -36,7 +37,19 @@ class SetHiddenSections extends Feature {
 
   getIsVisible(range) {
     if(!this.hasVisible) return false;
-    const cell = range.getValues()[this.config.visible.x][this.config.visible.y];
-    return cell.includes(this.config.visible.text);
+    const visible = this.getConfigVisible();
+    const cell = range.getValues()[visible.x][visible.y];
+    return cell.includes(visible.text);
+  }
+
+  getConfigVisible() {
+    if(!this.configVisible) {
+      this.configVisible = {
+        x: this.config.visible.x,
+        y: this.config.visible.y,
+        text: this.config.visible.text === PropertyCommand.EVENT_DATA ? this.eventData.value : this.config.visible.text
+      };
+    }
+    return this.configVisible;
   }
 }
