@@ -22,6 +22,7 @@ const FeatureClass = {
   copySheetEventsToCalendar: CopySheetEventsToCalendar,
   copySheetToExternalSheet:  CopySheetToExternalSheet,
   moveRowsMainToDone:        MoveRowsMainToDone,
+  setHiddenSections:         SetHiddenSections,
   setSectionGroups:          SetSectionGroups,
   setSheetStyles:            SetSheetStyles,
   //sidebar
