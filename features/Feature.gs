@@ -5,13 +5,9 @@ class Feature {
     this.camelCaseName = false;
     this.priority = false;
     this.responseCapabilities = [];
+    this.defaultEvent = 'defaultEvent';
     this.methods = {
-      onSpreadsheetOpen: { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
-      onSpreadsheetEdit: { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
-      onSelectionChange: { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
-      onCalendarEdit:    { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
-      onOvernightTimer:  { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
-      onHourTimer:       { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
+      defaultEvent:      { configValidator: 'isValidStandardSheetConfig', eventDataValidator: 'isValidStandardEventData'},
       onSidebarSubmit:   { configValidator: 'isValidSidebarSheetConfig',  eventDataValidator: 'isValidSidebarEventData' }
     };
   }
@@ -48,8 +44,9 @@ class Feature {
   }
 
   getResponseValidity() {
-    const configValidator = this.methods[this.event].configValidator;
-    const eventDataValidator = this.methods[this.event].eventDataValidator;
+    const key = this.event in this.methods ? this.event : this.defaultEvent;
+    const configValidator = this.methods[key].configValidator
+    const eventDataValidator = this.methods[key].eventDataValidator;
     this.hasValidSheetConfig = this[configValidator]();  if(!this.hasValidSheetConfig) return false;
     this.hasCapability = this.hasResponseCapability();   if(!this.hasCapability)       return false;
     this.hasRequest = this.hasResponseRequest();         if(!this.hasRequest)          return false;
