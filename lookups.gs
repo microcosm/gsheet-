@@ -19,6 +19,7 @@ const FeatureClass = {
   //calendar
   copyEventsCalendarToSheet: CopyEventsCalendarToSheet,
   //flexible
+  copyRowValues:             CopyRowValues,
   copySheetEventsToCalendar: CopySheetEventsToCalendar,
   copySheetToExternalSheet:  CopySheetToExternalSheet,
   moveRowsMainToDone:        MoveRowsMainToDone,
