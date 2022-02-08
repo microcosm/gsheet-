@@ -2,6 +2,7 @@ class CalendarEventsToSheet extends Feature {
   constructor(sheet) {
     super(sheet, 'Calendar Events To Sheet');
     this.addResponseCapability(Event.onCalendarEdit);
+    this.addResponseCapability(Event.onSpreadsheetEdit);
   }
 
   execute() {
