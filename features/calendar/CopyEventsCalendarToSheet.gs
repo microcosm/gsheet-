@@ -1,6 +1,6 @@
-class CalendarEventsToSheet extends Feature {
+class CopyEventsCalendarToSheet extends Feature {
   constructor(sheet) {
-    super(sheet, 'Calendar Events To Sheet');
+    super(sheet, 'Copy Events Calendar To Sheet');
     this.addResponseCapability(Event.onCalendarEdit);
     this.addResponseCapability(Event.onSpreadsheetEdit);
   }

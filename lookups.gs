@@ -17,16 +17,16 @@ const Event = {
 
 const FeatureClass = {
   //calendar
-  calendarEventsToSheet: CalendarEventsToSheet,
+  copyEventsCalendarToSheet: CopyEventsCalendarToSheet,
   //flexible
-  moveFromMainToDone:    MoveFromMainToDone,
-  resetSectionGroups:    ResetSectionGroups,
-  setSheetStyles:        SetSheetStyles,
-  sheetEventsToCalendar: SheetEventsToCalendar,
-  sheetToExternalSheet:  SheetToExternalSheet,
+  copySheetEventsToCalendar: CopySheetEventsToCalendar,
+  copySheetToExternalSheet:  CopySheetToExternalSheet,
+  moveRowsMainToDone:        MoveRowsMainToDone,
+  setSectionGroups:          SetSectionGroups,
+  setSheetStyles:            SetSheetStyles,
   //sidebar
-  orderMainSection:      OrderMainSection,
-  setHiddenValue:        SetHiddenValue
+  orderMainSection:          OrderMainSection,
+  setHiddenValue:            SetHiddenValue
 };
 
 const PropertyCommand = {

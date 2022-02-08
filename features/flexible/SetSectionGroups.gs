@@ -1,6 +1,6 @@
-class ResetSectionGroups extends Feature {
+class SetSectionGroups extends Feature {
   constructor(sheet) {
-    super(sheet, 'Reset Section Groups');
+    super(sheet, 'Set Section Groups');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);
