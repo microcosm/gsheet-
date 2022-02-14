@@ -418,29 +418,9 @@ class ValuesSheet extends Sheet {
 class FeatureSheet extends Sheet {
   constructor(config) {
     super(config);
-    this.ensureAccessExpectations();
   }
 
   isNamed(name) {
     return this.name === name;
-  }
-
-  ensureAccessExpectations() {
-    this.assignPropertiesFromConfig(['id']);
-  }
-
-  assignPropertiesFromConfig(propertyNames) {
-    propertyNames.forEach((propertyName) => {
-      this.assignPropertyFromConfig(propertyName);
-    });
-  }
-
-  assignPropertyFromConfig(propertyName) {
-    const propertyNameHasVersion = 'has' + capitalizeFirstLetter(propertyName);
-    this[propertyNameHasVersion] = false;
-    if(this.config.hasOwnProperty(propertyName)) {
-      this[propertyName] = this.config[propertyName];
-      this[propertyNameHasVersion] = true;
-    }
   }
 }

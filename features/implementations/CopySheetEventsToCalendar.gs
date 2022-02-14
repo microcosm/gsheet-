@@ -269,7 +269,7 @@ class EventsFromSheetStateBuilder {
     return 'This event is from the "' + this.currentWidgetName + '" widget' + nameStr +
       '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + state.spreadsheet.id +
       '/edit?usp=sharing' +
-      (this.sheet.hasId ? '#gid=' + this.sheet.id : '') +
+      (isProperty(this.config.sheetIdForUrl) ? '#gid=' + this.config.sheetIdForUrl : '') +
       '">' + state.spreadsheet.name + '</a>&nbsp;&larr; Click here for more';
   }
 }
