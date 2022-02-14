@@ -11,11 +11,11 @@ class CopySheetEventsToCalendar extends Feature {
   execute() {
     super.execute();
     this.eventsFromUserCalendarsStateBuilder = new EventsFromUserCalendarsStateBuilder(this);
-    this.eventsFromSpreadsheetStateBuilder = new EventsFromSheetStateBuilder(this);
+    this.eventsFromSheetStateBuilder = new EventsFromSheetStateBuilder(this);
     state.users.forEach((user) => {
       if(this.isValidUser(user)) {
         user.calendarEvents = this.eventsFromUserCalendarsStateBuilder.build(user);
-        user.spreadsheetEvents = this.eventsFromSpreadsheetStateBuilder.build(user);
+        user.sheetEvents = this.eventsFromSheetStateBuilder.build(user);
         this.updateCalendar(user);
       }
     });
@@ -29,7 +29,7 @@ class CopySheetEventsToCalendar extends Feature {
     logString(`Deleting...`);
     this.deleteUnmatchedCalendarEvents(user);
     logString(`Creating...`);
-    this.createUnmatchedSpreadsheetEvents(user);
+    this.createUnmatchedSheetEvents(user);
     endLogBlock();
   }
 
@@ -38,41 +38,41 @@ class CopySheetEventsToCalendar extends Feature {
   }
 
   discoverMatchingEvents(user) {
-    user.spreadsheetEvents.forEach((spreadsheetEvent) => {
-      var matchingCalendarEvent = this.findInCalendarEvents(spreadsheetEvent, user.calendarEvents);
+    user.sheetEvents.forEach((sheetEvent) => {
+      var matchingCalendarEvent = this.findInCalendarEvents(sheetEvent, user.calendarEvents);
       if(matchingCalendarEvent) {
-        matchingCalendarEvent.existsInSpreadsheet = true;
-        spreadsheetEvent.existsInCalendar = true;
+        matchingCalendarEvent.existsInSheet = true;
+        sheetEvent.existsInCalendar = true;
       }
-      logCalendarEventFound(spreadsheetEvent, matchingCalendarEvent);
+      logCalendarEventFound(sheetEvent, matchingCalendarEvent);
     });
   }
 
   deleteUnmatchedCalendarEvents(user) {
     user.calendarEvents.forEach((calendarEvent) => {
-      if(!calendarEvent.existsInSpreadsheet){
+      if(!calendarEvent.existsInSheet){
         this.deleteCalendarEvent(calendarEvent);
       }
     });
   }
 
-  createUnmatchedSpreadsheetEvents(user) {
-    user.spreadsheetEvents.forEach((spreadsheetEvent) => {
-      if(!spreadsheetEvent.existsInCalendar) {
-        this.createCalendarEvent(spreadsheetEvent, user.calendar);
+  createUnmatchedSheetEvents(user) {
+    user.sheetEvents.forEach((sheetEvent) => {
+      if(!sheetEvent.existsInCalendar) {
+        this.createCalendarEvent(sheetEvent, user.calendar);
       }
     });
   }
 
-  findInCalendarEvents(spreadsheetEvent, calendarEvents) {
+  findInCalendarEvents(sheetEvent, calendarEvents) {
     var match = false;
     calendarEvents.forEach((calendarEvent) => {
       var isEqual =
-        calendarEvent.title === spreadsheetEvent.title &&
-        calendarEvent.startDateTime.getTime() === spreadsheetEvent.startDateTime.getTime() &&
-        calendarEvent.isAllDay === spreadsheetEvent.isAllDay &&
-        (calendarEvent.isAllDay ? true : calendarEvent.endDateTime.getTime() === spreadsheetEvent.endDateTime.getTime()) &&
-        calendarEvent.options.location === spreadsheetEvent.options.location;
+        calendarEvent.title === sheetEvent.title &&
+        calendarEvent.startDateTime.getTime() === sheetEvent.startDateTime.getTime() &&
+        calendarEvent.isAllDay === sheetEvent.isAllDay &&
+        (calendarEvent.isAllDay ? true : calendarEvent.endDateTime.getTime() === sheetEvent.endDateTime.getTime()) &&
+        calendarEvent.options.location === sheetEvent.options.location;
       if(isEqual) {
         match = calendarEvent;
       }
@@ -87,12 +87,12 @@ class CopySheetEventsToCalendar extends Feature {
     }
   }
 
-  createCalendarEvent(spreadsheetEvent, calendar) {
-    logCalendarEventCreated(spreadsheetEvent);
+  createCalendarEvent(sheetEvent, calendar) {
+    logCalendarEventCreated(sheetEvent);
     if(state.toggles.performDataUpdates) {
-      spreadsheetEvent.isAllDay ?
-        calendar.createAllDayEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.options) :
-        calendar.createEvent(spreadsheetEvent.title, spreadsheetEvent.startDateTime, spreadsheetEvent.endDateTime, spreadsheetEvent.options);
+      sheetEvent.isAllDay ?
+        calendar.createAllDayEvent(sheetEvent.title, sheetEvent.startDateTime, sheetEvent.options) :
+        calendar.createEvent(sheetEvent.title, sheetEvent.startDateTime, sheetEvent.endDateTime, sheetEvent.options);
     }
   }
 }
@@ -111,7 +111,7 @@ class EventsFromUserCalendarsStateBuilder {
         startDateTime: e.getStartTime(),
         endDateTime: e.getEndTime(),
         isAllDay: e.isAllDayEvent(),
-        existsInSpreadsheet: false,
+        existsInSheet: false,
         options: {
           description: e.getDescription(),
           location: e.getLocation()
@@ -155,8 +155,8 @@ class EventsFromSheetStateBuilder {
       if(this.isWorkDateLabel(row[this.columns.workDate])) {
         this.currentWidgetName = sheetValues[i + this.widgetCategory.name.rowOffset][this.widgetCategory.name.column.zeroBasedIndex];
       } else if(this.isValidEvent(row)) {
-        var eventFromSpreadsheet = this.buildEventFromRow(row);
-        this.events.push(eventFromSpreadsheet);
+        var eventFromSheet = this.buildEventFromRow(row);
+        this.events.push(eventFromSheet);
       }
     }
   }
