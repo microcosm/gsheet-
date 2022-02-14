@@ -81,8 +81,12 @@ function toCamelCase(str) {
   }).replace(/\s+/g, '');
 }
 
-function toArray(val){
+function toArray(val) {
   return isArray(val) ? val : [val];
+}
+
+function toString(val) {
+  return isString(val) ? val : '';
 }
 
 function pushIfNew(array, item) {
