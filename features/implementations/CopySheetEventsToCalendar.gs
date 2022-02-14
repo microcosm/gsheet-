@@ -20,8 +20,11 @@ class CopySheetEventsToCalendar extends Feature {
   }
 
   updateCalendar(user) {
+    logString(`Discovery for user '` + user.name + `'`);
     this.discoverMatchingEvents(user);
+    logString(`Deletions for user '` + user.name + `'`);
     this.deleteUnmatchedCalendarEvents(user);
+    logString(`Creations for user '` + user.name + `'`);
     this.createUnmatchedSpreadsheetEvents(user);
   }
 
@@ -115,11 +118,11 @@ class EventsFromSheetStateBuilder {
     this.workDateLabel = this.config.workDateLabel;
     this.workDateLabelLength = this.config.workDateLabel.length;
     this.currentWidgetName = '';
-    this.events = [];
     this.fillInTheBlanksDate = state.today;
   }
 
   build(user) {
+    this.events = [];
     this.user = user;
     this.exclusionListNames = this.getOtherUsersNames(user);
     for(var widgetCategory in this.config.widgetCategories) {
