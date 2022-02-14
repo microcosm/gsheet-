@@ -10,7 +10,7 @@ class CopySheetEventsToCalendar extends Feature {
 
   execute() {
     super.execute();
-    this.eventsFromUserCalendarsStateBuilder = new EventsFromUserCalendarsStateBuilder();
+    this.eventsFromUserCalendarsStateBuilder = new EventsFromUserCalendarsStateBuilder(this);
     this.eventsFromSpreadsheetStateBuilder = new EventsFromSheetStateBuilder(this);
     state.users.forEach((user) => {
       if(this.isValidUser(user)) {
@@ -98,22 +98,26 @@ class CopySheetEventsToCalendar extends Feature {
 }
 
 class EventsFromUserCalendarsStateBuilder {
+  constructor(feature) {
+    this.sheet = feature.sheet;
+  }
+
   build(user, fromDate=new Date('January 1, 2000'), toDate=new Date('January 1, 3000')) {
     const googleCalendarEvents = user.calendar.getEvents(fromDate, toDate);
     var calendarEvents = [];
-    googleCalendarEvents.forEach((googleCalendarEvent) => {
+    googleCalendarEvents.filter(e => e.getLocation().startsWith(this.sheet.name)).forEach((e) => {
       calendarEvents.push({
-        title: googleCalendarEvent.getTitle(),
-        startDateTime: googleCalendarEvent.getStartTime(),
-        endDateTime: googleCalendarEvent.getEndTime(),
-        isAllDay: googleCalendarEvent.isAllDayEvent(),
+        title: e.getTitle(),
+        startDateTime: e.getStartTime(),
+        endDateTime: e.getEndTime(),
+        isAllDay: e.isAllDayEvent(),
         existsInSpreadsheet: false,
         options: {
-          description: googleCalendarEvent.getDescription(),
-          location: googleCalendarEvent.getLocation()
+          description: e.getDescription(),
+          location: e.getLocation()
         },
-        gcal: googleCalendarEvent,
-        gcalId: googleCalendarEvent.getId()
+        gcal: e,
+        gcalId: e.getId()
       });
     });
     return calendarEvents;
@@ -211,7 +215,7 @@ class EventsFromSheetStateBuilder {
       isAllDay: isAllDay,
       options: {
         description: this.generateDescription(row),
-        location: this.currentWidgetName,
+        location: this.sheet.name + '.' + this.currentWidgetName,
         guests: this.user.inviteEmail
       },
       isAlreadyInCalendar: false
