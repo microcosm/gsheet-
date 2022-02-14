@@ -166,15 +166,13 @@ class EventsFromSheetStateBuilder {
   }
 
   isValidEvent(row) {
-    var check = {
-      isNounColValidString:     typeof row[this.columns.noun] == 'string' && row[this.columns.noun].length > 0,
-      isVerbColValidString:     typeof row[this.columns.verb] == 'string' && row[this.columns.verb].length > 0,
-      isValidDate:              this.widgetCategory.allowFillInTheBlanksDates || row[this.columns.workDate] instanceof Date,
-      isValidUser:              !this.exclusionListNames.includes(row[this.columns.name]),
-      isValidWidget:            typeof this.config.widgetValidator === "undefined" || this.config.widgetValidator.method(this.currentWidgetName, this.sheet, this.config.widgetValidator.data),
-      isValidEventData:         typeof this.config.eventValidator === "undefined" || this.config.eventValidator.method(row, this.config.eventValidator.data, this.widgetCategory.columns, this.widgetCategoryName)
-    };
-    return Object.values(check).every(is => is === true);
+    if(isProperty(this.config.widgetValidator) && !this.config.widgetValidator.method(this.currentWidgetName, this.sheet, this.config.widgetValidator.data)) return false;
+    if(!isString(row[this.columns.noun])) return false;
+    if(!isString(row[this.columns.verb])) return false;
+    if(!this.widgetCategory.allowFillInTheBlanksDates && !isDate(row[this.columns.workDate])) return false;
+    if(this.exclusionListNames.includes(row[this.columns.name])) return false;
+    if(isProperty(this.config.eventValidator) && !this.config.eventValidator.method(row, this.config.eventValidator.data, this.widgetCategory.columns, this.widgetCategoryName)) return false;
+    return true;
   }
 
   buildEventFromRow(row) {
