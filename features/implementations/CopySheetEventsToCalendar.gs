@@ -134,8 +134,9 @@ class EventsFromSheetStateBuilder {
     this.events = [];
     this.user = user;
     this.exclusionListNames = this.getOtherUsersNames(user);
-    for(var widgetCategory in this.config.widgetCategories) {
-      this.widgetCategory = this.config.widgetCategories[widgetCategory];
+    for(var widgetCategoryKey in this.config.widgetCategories) {
+      this.widgetCategoryName = widgetCategoryKey;
+      this.widgetCategory = this.config.widgetCategories[widgetCategoryKey];
       this.columns = this.widgetCategory.columns.zeroBasedIndices;
       this.buildEventsFromWidgetCategory();
     }
@@ -167,7 +168,7 @@ class EventsFromSheetStateBuilder {
       isValidDate:              this.widgetCategory.allowFillInTheBlanksDates || row[this.columns.workDate] instanceof Date,
       isValidUser:              !this.exclusionListNames.includes(row[this.columns.name]),
       isValidWidget:            typeof this.config.widgetValidator === "undefined" || this.config.widgetValidator.method(this.currentWidgetName, this.sheet, this.config.widgetValidator.data),
-      isValidEventData:         typeof isValidEventData === "undefined" || isValidEventData(row, this.widgetCategory.columns)
+      isValidEventData:         typeof this.config.eventValidator === "undefined" || this.config.eventValidator.method(row, this.config.eventValidator.data, this.widgetCategory.columns, this.widgetCategoryName)
     };
     return Object.values(check).every(is => is === true);
   }
