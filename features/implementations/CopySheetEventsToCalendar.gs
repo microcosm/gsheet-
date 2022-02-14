@@ -131,7 +131,6 @@ class EventsFromSheetStateBuilder {
     this.workDateLabel = this.config.workDateLabel;
     this.workDateLabelLength = this.config.workDateLabel.length;
     this.currentWidgetName = '';
-    this.fillInTheBlanksDate = state.today;
   }
 
   build(user) {
@@ -169,7 +168,6 @@ class EventsFromSheetStateBuilder {
     if(isProperty(this.config.widgetValidator) && !this.config.widgetValidator.method(this.currentWidgetName, this.sheet, this.config.widgetValidator.data)) return false;
     if(!isString(row[this.columns.noun])) return false;
     if(!isString(row[this.columns.verb])) return false;
-    if(!this.widgetCategory.allowFillInTheBlanksDates && !isDate(row[this.columns.workDate])) return false;
     if(this.exclusionListNames.includes(row[this.columns.name])) return false;
     if(isProperty(this.config.eventValidator) && !this.config.eventValidator.method(row, this.config.eventValidator.data, this.widgetCategory.columns, this.widgetCategoryName)) return false;
     return true;
@@ -178,9 +176,9 @@ class EventsFromSheetStateBuilder {
   buildEventFromRow(row) {
     var startDateTime, endDateTime, isAllDay;
 
-    if(this.isFillInTheBlanks(row, this.widgetCategory)) {
+    if(!isDate(row[this.columns.workDate])) {
       isAllDay = true;
-      startDateTime = new Date(this.fillInTheBlanksDate);
+      startDateTime = new Date(state.today);
       endDateTime = null;
     } else {
       const startTime = row[this.columns.startTime];
@@ -234,10 +232,6 @@ class EventsFromSheetStateBuilder {
 
   getStartTimeMinutes(startTime) {
     return isValidTimeString(startTime) ? startTime.split(':')[1] : false;
-  }
-
-  isFillInTheBlanks(row, widgetCategory) {
-    return widgetCategory.allowFillInTheBlanksDates && (!(row[this.columns.workDate] instanceof Date));
   }
 
   getPulledForward(dateTime) {
