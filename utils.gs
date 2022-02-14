@@ -110,3 +110,7 @@ function isString(value) {
 function isDate(value) {
   return !!(value && value instanceof Date);
 }
+
+function isProperty(value) {
+  return typeof value !== 'undefined';
+}

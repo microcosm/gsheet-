@@ -114,7 +114,7 @@ class EventsFromSheetStateBuilder {
     this.config = feature.config;
     this.workDateLabel = this.config.workDateLabel;
     this.workDateLabelLength = this.config.workDateLabel.length;
-    this.currentWidget = '';
+    this.currentWidgetName = '';
     this.events = [];
     this.fillInTheBlanksDate = state.today;
   }
@@ -136,7 +136,7 @@ class EventsFromSheetStateBuilder {
       const row = sheetValues[i];
 
       if(this.isWorkDateLabel(row[this.columns.workDate])) {
-        this.currentWidget = sheetValues[i + this.widgetCategory.name.rowOffset][this.widgetCategory.name.column.zeroBasedIndex];
+        this.currentWidgetName = sheetValues[i + this.widgetCategory.name.rowOffset][this.widgetCategory.name.column.zeroBasedIndex];
       } else if(this.isValidEvent(row)) {
         var eventFromSpreadsheet = this.buildEventFromRow(row);
         this.events.push(eventFromSpreadsheet);
@@ -149,16 +149,15 @@ class EventsFromSheetStateBuilder {
   }
 
   isValidEvent(row) {
-    var validity = {
-      isScriptResponsiveWidget: this.config.scriptResponsiveWidgetNames.includes(this.currentWidget),
-      isNotDoneOrWaiting:       !this.getIsDoneOrWaiting(this.widgetCategory, row),
+    var check = {
       isNounColValidString:     typeof row[this.columns.noun] == 'string' && row[this.columns.noun].length > 0,
       isVerbColValidString:     typeof row[this.columns.verb] == 'string' && row[this.columns.verb].length > 0,
       isValidDate:              this.widgetCategory.allowFillInTheBlanksDates || row[this.columns.workDate] instanceof Date,
       isValidUser:              !this.exclusionListNames.includes(row[this.columns.name]),
-      isCustomValidated:        typeof isValidEventData === "undefined" || isValidEventData(row, this.widgetCategory.columns)
+      isValidWidget:            typeof this.config.widgetValidator === "undefined" || this.config.widgetValidator.method(this.currentWidgetName, this.sheet, this.config.widgetValidator.data),
+      isValidEventData:         typeof isValidEventData === "undefined" || isValidEventData(row, this.widgetCategory.columns)
     };
-    return Object.values(validity).every(check => check === true);
+    return Object.values(check).every(is => is === true);
   }
 
   buildEventFromRow(row) {
@@ -199,7 +198,7 @@ class EventsFromSheetStateBuilder {
       isAllDay: isAllDay,
       options: {
         description: this.generateDescription(row),
-        location: this.currentWidget,
+        location: this.currentWidgetName,
         guests: this.user.inviteEmail
       },
       isAlreadyInCalendar: false
@@ -237,13 +236,6 @@ class EventsFromSheetStateBuilder {
     return dateTime;
   }
 
-  getIsDoneOrWaiting(widgetCategory, row) {
-    if(widgetCategory.hasDoneCol) {
-      return row[this.columns.done] === 'Yes' || row[this.columns.done] === 'Waiting';
-    }
-    return false;
-  }
-
   getOtherUsersNames(user) {
     var otherNames = [];
     state.users.forEach((possibleOther) => {
@@ -255,11 +247,9 @@ class EventsFromSheetStateBuilder {
   }
 
   generateDescription(row) {
-    var name = row[this.columns.name];
-    name = typeof customNameSubstitution === "undefined" ? name : customNameSubstitution(name);
+    var nameStr = this.columns.name === undefined ? '' : ' for ' + row[this.columns.name];
 
-    return 'This event is from the "' + this.currentWidget +
-      '" widget' + (name ? ' for ' + name : '') +
+    return 'This event is from the "' + this.currentWidgetName + '" widget' + nameStr +
       '.\n\nCreated by <a href="https://docs.google.com/spreadsheets/d/' + state.spreadsheet.id +
       '/edit?usp=sharing' +
       (this.sheet.hasId ? '#gid=' + this.sheet.id : '') +
