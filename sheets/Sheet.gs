@@ -51,6 +51,11 @@ class Sheet {
     this.cache = this.initializeCache();
   }
 
+  getValue(row, column) {
+    const values = this.getValues();
+    return values[row - 1][column - 1];
+  }
+
   getValues() {
     if(!this.cache.values) {
       this.cache.values = this.getSheetRange().getValues();
