@@ -13,9 +13,11 @@ class CopySheetEventsToCalendar extends Feature {
     this.eventsFromUserCalendarsStateBuilder = new EventsFromUserCalendarsStateBuilder();
     this.eventsFromSpreadsheetStateBuilder = new EventsFromSheetStateBuilder(this);
     state.users.forEach((user) => {
-      user.calendarEvents = this.eventsFromUserCalendarsStateBuilder.build(user);
-      user.spreadsheetEvents = this.eventsFromSpreadsheetStateBuilder.build(user);
-      this.updateCalendar(user);
+      if(this.isValidUser(user)) {
+        user.calendarEvents = this.eventsFromUserCalendarsStateBuilder.build(user);
+        user.spreadsheetEvents = this.eventsFromSpreadsheetStateBuilder.build(user);
+        this.updateCalendar(user);
+      }
     });
   }
 
@@ -29,6 +31,10 @@ class CopySheetEventsToCalendar extends Feature {
     logString(`Creating...`);
     this.createUnmatchedSpreadsheetEvents(user);
     endLogBlock();
+  }
+
+  isValidUser(user) {
+    return !isProperty(this.config.username) || user.name === this.config.username;
   }
 
   discoverMatchingEvents(user) {
