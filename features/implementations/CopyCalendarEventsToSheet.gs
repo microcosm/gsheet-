@@ -56,6 +56,7 @@ class CopyCalendarEventsToSheet extends Feature {
     this.eventValuesForUpdate = this.eventRangeForUpdate.getValues();
     this.dateValuesForReference = sheet.sheetRef.getRange(beginRow, dateColumn, numRows, 1).getValues();
     this.eventFiltersForReference = sheet.sheetRef.getRange(filterRow, eventColumn, 1, 1).getValue().split('\n');
+    this.eventFiltersForReference = this.eventFiltersForReference.map((str) => { return str.toLowerCase(); });
   }
 
   findCalendarEventsThisWeek(weekCommenceDate) {
@@ -70,9 +71,10 @@ class CopyCalendarEventsToSheet extends Feature {
 
   isValidCalendarEventForWeek(calendarEvent, weekCommenceDate) {
     const weekConcludeDate = weekCommenceDate.addDays(7);
+    const title = calendarEvent.title.toLowerCase();
     return calendarEvent.startDateTime >= weekCommenceDate &&
            calendarEvent.startDateTime < weekConcludeDate &&
-           !this.eventFiltersForReference.includes(calendarEvent.title);
+           this.eventFiltersForReference.find(filter => title.includes(filter)) === undefined;
   }
 
   formatCalendarEventsForCell(calendarEventsForCell) {
