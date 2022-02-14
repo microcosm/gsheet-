@@ -20,12 +20,15 @@ class CopySheetEventsToCalendar extends Feature {
   }
 
   updateCalendar(user) {
-    logString(`Discovery for user '` + user.name + `'`);
+    logString(`Calendar update for user '` + user.name + `'`);
+    startLogBlock();
+    logString(`Discovering...`);
     this.discoverMatchingEvents(user);
-    logString(`Deletions for user '` + user.name + `'`);
+    logString(`Deleting...`);
     this.deleteUnmatchedCalendarEvents(user);
-    logString(`Creations for user '` + user.name + `'`);
+    logString(`Creating...`);
     this.createUnmatchedSpreadsheetEvents(user);
+    endLogBlock();
   }
 
   discoverMatchingEvents(user) {

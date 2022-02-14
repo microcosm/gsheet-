@@ -100,9 +100,9 @@ function logLockReleased() {
 
 function logCalendarEventFound(event, hasMatch) {
   if(state.toggles.verboseLogging) {
-    state.log += (hasMatch ? '' : '* ') + buildCalendarEventLogStr(event);
+    state.log += (hasMatch ? '    Found: ' : '    NEW:   ') + buildCalendarEventLogStr(event);
   } else if(!hasMatch) {
-    state.log += '* ' + buildCalendarEventLogStr(event);
+    state.log += '    NEW: ' + buildCalendarEventLogStr(event);
   }
 }
 
@@ -117,9 +117,9 @@ function buildCalendarEventLogStr(event) {
 }
 
 function logCalendarEventDeleted(event) {
-  state.log += `Deleting ` + removeNewlines(event.title) + `\n`;
+  state.log += `    Deleting: ` + removeNewlines(event.title) + `\n`;
 }
 
 function logCalendarEventCreated(event) {
-  state.log += `Creating ` + removeNewlines(event.title) + `\n`;
+  state.log += `    Creating: ` + removeNewlines(event.title) + `\n`;
 }
