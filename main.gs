@@ -8,11 +8,11 @@ function onSpreadsheetOpen() {
   endEventResponse();
 }
 
-function onSpreadsheetEdit(eventData) {
-  startEventResponse(Event.onSpreadsheetEdit);
+function onSheetEdit(eventData) {
+  startEventResponse(Event.onSheetEdit);
   const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUsersState();
-  executeFeaturesForEvent(Event.onSpreadsheetEdit, eventData);
+  executeFeaturesForEvent(Event.onSheetEdit, eventData);
   endEventResponse();
 }
 

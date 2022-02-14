@@ -81,7 +81,7 @@ class Feature {
   }
 
   isValidStandardEventData() {
-    if(this.event === Event.onSpreadsheetEdit) {
+    if(this.event === Event.onSheetEdit) {
       let triggerColumnValidityStr = '';
       let isValidColumn = true;
       if(this.config.hasOwnProperty('triggerColumns')) {

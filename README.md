@@ -113,7 +113,7 @@ State is built in chunks, with only the relevant state built by each event handl
 
 Features are bound 1:1 to sheets, meaning there are often two or more instances of the same feature with each interacting with different sheets. Each feature registers itself as capable of responding to a subset of events for which they make sense. For example:
 
-- The `ReplicateSheetInExternalSpreadsheet` feature syncs changes from a source sheet to a target sheet -- therefore it is capable of responding to `onSpreadsheetEdit`
+- The `ReplicateSheetInExternalSpreadsheet` feature syncs changes from a source sheet to a target sheet -- therefore it is capable of responding to `onSheetEdit`
 - The `UpdateSheetHiddenValue` feature updates a hidden cell, typically triggering a UI change, typically requiring a human input -- therefore it is capable of responding to `onSidebarSubmit`
 
 Event handlers methods in `main.gs` compile a list of "registered" features based on these capabilities, and send event data to each of them to assess whether they should be marked for execution.

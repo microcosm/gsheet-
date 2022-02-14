@@ -5,7 +5,7 @@ const SpreadsheetSource = {
 
 const Event = {
   onSpreadsheetOpen:  'onSpreadsheetOpen',
-  onSpreadsheetEdit:  'onSpreadsheetEdit',
+  onSheetEdit:        'onSheetEdit',
   onCalendarEdit:     'onCalendarEdit',
   onOvernightTimer:   'onOvernightTimer',
   onHourTimer:        'onHourTimer',

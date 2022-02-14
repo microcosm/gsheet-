@@ -2,7 +2,7 @@ class CopySheetToExternalSpreadsheet extends Feature {
   constructor(sheet) {
     super(sheet, 'Copy Sheet To External Spreadsheet');
     this.addResponseCapability(Event.onSpreadsheetOpen);
-    this.addResponseCapability(Event.onSpreadsheetEdit);
+    this.addResponseCapability(Event.onSheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);
     this.addResponseCapability(Event.onSidebarSubmit);

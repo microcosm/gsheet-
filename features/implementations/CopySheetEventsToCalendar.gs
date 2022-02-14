@@ -2,7 +2,7 @@ class CopySheetEventsToCalendar extends Feature {
   constructor(sheet) {
     super(sheet, 'Copy Sheet Events To Calendar');
     this.addResponseCapability(Event.onSpreadsheetOpen);
-    this.addResponseCapability(Event.onSpreadsheetEdit);
+    this.addResponseCapability(Event.onSheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);
     this.addResponseCapability(Event.onSidebarSubmit);
