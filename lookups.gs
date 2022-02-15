@@ -30,8 +30,9 @@ const FeatureClass = {
 
 const PropertyCommand = {
   IGNORE: 'ignore',
-  MATCH:  'match',
-  EVENT_DATA: 'event_data'
+  MATCH: 'match',
+  EVENT_DATA: 'event_data',
+  CURRENT_DATE: 'current_date'
 };
 
 const Priority = {
