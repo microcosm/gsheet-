@@ -7,7 +7,7 @@ class SetSheetHiddenValue extends Feature {
   execute() {
     super.execute();
     const column = this.config.update.column.cardinalIndex;
-    const row = this.sheet.config.hiddenValueRow.cardinalIndex;
+    const row = this.sheet.getHiddenValuesRow();
     const range = this.sheet.sheetRef.getRange(row, column, 1, 1);
     const value = this.getValue();
     if(value) {

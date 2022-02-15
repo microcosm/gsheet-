@@ -31,6 +31,7 @@ class Sheet {
       sheetRange: false,
       numRows: false,
       numColumns: false,
+      hiddenValuesRow: false,
       firstRow: false,
       firstMainRow: false,
       lastMainRow: false,
@@ -93,6 +94,13 @@ class Sheet {
 
   getLastRow() {
     return this.getNumRows();
+  }
+
+  getHiddenValuesRow() {
+    if(!this.cache.hiddenValuesRow) {
+      this.cache.hiddenValuesRow = 3;
+    }
+    return this.cache.hiddenValuesRow;
   }
 
   getFirstColumn() {
