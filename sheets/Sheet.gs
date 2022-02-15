@@ -5,7 +5,7 @@ const SectionMarker = {
   main:         'MAIN_HEADER_MARKER',
   done:         'DONE_HEADER_MARKER',
   generic:      'GENERIC_HEADER_MARKER'
-}
+};
 
 const ContentMarker = {
   MAIN_HEADER_MARKER:    'MAIN_FOOTER_MARKER',
@@ -50,6 +50,16 @@ class Sheet {
 
   clearCache() {
     this.cache = this.initializeCache();
+  }
+
+  getRowOffset(marker) {
+    if(Object.keys(ContentMarker).includes(marker)) {
+      return 2;
+    }
+    if(Object.values(ContentMarker).includes(marker)) {
+      return 0;
+    }
+    return 1;
   }
 
   getValue(row, column) {
@@ -98,7 +108,7 @@ class Sheet {
 
   getHiddenValuesRow() {
     if(!this.cache.hiddenValuesRow) {
-      this.cache.hiddenValuesRow = 3;
+      this.cache.hiddenValuesRow = this.getFirstRow(SectionMarker.hiddenValues);
     }
     return this.cache.hiddenValuesRow;
   }
@@ -112,55 +122,55 @@ class Sheet {
 
   getFirstMainRow() {
     if(!this.cache.firstMainRow) {
-      this.cache.firstMainRow = this.getFirstContentRow(SectionMarker.main);
+      this.cache.firstMainRow = this.getFirstRow(SectionMarker.main);
     }
     return this.cache.firstMainRow;
   }
 
   getLastMainRow() {
     if(!this.cache.lastMainRow) {
-      this.cache.lastMainRow = this.getLastContentRow(SectionMarker.main);
+      this.cache.lastMainRow = this.getLastRow(SectionMarker.main);
     }
     return this.cache.lastMainRow;
   }
 
   getFirstDoneRow() {
     if(!this.cache.firstDoneRow) {
-      this.cache.firstDoneRow = this.getFirstContentRow(SectionMarker.done);
+      this.cache.firstDoneRow = this.getFirstRow(SectionMarker.done);
     }
     return this.cache.firstDoneRow;
   }
 
   getLastDoneRow() {
     if(!this.cache.lastDoneRow) {
-      this.cache.lastDoneRow = this.getLastContentRow(SectionMarker.done);
+      this.cache.lastDoneRow = this.getLastRow(SectionMarker.done);
     }
     return this.cache.lastDoneRow;
   }
 
-  getFirstContentRow(marker) {
-    return this.getFirstContentRows(marker)[0];
+  getFirstRow(marker) {
+    return this.getFirstRows(marker)[0];
   }
 
-  getFirstContentRows(marker) {
+  getFirstRows(marker) {
     const values = this.getValues();
     let rows = [];
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].includes(marker)) rows.push(i + 2);
+      if(values[i][0].includes(marker)) rows.push(i + this.getRowOffset(marker));
     }
     return rows;
   }
 
-  getLastContentRow(marker) {
-    return this.getLastContentRows(marker)[0];
+  getLastRow(marker) {
+    return this.getLastRows(marker)[0];
   }
 
-  getLastContentRows(marker) {
+  getLastRows(marker) {
     const endMarker = ContentMarker[marker];
     const values = this.getValues();
     let rows = [];
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].includes(endMarker)) rows.push(i);
+      if(values[i][0].includes(endMarker)) rows.push(i + this.getRowOffset(marker));
     }
     return rows;
   }
@@ -286,14 +296,14 @@ class Sheet {
     const values = this.getValues();
     let indices = [];
 
-    const firstContentRows = this.getFirstContentRows(contentMarker);
-    const lastContentRows = this.getLastContentRows(contentMarker);
-    if(firstContentRows.length !== lastContentRows.length) throw 'Content markers do not match.';
+    const firstRows = this.getFirstRows(contentMarker);
+    const lastRows = this.getLastRows(contentMarker);
+    if(firstRows.length !== lastRows.length) throw 'Content markers do not match.';
 
-    for(let i = 0; i < firstContentRows.length; i++) {
-      const firstContentRow = firstContentRows[i];
-      const lastContentRow = lastContentRows[i];
-      for(let j = firstContentRow - 1; j < lastContentRow; j++) {
+    for(let i = 0; i < firstRows.length; i++) {
+      const firstRow = firstRows[i];
+      const lastRow = lastRows[i];
+      for(let j = firstRow - 1; j < lastRow; j++) {
         if(isMatch(values[j][columnZeroIndex], matcher)) indices.push(j + 1);
       }
     }
