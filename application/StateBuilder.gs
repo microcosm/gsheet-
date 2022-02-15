@@ -35,6 +35,9 @@ class StateBuilder {
   }
 
   buildSheetState() {
+    this.appendState({
+      style: new Style()
+    });
     this.buildValuesSheetState();
     this.buildFeatureSheetStates();
     this.appendState({
