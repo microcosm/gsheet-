@@ -217,12 +217,14 @@ class Sheet {
     for(const sectionLookup of sectionLookups) {
       const subRanges = [];
       for(const rangeConfig of rangeConfigs) {
+        const invertColumnCounting = (!isProperty(rangeConfig.beginColumnOffset)) && isProperty(rangeConfig.endColumnOffset);
         const beginColumnOffset = rangeConfig.beginColumnOffset || 0;
+        const endColumnOffset = rangeConfig.endColumnOffset || 0;
         const beginRowOffset = rangeConfig.beginRowOffset || 0;
         const row = sectionLookup.row + beginRowOffset;
-        const column = this.getFirstContentColumn() + beginColumnOffset;
+        const column = invertColumnCounting ? this.getLastContentColumn() - endColumnOffset : this.getFirstContentColumn() + beginColumnOffset;
         const numRows = sectionLookup.numRows - beginRowOffset;
-        const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
+        const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset - endColumnOffset;
         subRanges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
       }
       multipleSubRanges.push(subRanges);
