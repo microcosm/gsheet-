@@ -389,7 +389,7 @@ class Sheet {
     const endMarker = ContentMarker[marker];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      const val = values[i][0];
+      const val = values[i][0].split(' ');
       if(val.includes(endMarker)) {
         lookups.push({ row: start + 2, numRows: i - start - 1 });
       }
