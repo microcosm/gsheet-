@@ -32,7 +32,8 @@ const PropertyCommand = {
   IGNORE: 'ignore',
   MATCH: 'match',
   EVENT_DATA: 'event_data',
-  CURRENT_DATE: 'current_date'
+  CURRENT_DATE: 'current_date',
+  LAST_COLUMN: 'last_column'
 };
 
 const Priority = {

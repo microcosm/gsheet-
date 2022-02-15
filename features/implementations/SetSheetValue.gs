@@ -6,7 +6,8 @@ class SetSheetValue extends Feature {
 
   execute() {
     super.execute();
-    const column = this.config.update.column.cardinalIndex;
+    const useLastColumn = this.config.update.column.asConfig === PropertyCommand.LAST_COLUMN;
+    const column = useLastColumn ? this.sheet.getLastContentColumn() : this.config.update.column.cardinalIndex;
     const row = this.sheet.getFirstRow(this.config.update.rowMarker);
     const range = this.sheet.sheetRef.getRange(row, column, 1, 1);
     const value = this.getValue();
