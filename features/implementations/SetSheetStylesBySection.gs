@@ -51,6 +51,7 @@ class SetSheetStylesBySection extends Feature {
   setLookups() {
     this.lookups = {
       titles:           { styles:this.styles.titles,           rangeGetter:'getTitlesSectionsSubRanges'       },
+      titlesAbove:      { styles:this.styles.titlesAbove,      rangeGetter:'getTitlesAboveSectionsSubRanges'  },
       titlesAboveBelow: { styles:this.styles.titlesAboveBelow, rangeGetter:'getTitlesAboveBelowRanges'        },
       hiddenValues:     { styles:this.styles.hiddenValues,     rangeGetter:'getHiddenValuesSectionsSubRanges' },
       headers:          { styles:this.styles.headers,          rangeGetter:'getHeaderSectionsSubRanges'       },
@@ -61,6 +62,8 @@ class SetSheetStylesBySection extends Feature {
       underDone:        { styles:this.styles.underContents,    rangeGetter:'getUnderDoneSectionsSubRanges'    },
       underGeneric:     { styles:this.styles.underContents,    rangeGetter:'getUnderGenericSectionsSubRanges' },
       rowsOutside:      { styles:this.styles.rowsOutside,      rangeGetter:'getOutsideRowsRanges'             },
+      rowTopOutside:    { styles:this.styles.rowTopOutside,    rangeGetter:'getTopOutsideRowRanges'           },
+      rowBottomOutside: { styles:this.styles.rowBottomOutside, rangeGetter:'getBottomOutsideRowRanges'        },
       columnsOutside:   { styles:this.styles.columnsOutside,   rangeGetter:'getOutsideColumnsRanges'          },
       matchers:         { styles:this.styles.matchers,         rangeGetter:'getMatchingGenericSectionRanges'  }
     };

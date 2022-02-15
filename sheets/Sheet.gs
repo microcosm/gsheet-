@@ -1,4 +1,5 @@
 const SectionMarker = {
+  aboveTitle:   'ABOVE_TITLE_MARKER',
   title:        'TITLE_MARKER',
   hiddenValues: 'HIDDEN_MARKER',
   headers:      'HEADER_MARKER',
@@ -42,6 +43,8 @@ class Sheet {
       numContentColumns: false,
       firstContentColumn: false,
       lastContentColumn: false,
+      topOutsideRowRanges: false,
+      bottomOutsideRowRanges: false,
       outsideRowsRanges: false,
       outsideColumnsRanges: false,
       titlesAboveBelowRanges: false,
@@ -213,18 +216,31 @@ class Sheet {
       const subRanges = [];
       for(const rangeConfig of rangeConfigs) {
         const invertColumnCounting = (!isProperty(rangeConfig.beginColumnOffset)) && isProperty(rangeConfig.endColumnOffset);
+
         const beginColumnOffset = rangeConfig.beginColumnOffset || 0;
         const endColumnOffset = rangeConfig.endColumnOffset || 0;
         const beginRowOffset = rangeConfig.beginRowOffset || 0;
+
         const row = sectionLookup.row + beginRowOffset;
-        const column = invertColumnCounting ? this.getLastContentColumn() - endColumnOffset : this.getFirstContentColumn() + beginColumnOffset;
         const numRows = sectionLookup.numRows - beginRowOffset;
-        const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset - endColumnOffset;
+
+        const numColumns = invertColumnCounting ?
+          rangeConfig.numColumns || this.getNumContentColumns() - endColumnOffset:
+          rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
+
+        const column = invertColumnCounting ?
+          this.getLastContentColumn() - endColumnOffset - numColumns + this.getFirstContentColumn() - 1 :
+          this.getFirstContentColumn() + beginColumnOffset;
+
         subRanges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
       }
       multipleSubRanges.push(subRanges);
     }
     return multipleSubRanges;
+  }
+
+  getTitlesAboveSectionsSubRanges(rangeConfigs=[{}]) {
+    return this.getContentSectionsSubRanges(SectionMarker.aboveTitle, rangeConfigs);
   }
 
   getTitlesSectionsSubRanges(rangeConfigs=[{}]) {
@@ -322,16 +338,33 @@ class Sheet {
     return this.sheetRef.getRange(row, column, numRows, numColumns);
   }
 
-  getOutsideRowsRanges() {
-    if(!this.cache.outsideRowsRanges) {
-      let ranges = [];
+  getTopOutsideRowRanges() {
+    if(!this.cache.topOutsideRowRanges) {
       const topOutsideRow = this.getFirstRow();
+      const column = 1;
+      const numRows = 1;
+      const numColumns = this.getNumColumns();
+      this.cache.topOutsideRowRanges = [this.sheetRef.getRange(topOutsideRow, column, numRows, numColumns)];
+    }
+    return this.cache.topOutsideRowRanges;
+  }
+
+  getBottomOutsideRowRanges() {
+    if(!this.cache.bottomOutsideRowRanges) {
       const bottomOutsideRow = this.getLastRow();
       const column = 1;
       const numRows = 1;
       const numColumns = this.getNumColumns();
-      ranges.push(this.sheetRef.getRange(topOutsideRow, column, numRows, numColumns));
-      ranges.push(this.sheetRef.getRange(bottomOutsideRow, column, numRows, numColumns));
+      this.cache.bottomOutsideRowRanges = [this.sheetRef.getRange(bottomOutsideRow, column, numRows, numColumns)];
+    }
+    return this.cache.bottomOutsideRowRanges;
+  }
+
+  getOutsideRowsRanges() {
+    if(!this.cache.outsideRowsRanges) {
+      let ranges = [];
+      ranges = ranges.concat(this.getTopOutsideRowRanges());
+      ranges = ranges.concat(this.getBottomOutsideRowRanges());
       this.cache.outsideRowsRanges = ranges;
     }
     return this.cache.outsideRowsRanges;

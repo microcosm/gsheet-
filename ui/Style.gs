@@ -114,6 +114,23 @@ class Style {
   getTimeline(sections) {
     let styles = {
       sections: sections,
+      titlesAbove: [{
+        endColumnOffset: 1,
+        fontFamily: this.font.default,
+        fontSize: 1,
+        fontColor: this.color.lightGrey,
+        background: this.color.lightGrey,
+        rowHeight: 24,
+        border: { top: false, left: false, bottom: null, right: false, vertical: false, horizontal: false }
+      }, {
+        endColumnOffset: 0,
+        numColumns: 1,
+        fontFamily: this.font.default,
+        fontSize: 9,
+        fontColor: null,
+        background: this.color.lightGrey,
+        border: { top: false, left: false, bottom: null, right: false, vertical: false, horizontal: false }
+      }],
       titles: [{
         beginColumnOffset: 0,
         numColumns: 1,
@@ -215,12 +232,13 @@ class Style {
         numColumns: 3,
         border: { top: true, left: true, bottom: true, right: null, vertical: null, horizontal: null, color: '#666666', style: 'SOLID_MEDIUM' }
       }],
-      rowsOutside: [{
+      rowBottomOutside: [{
         fontFamily: this.font.default,
         fontSize: 1,
         fontColor: this.color.lightGrey,
         background: this.color.lightGrey,
-        rowHeight: 9
+        rowHeight: 9,
+        border: { top: null, left: false, bottom: false, right: false, vertical: false, horizontal: false }
       }],
       columnsOutside: [{
         fontFamily: this.font.default,
