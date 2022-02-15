@@ -1,13 +1,13 @@
-class SetSheetHiddenValue extends Feature {
+class SetSheetValue extends Feature {
   constructor(sheet) {
-    super(sheet, 'Set Sheet Hidden Value');
+    super(sheet, 'Set Sheet Value');
     this.addResponseCapability(Event.onSidebarSubmit);
   }
 
   execute() {
     super.execute();
     const column = this.config.update.column.cardinalIndex;
-    const row = this.sheet.getHiddenValuesRow();
+    const row = this.sheet.getFirstRow(this.config.update.rowMarker);
     const range = this.sheet.sheetRef.getRange(row, column, 1, 1);
     const value = this.getValue();
     if(value) {

@@ -24,8 +24,8 @@ const FeatureClass = {
   orderSheetMainSection: OrderSheetMainSection,
   setSheetGroupsBySection: SetSheetGroupsBySection,
   setSheetHiddenRowsBySection: SetSheetHiddenRowsBySection,
-  setSheetHiddenValue: SetSheetHiddenValue,
-  setSheetStylesBySection: SetSheetStylesBySection
+  setSheetStylesBySection: SetSheetStylesBySection,
+  setSheetValue: SetSheetValue
 };
 
 const PropertyCommand = {
