@@ -379,7 +379,10 @@ class Sheet {
     let lookups = [];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].includes(marker)) lookups.push({ row: i + 1, numRows: 1 });
+      const val = values[i][0].split(' ');
+      if(val.includes(marker)) {
+        lookups.push({ row: i + 1, numRows: 1 });
+      }
     }
     return lookups;
   }
