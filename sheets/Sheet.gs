@@ -54,12 +54,7 @@ class Sheet {
   }
 
   getRowOffset(marker) {
-    if(Object.keys(ContentMarker).includes(marker)) {
-      return 2;
-    }
-    if(Object.values(ContentMarker).includes(marker)) {
-      return 0;
-    }
+    if(Object.keys(ContentMarker).includes(marker)) return 2;
     return 1;
   }
 
@@ -139,7 +134,7 @@ class Sheet {
   }
 
   getFirstRow(marker) {
-    if(isString(marker)) this.getFirstRows(marker)[0];
+    if(isString(marker)) return this.getFirstRows(marker)[0];
     if(!this.cache.firstRow) {
       this.cache.firstRow = 1;
     }
@@ -168,7 +163,7 @@ class Sheet {
     const values = this.getValues();
     let rows = [];
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].includes(endMarker)) rows.push(i + this.getRowOffset(marker));
+      if(values[i][0].includes(endMarker)) rows.push(i);
     }
     return rows;
   }
