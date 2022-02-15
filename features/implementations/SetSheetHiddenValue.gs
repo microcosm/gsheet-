@@ -6,9 +6,19 @@ class SetSheetHiddenValue extends Feature {
 
   execute() {
     super.execute();
-    const column = this.config.cellToUpdate.column.cardinalIndex;
+    const column = this.config.update.column.cardinalIndex;
     const row = this.sheet.config.hiddenValueRow.cardinalIndex;
     const range = this.sheet.sheetRef.getRange(row, column, 1, 1);
-    range.setValue(this.eventData.value);
+    const value = this.getValue();
+    if(value) {
+      range.setValue(value);
+    }
+  }
+
+  getValue() {
+    if(this.config.update.value === PropertyCommand.EVENT_DATA) return this.eventData.value;
+    if(this.config.update.value === PropertyCommand.CURRENT_DATE) return state.today;
+    logString('Cell not updated because no cell value config found');
+    return false;
   }
 }
