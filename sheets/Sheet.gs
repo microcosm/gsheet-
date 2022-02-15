@@ -33,6 +33,7 @@ class Sheet {
       numColumns: false,
       hiddenValuesRow: false,
       firstRow: false,
+      lastRow: false,
       firstMainRow: false,
       lastMainRow: false,
       firstDoneRow: false,
@@ -95,17 +96,6 @@ class Sheet {
     return this.cache.numColumns;
   }
 
-  getFirstRow() {
-    if(!this.cache.firstRow) {
-      this.cache.firstRow = 1;
-    }
-    return this.cache.firstRow;
-  }
-
-  getLastRow() {
-    return this.getNumRows();
-  }
-
   getHiddenValuesRow() {
     if(!this.cache.hiddenValuesRow) {
       this.cache.hiddenValuesRow = this.getFirstRow(SectionMarker.hiddenValues);
@@ -149,7 +139,11 @@ class Sheet {
   }
 
   getFirstRow(marker) {
-    return this.getFirstRows(marker)[0];
+    if(isString(marker)) this.getFirstRows(marker)[0];
+    if(!this.cache.firstRow) {
+      this.cache.firstRow = 1;
+    }
+    return this.cache.firstRow;
   }
 
   getFirstRows(marker) {
@@ -162,7 +156,11 @@ class Sheet {
   }
 
   getLastRow(marker) {
-    return this.getLastRows(marker)[0];
+    if(isString(marker)) return this.getLastRows(marker)[0];
+    if(!this.cache.lastRow) {
+      this.cache.lastRow = this.getNumRows();
+    }
+    return this.cache.lastRow;
   }
 
   getLastRows(marker) {
