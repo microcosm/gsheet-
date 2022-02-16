@@ -9,7 +9,8 @@ class Style {
       family: 'Roboto Mono'
     };
     this.border = {
-      empty: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }
+      empty: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false },
+      panelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID_MEDIUM' }
     }
   }
 
@@ -92,12 +93,30 @@ class Style {
     styles.contents.all.fontSize = PropertyCommand.IGNORE;
     styles.contents.left = {
       beginColumnOffset: 0,
-      numColumns: numLeftColumns,
-      fontSize: 12
+      numColumns: numLeftColumns
     };
     styles.contents.right = {
       beginColumnOffset: numLeftColumns,
-      fontSize: 9
+      border: this.border.panelDivider
+    };
+    return styles;
+  }
+
+  getThreePanel(sections, numLeftColumns=1, numMidColumns=1) {
+    let styles = this.getDefault(sections);
+    styles.contents.all.fontSize = PropertyCommand.IGNORE;
+    styles.contents.left = {
+      beginColumnOffset: 0,
+      numColumns: numLeftColumns,
+    };
+    styles.contents.middle = {
+      beginColumnOffset: numLeftColumns,
+      numColumns: numMidColumns,
+      border: this.border.panelDivider
+    };
+    styles.contents.right = {
+      beginColumnOffset: numLeftColumns + numMidColumns,
+      border: this.border.panelDivider
     };
     return styles;
   }
