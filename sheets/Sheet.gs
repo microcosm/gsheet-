@@ -1,5 +1,5 @@
 const SectionMarker = {
-  aboveTitle:   'ABOVE_TITLE_MARKER',
+  aboveTitle:   'TITLE_ABOVE_MARKER',
   title:        'TITLE_MARKER',
   hiddenValues: 'HIDDEN_MARKER',
   headers:      'HEADER_MARKER',
@@ -35,10 +35,7 @@ class Sheet {
       hiddenValuesRow: false,
       firstRow: false,
       lastRow: false,
-      firstMainRow: false,
-      lastMainRow: false,
       firstDoneRow: false,
-      lastDoneRow: false,
       firstColumn: false,
       numContentColumns: false,
       firstContentColumn: false,
@@ -47,13 +44,20 @@ class Sheet {
       bottomOutsideRowRanges: false,
       outsideRowsRanges: false,
       outsideColumnsRanges: false,
-      titlesAboveBelowRanges: false,
-      mainSectionRange: false
+      titlesAboveBelowRanges: false
     };
   }
 
   clearCache() {
     this.cache = this.initializeCache();
+  }
+
+  isMarkerMatch(val, marker) {
+    const vals = val.split(' ');
+    for(const v of vals) {
+      if(v.endsWith(marker)) return true;
+    }
+    return false;
   }
 
   getRowOffset(marker) {
@@ -108,32 +112,11 @@ class Sheet {
     return this.cache.firstColumn;
   }
 
-  getFirstMainRow() {
-    if(!this.cache.firstMainRow) {
-      this.cache.firstMainRow = this.getFirstRow(SectionMarker.main);
-    }
-    return this.cache.firstMainRow;
-  }
-
-  getLastMainRow() {
-    if(!this.cache.lastMainRow) {
-      this.cache.lastMainRow = this.getLastRow(SectionMarker.main);
-    }
-    return this.cache.lastMainRow;
-  }
-
   getFirstDoneRow() {
     if(!this.cache.firstDoneRow) {
       this.cache.firstDoneRow = this.getFirstRow(SectionMarker.done);
     }
     return this.cache.firstDoneRow;
-  }
-
-  getLastDoneRow() {
-    if(!this.cache.lastDoneRow) {
-      this.cache.lastDoneRow = this.getLastRow(SectionMarker.done);
-    }
-    return this.cache.lastDoneRow;
   }
 
   getFirstRow(marker) {
@@ -148,7 +131,7 @@ class Sheet {
     const values = this.getValues();
     let rows = [];
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].includes(marker)) rows.push(i + this.getRowOffset(marker));
+      if(this.isMarkerMatch(values[i][0], marker)) rows.push(i + this.getRowOffset(marker));
     }
     return rows;
   }
@@ -166,7 +149,7 @@ class Sheet {
     const values = this.getValues();
     let rows = [];
     for(let i = 0; i < values.length; i++) {
-      if(values[i][0].includes(endMarker)) rows.push(i);
+      if(this.isMarkerMatch(values[i][0], endMarker)) rows.push(i);
     }
     return rows;
   }
@@ -200,10 +183,12 @@ class Sheet {
 /* getContentSectionsSubRanges (and its accessors)                      */
 /* -------------------------------------------------------------------- */
 /* If there are n sections marked up with sectionMarker, then there are */
-/* n elements in the return array.                                      */
+/* n elements in the return array -- one for each sectionMarker in the  */
+/* sheet.                                                               */
 /*                                                                      */
 /* If there are n config objects in rangeConfigs[i], then there are n   */ 
-/* ranges in returnArray[i], each based on the matching config object.  */
+/* ranges in returnArray[i], each a subset of sectionMarker's implied   */
+/* range, and based on the properties of the matching config object.    */
 /*                                                                      */
 /* The rangeConfigs argument can be an object rather than an array, in  */
 /* which case the keys are ignored and the values are read as an array. */
@@ -284,21 +269,10 @@ class Sheet {
     return this.getContentSectionsSubRanges(ContentMarker[SectionMarker.generic], rangeConfigs);
   }
 
-/* -------------------------------------------------------------------- */
-
-  getMainSectionRange() {
-    if(!this.cache.mainSectionRange) {
-      this.cache.mainSectionRange = this.getMainSectionsSubRanges()[0][0];
-    }
-    return this.cache.mainSectionRange;
-  }
-
-/* -------------------------------------------------------------------- */
-
   getMatchingGenericSectionRanges(rangeConfigs) {
     let ranges = [];
     for(const rangeConfig of toArray(rangeConfigs)) {
-      const rows = this.getMatchingRowsFromContentSection(rangeConfig.match.value, rangeConfig.match.column.cardinalIndex, SectionMarker.generic);
+      const rows = this.getMatchingRowsFromContentSections(rangeConfig.match.value, rangeConfig.match.column.cardinalIndex, SectionMarker.generic);
       for(const row of rows) {
         rangeConfig.row = row;
         ranges.push(this.getContentSectionRange(rangeConfig));
@@ -307,7 +281,7 @@ class Sheet {
     return ranges;
   }
 
-  getMatchingRowsFromContentSection(matcher, column, contentMarker) {
+  getMatchingRowsFromContentSections(matcher, column, contentMarker) {
     const columnZeroIndex = column - 1;
     const values = this.getValues();
     let indices = [];
@@ -417,8 +391,7 @@ class Sheet {
     let lookups = [];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      const val = values[i][0].split(' ');
-      if(val.includes(marker)) {
+      if(this.isMarkerMatch(values[i][0], marker)) {
         lookups.push({ row: i + 1, numRows: 1 });
       }
     }
@@ -430,11 +403,11 @@ class Sheet {
     const endMarker = ContentMarker[marker];
     const values = this.getValues();
     for(let i = 0; i < values.length; i++) {
-      const val = values[i][0].split(' ');
-      if(val.includes(endMarker)) {
+      const val = values[i][0];
+      if(this.isMarkerMatch(val, endMarker)) {
         lookups.push({ row: start + 2, numRows: i - start - 1 });
       }
-      if(val.includes(marker)) {
+      if(this.isMarkerMatch(val, marker)) {
         start = i;
       }
     }

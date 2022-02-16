@@ -1,6 +1,6 @@
-class OrderSheetMainSection extends Feature {
+class OrderSheetMainSections extends Feature {
   constructor(sheet) {
-    super(sheet, 'Order Sheet Main Section');
+    super(sheet, 'Order Sheet Main Sections');
     this.addResponseCapability(Event.onSidebarSubmit);
     this.ascendingMarker = 'ascending';
   }
@@ -8,8 +8,10 @@ class OrderSheetMainSection extends Feature {
   execute() {
     super.execute();
     const googleConfigArray = this.getGoogleConfigArray();
-    const mainRange = this.sheet.getMainSectionRange();
-    mainRange.sort(googleConfigArray);
+    const mainRangeSections = this.sheet.getMainSectionsSubRanges();
+    for(const ranges of mainRangeSections) {
+      ranges[0].sort(googleConfigArray);
+    }
   }
 
   getGoogleConfigArray() {

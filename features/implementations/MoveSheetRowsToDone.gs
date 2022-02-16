@@ -1,6 +1,6 @@
-class MoveSheetRowsMainToDone extends Feature {
+class MoveSheetRowsToDone extends Feature {
   constructor(sheet) {
-    super(sheet, 'Move Sheet Rows Main To Done');
+    super(sheet, 'Move Sheet Rows To Done');
     this.addResponseCapability(Event.onSpreadsheetOpen);
     this.addResponseCapability(Event.onSheetEdit);
     this.addResponseCapability(Event.onOvernightTimer);
@@ -14,14 +14,14 @@ class MoveSheetRowsMainToDone extends Feature {
     this.matchColumn = this.config.match.column.cardinalIndex;
     this.doneSectionIndex = this.sheet.getFirstDoneRow();
     this.foundRows = [];
-    this.findTextMatchingRowsInMainSection();
+    this.findTextMatchingRows();
     this.moveRowsToDone();
     this.sheet.clearCache();
   }
 
-  findTextMatchingRowsInMainSection() {
+  findTextMatchingRows() {
     for(const matcher of this.matchTexts) {
-      const matchingRows = this.sheet.getMatchingRowsFromContentSection(matcher, this.matchColumn, SectionMarker.main);
+      const matchingRows = this.sheet.getMatchingRowsFromContentSections(matcher, this.matchColumn, this.config.from);
       this.foundRows = this.foundRows.concat(matchingRows);
     }
   }
