@@ -70,7 +70,7 @@ class Style {
         }
       },
       titlesAboveBelow: {
-        all: this.getBlank({ rowHeight: 9 })
+        all: this.getBlank({ rowHeight: 9, border: { top: null, left: false, bottom: null, right: false, vertical: false, horizontal: false } })
       },
       hiddenValues: {
         all: this.getBlank()
