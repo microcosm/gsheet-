@@ -82,7 +82,9 @@ function toCamelCase(str) {
 }
 
 function toArray(val) {
-  return isArray(val) ? val : [val];
+  if(isArray(val)) return val;
+  if(isObject(val)) return Object.values(val);
+  return [val];
 }
 
 function toString(val) {

@@ -199,22 +199,29 @@ class Sheet {
 /* -------------------------------------------------------------------- */
 /* getContentSectionsSubRanges (and its accessors)                      */
 /* -------------------------------------------------------------------- */
-/* The return array contains 1 item for each of the ranges identified   */
-/* by the sectionMarker argument (which may be only 1).                 */
+/* If there are n sections marked up with sectionMarker, then there are */
+/* n elements in the return array.                                      */
 /*                                                                      */
-/* The rangeConfigs argument takes the form:                            */
+/* If there are n config objects in rangeConfigs[i], then there are n   */ 
+/* ranges in returnArray[i], each based on the matching config object.  */
+/*                                                                      */
+/* The rangeConfigs argument can be an object rather than an array, in  */
+/* which case the keys are ignored and the values are read as an array. */
+/*                                                                      */
+/* A rangeConfig for a single row marked by sectionMarker could be:     */
 /*        [{ beginColumnOffset: 0, numColumns: 2 },                     */
-/*         { beginColumnOffset: 2, numColumns: 3 }]  //etc              */
+/*         { beginColumnOffset: 2, numColumns: 3 }]                     */
 /*                                                                      */
-/* Each element in the return array is an array of ranges matching the  */
-/* specifications of rangeConfigs.                                      */
+/* In which case the return array would look like:                      */
+/*        [[range-of-first-two-cells,                                   */
+/*          range-of-next-three-cells]]                                 */
 /* -------------------------------------------------------------------- */
   getContentSectionsSubRanges(sectionMarker, rangeConfigs=[{}]) {
     const multipleSubRanges = [];
     const sectionLookups = this.getSectionRangeLookups(sectionMarker);
     for(const sectionLookup of sectionLookups) {
       const subRanges = [];
-      for(const rangeConfig of rangeConfigs) {
+      for(const rangeConfig of toArray(rangeConfigs)) {
         const invertColumnCounting = (!isProperty(rangeConfig.beginColumnOffset)) && isProperty(rangeConfig.endColumnOffset);
 
         const beginColumnOffset = rangeConfig.beginColumnOffset || 0;
@@ -224,9 +231,7 @@ class Sheet {
         const row = sectionLookup.row + beginRowOffset;
         const numRows = sectionLookup.numRows - beginRowOffset;
 
-        const numColumns = invertColumnCounting ?
-          rangeConfig.numColumns || this.getNumContentColumns() - endColumnOffset:
-          rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset;
+        const numColumns = rangeConfig.numColumns || this.getNumContentColumns() - beginColumnOffset - endColumnOffset;
 
         const column = invertColumnCounting ?
           this.getLastContentColumn() - endColumnOffset - numColumns + this.getFirstContentColumn() - 1 :
@@ -292,7 +297,7 @@ class Sheet {
 
   getMatchingGenericSectionRanges(rangeConfigs) {
     let ranges = [];
-    for(const rangeConfig of rangeConfigs) {
+    for(const rangeConfig of toArray(rangeConfigs)) {
       const rows = this.getMatchingRowsFromContentSection(rangeConfig.match.value, rangeConfig.match.column.cardinalIndex, SectionMarker.generic);
       for(const row of rows) {
         rangeConfig.row = row;

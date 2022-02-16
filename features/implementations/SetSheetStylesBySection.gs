@@ -36,9 +36,10 @@ class SetSheetStylesBySection extends Feature {
 
   setRangeStyles(ranges, styles) {
     for(let i = 0; i < ranges.length; i++) {
-      const val = ranges[i];
-      if(isArray(val)) this.setRangeStyles(val, styles);
-      else this.setRangeStyle(val, styles[i % styles.length]);
+      const r = ranges[i];
+      const s = toArray(styles);
+      if(isArray(r)) this.setRangeStyles(r, s);
+      else this.setRangeStyle(r, s[i % s.length]);
     }
   }
 
