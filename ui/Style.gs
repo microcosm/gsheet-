@@ -10,7 +10,8 @@ class Style {
     };
     this.border = {
       empty: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false },
-      panelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID_MEDIUM' }
+      thinPanelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID' },
+      thickPanelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID_MEDIUM' }
     }
   }
 
@@ -97,7 +98,7 @@ class Style {
     };
     styles.contents.right = {
       beginColumnOffset: numLeftColumns,
-      border: this.border.panelDivider
+      border: this.border.thickPanelDivider
     };
     return styles;
   }
@@ -112,11 +113,35 @@ class Style {
     styles.contents.middle = {
       beginColumnOffset: numLeftColumns,
       numColumns: numMidColumns,
-      border: this.border.panelDivider
+      border: this.border.thickPanelDivider
     };
     styles.contents.right = {
       beginColumnOffset: numLeftColumns + numMidColumns,
-      border: this.border.panelDivider
+      border: this.border.thickPanelDivider
+    };
+    return styles;
+  }
+
+  getFourPanel(sections, numLeftColumns=1, numLeftMidColumns=1, numRightMidColumns=1) {
+    let styles = this.getDefault(sections);
+    styles.contents.all.fontSize = PropertyCommand.IGNORE;
+    styles.contents.left = {
+      beginColumnOffset: 0,
+      numColumns: numLeftColumns,
+    };
+    styles.contents.leftMiddle = {
+      beginColumnOffset: numLeftColumns,
+      numColumns: numLeftMidColumns,
+      border: this.border.thickPanelDivider
+    };
+    styles.contents.rightMiddle = {
+      beginColumnOffset: numLeftColumns + numLeftMidColumns,
+      numColumns: numRightMidColumns,
+      border: this.border.thickPanelDivider
+    };
+    styles.contents.right = {
+      beginColumnOffset: numLeftColumns + numLeftMidColumns + numRightMidColumns,
+      border: this.border.thickPanelDivider
     };
     return styles;
   }
