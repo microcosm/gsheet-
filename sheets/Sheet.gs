@@ -35,6 +35,7 @@ class Sheet {
       hiddenValuesRow: false,
       firstRow: false,
       lastRow: false,
+      firstMainRow: false,
       firstDoneRow: false,
       firstColumn: false,
       numContentColumns: false,
@@ -110,6 +111,13 @@ class Sheet {
       this.cache.firstColumn = 1;
     }
     return this.cache.firstColumn;
+  }
+
+  getFirstMainRow() {
+    if(!this.cache.firstMainRow) {
+      this.cache.firstMainRow = this.getFirstRow(SectionMarker.main);
+    }
+    return this.cache.firstMainRow;
   }
 
   getFirstDoneRow() {

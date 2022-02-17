@@ -20,6 +20,7 @@ const FeatureClass = {
   copySheetEventsToCalendar: CopySheetEventsToCalendar,
   copySheetToExternalSpreadsheet: CopySheetToExternalSpreadsheet,
   copySheetValuesBySection: CopySheetValuesBySection,
+  createSheetItem: CreateSheetItem,
   moveSheetRowsToDone: MoveSheetRowsToDone,
   orderSheetMainSections: OrderSheetMainSections,
   setSheetGroupsBySection: SetSheetGroupsBySection,
