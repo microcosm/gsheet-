@@ -230,7 +230,7 @@ class Sheet {
           this.getLastContentColumn() - endColumnOffset - numColumns + this.getFirstContentColumn() - 1 :
           this.getFirstContentColumn() + beginColumnOffset;
 
-        subRanges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
+        if(numRows > 0) subRanges.push(this.sheetRef.getRange(row, column, numRows, numColumns));
       }
       multipleSubRanges.push(subRanges);
     }
