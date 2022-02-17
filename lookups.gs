@@ -16,6 +16,7 @@ const Event = {
 };
 
 const FeatureClass = {
+  alertSheetOnEdit: AlertSheetOnEdit,
   copyCalendarEventsToSheet: CopyCalendarEventsToSheet,
   copySheetEventsToCalendar: CopySheetEventsToCalendar,
   copySheetToExternalSpreadsheet: CopySheetToExternalSpreadsheet,
