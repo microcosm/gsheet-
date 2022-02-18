@@ -135,6 +135,10 @@ class Sheet {
     return this.cache.firstRow;
   }
 
+  getNthFirstRow(marker, n) {
+    return this.getFirstRows(marker)[n - 1];
+  }
+
   getFirstRows(marker) {
     const values = this.getValues();
     let rows = [];

@@ -12,7 +12,12 @@ class CreateSheetItem extends Feature {
   }
 
   insertNewRow() {
-    this.firstContentRow = this.sheet.getFirstMainRow();
+    let insertionSectionIndex = 1;
+    if(isProperty(this.config.getInsertionSectionIndex)) {
+      insertionSectionIndex = this.config.getInsertionSectionIndex(this.eventData.value);
+    }
+
+    this.firstContentRow = this.sheet.getNthFirstRow(SectionMarker.main, insertionSectionIndex);
     this.sheet.sheetRef.insertRowBefore(this.firstContentRow);
   }
 
