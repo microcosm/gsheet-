@@ -18,7 +18,6 @@ class StateBuilder {
     this.appendState({
       today: getTodaysDate(),
       execution: { lock: null, timeout: 60000 },
-      userProperties: PropertiesService.getUserProperties(),
       builder: this,
     });
   }
@@ -98,6 +97,14 @@ class StateBuilder {
     this.appendState({
       ui: new UserInterface()
     });
+    this.buildUserPropertiesState();
+    return this;
+  }
+
+  buildUserPropertiesState() {
+    if(!isProperty(state.userProperties)) {
+      this.appendState({ userProperties: PropertiesService.getUserProperties() });
+    }
     return this;
   }
 
