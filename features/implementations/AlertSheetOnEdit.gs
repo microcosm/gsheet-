@@ -6,6 +6,7 @@ class AlertSheetOnEdit extends Feature {
 
   execute() {
     super.execute();
+    state.builder.buildScriptPropertiesState();
     if(this.isValidTriggerValue()) {
       this.setRowValues();
       this.message = this.config.getMessage(this.rowValues);
@@ -24,8 +25,19 @@ class AlertSheetOnEdit extends Feature {
   }
 
   setRowValues() {
-    const row = this.eventData.range.getRow();
-    const rowValuesArray = this.sheet.getRow(row);
+    this.row = this.eventData.range.getRow();
+    if(!this.setRowValuesFromCache()) this.setRowValuesFromSheet();
+  }
+
+  setRowValuesFromCache() {
+    const fromCache = state.scriptProperties.getProperty(this.config.cacheKey);
+    if(!isString(fromCache)) return false;
+    logString('Reading sheet values from cache');
+    this.rowValues = JSON.parse(fromCache);
+  }
+
+  setRowValuesFromSheet() {
+    const rowValuesArray = this.sheet.getRow(this.row);
     this.rowValues = {};
     for(let i = 0; i < rowValuesArray.length; i++) {
       this.rowValues[zeroBasedIndexToColumn(i)] = rowValuesArray[i];
