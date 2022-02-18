@@ -20,7 +20,7 @@ class AlertSheetOnEdit extends Feature {
     const ui = SpreadsheetApp.getUi();
     const buttonSet = SpreadsheetApp.getUi().ButtonSet[this.config.buttonSet] || ui.ButtonSet.OK;
     const response = ui.alert(this.message.title, this.message.text, buttonSet);
-    if(this.isPrompt) this.config.respondToPrompt(ui.Button, this.rowValues);
+    if(this.isPrompt && response == ui.Button.YES) this.config.respondToPrompt(ui.Button, this.rowValues);
   }
 
   setRowValues() {
