@@ -153,7 +153,10 @@ class SidebarHtmlBuilder {
         border: 1px solid #ebebeb;
       }
       td {
-        padding: 0;
+        padding: 0.75em;
+      }
+      pre {
+        margin: 0;
       }
     </style>
     <script>
