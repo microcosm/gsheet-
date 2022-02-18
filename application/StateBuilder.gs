@@ -114,6 +114,10 @@ class StateBuilder {
     state.features.registered = state.features.registered.concat(features);
   }
 
+  findFeature(id) {
+    return state.features.registered.find(feature => feature.config?.id === id);
+  }
+
   prepareForExecution() {
     state.features.executions.sort((a, b) => {
       return a.getPriority() > b.getPriority() ? 1 : -1;

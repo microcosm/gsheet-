@@ -7,7 +7,8 @@ class AlertSheetOnEdit extends Feature {
   execute() {
     super.execute();
     if(this.isValidTriggerColumn() && this.isValidTriggerValue()) {
-      this.message = this.config.getMessage(this.getDecisionColumns());
+      this.setRowValues();
+      this.message = this.config.getMessage(this.rowValues);
       if(this.message) {
         this.showDialog();
       }
@@ -15,26 +16,20 @@ class AlertSheetOnEdit extends Feature {
   }
 
   showDialog() {
+    this.isPrompt = isProperty(this.config.buttonSet);
     const ui = SpreadsheetApp.getUi();
     const buttonSet = SpreadsheetApp.getUi().ButtonSet[this.config.buttonSet] || ui.ButtonSet.OK;
     const response = ui.alert(this.message.title, this.message.text, buttonSet);
-    if (response == ui.Button.YES) {
-      Logger.log('The user clicked "Yes."');
-    } else {
-      Logger.log('The user clicked "No" or the dialog\'s close button.');
-    }
+    if(this.isPrompt) this.config.respondToPrompt(ui.Button, this.rowValues);
   }
 
-  getDecisionColumns() {
+  setRowValues() {
     const row = this.eventData.range.getRow();
-    const decisionColumns = {};
-    const numCols = this.config.decisionColumns.cardinalIndices;
-    for(let i = 0; i < numCols; i++) {
-      const columnCardinalIndex = this.config.decisionColumns.cardinalIndices[i];
-      const columnAsConfig = this.config.decisionColumns.asConfig[i];
-      decisionColumns[columnAsConfig] = this.sheet.getValue(row, columnCardinalIndex);
+    const rowValuesArray = this.sheet.getRow(row);
+    this.rowValues = {};
+    for(let i = 0; i < rowValuesArray.length; i++) {
+      this.rowValues[zeroBasedIndexToColumn(i)] = rowValuesArray[i];
     }
-    return decisionColumns;
   }
 
   isValidTriggerColumn() {

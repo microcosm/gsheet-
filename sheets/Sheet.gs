@@ -67,8 +67,12 @@ class Sheet {
   }
 
   getValue(row, column) {
+    return this.getRow(row)[column - 1];
+  }
+
+  getRow(row) {
     const values = this.getValues();
-    return values[row - 1][column - 1];
+    return values[row - 1];
   }
 
   getValues() {

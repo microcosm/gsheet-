@@ -120,3 +120,14 @@ function isDate(value) {
 function isProperty(value) {
   return typeof value !== 'undefined';
 }
+
+function zeroBasedIndexToColumn(index) {
+  index += 1;
+  let temp, letter = '';
+  while (index > 0) {
+    temp = (index - 1) % 26;
+    letter = String.fromCharCode(temp + 65) + letter;
+    index = (index - temp - 1) / 26;
+  }
+  return letter;
+}
