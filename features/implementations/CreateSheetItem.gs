@@ -6,18 +6,24 @@ class CreateSheetItem extends Feature {
 
   execute() {
     super.execute();
+    this.setInsertionSectionIndex();
     this.insertNewRow();
     this.updateNewRow();
     this.sheet.clearCache();
   }
 
-  insertNewRow() {
-    let insertionSectionIndex = 1;
-    if(isProperty(this.config.getInsertionSectionIndex)) {
-      insertionSectionIndex = this.config.getInsertionSectionIndex(this.eventData.value);
+  setInsertionSectionIndex() {
+    if(isNumber(this.config.insertionSectionIndex)) {
+      this.insertionSectionIndex = this.config.insertionSectionIndex;
+    } else if(isProperty(this.config.getInsertionSectionIndex)) {
+      this.insertionSectionIndex = this.config.getInsertionSectionIndex(this.eventData.value);
+    } else {
+      this.insertionSectionIndex = 1;
     }
+  }
 
-    this.firstContentRow = this.sheet.getNthFirstRow(SectionMarker.main, insertionSectionIndex);
+  insertNewRow() {
+    this.firstContentRow = this.sheet.getNthFirstRow(SectionMarker.main, this.insertionSectionIndex);
     this.sheet.sheetRef.insertRowBefore(this.firstContentRow);
   }
 
