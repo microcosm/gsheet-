@@ -12,7 +12,19 @@ class Style {
       empty: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false },
       thinPanelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID' },
       thickPanelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID_MEDIUM' }
-    }
+    };
+    this.alignment = {
+      vertical: {
+        top: 'top',
+        middle: 'middle',
+        bottom: 'bottom'
+      },
+      horizontal: {
+        left: 'left',
+        center: 'center',
+        right: 'right'
+      }
+    };
   }
 
   getBlank(append={}) {
@@ -20,7 +32,9 @@ class Style {
       fontFamily: this.font.family,
       fontSize: 1,
       fontColor: this.color.lightGrey,
-      background: this.color.lightGrey
+      background: this.color.lightGrey,
+      verticalAlignment: this.alignment.vertical.middle,
+      horizontalAlignment: this.alignment.horizontal.left
     }
     return Object.assign(style, append);
   }
@@ -36,6 +50,7 @@ class Style {
           fontSize: 24,
           fontColor: this.color.darkestGrey,
           background: this.color.lightGrey,
+          verticalAlignment: this.alignment.vertical.bottom,
           rowHeight: 55,
           border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }
         },
@@ -46,6 +61,7 @@ class Style {
           fontSize: 9,
           fontColor: null,
           background: this.color.lightGrey,
+          verticalAlignment: this.alignment.vertical.bottom,
           border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }
         },
         between: this.getBlank({ beginColumnOffset: 1, endColumnOffset: 1, border: this.border.empty })
@@ -56,6 +72,7 @@ class Style {
           fontSize: 13,
           fontColor: '#ffffff',
           background: this.color.darkGrey,
+          verticalAlignment: this.alignment.vertical.bottom,
           rowHeight: 56,
           border: { top: true, left: false, bottom: true, right: false, vertical: false, horizontal: false, color: '#333333', style: 'SOLID_THICK' }
         }
@@ -66,6 +83,7 @@ class Style {
           fontSize: 9,
           fontColor: null,
           background: null,
+          verticalAlignment: this.alignment.vertical.middle,
           rowHeight: 48,
           border: { top: null, left: false, bottom: null, right: false, vertical: false, horizontal: true, color: this.color.darkGrey, style: 'SOLID' }
         }

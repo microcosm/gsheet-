@@ -24,14 +24,16 @@ class SetSheetStylesBySection extends Feature {
   }
 
   setRangeStyle(range, styles) {
-    if(this.isValidProperty(styles, 'fontFamily' )) range.setFontFamily(styles.fontFamily);
-    if(this.isValidProperty(styles, 'fontSize'   )) range.setFontSize  (styles.fontSize);
-    if(this.isValidProperty(styles, 'fontColor'  )) range.setFontColor (styles.fontColor);
-    if(this.isValidProperty(styles, 'background' )) range.setBackground(styles.background);
-    if(this.isValidProperty(styles, 'border'     )) this.setBorders    ([styles.border], range);
-    if(this.isValidProperty(styles, 'borders'    )) this.setBorders    (styles.borders, range);
-    if(this.isValidProperty(styles, 'rowHeight'  )) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), styles.rowHeight);
-    if(this.isValidProperty(styles, 'columnWidth')) this.sheet.sheetRef.setColumnWidths(range.getColumn(), range.getNumColumns(), styles.columnWidth);
+    if(this.isValidProperty(styles, 'fontFamily'          )) range.setFontFamily         (styles.fontFamily);
+    if(this.isValidProperty(styles, 'fontSize'            )) range.setFontSize           (styles.fontSize);
+    if(this.isValidProperty(styles, 'fontColor'           )) range.setFontColor          (styles.fontColor);
+    if(this.isValidProperty(styles, 'background'          )) range.setBackground         (styles.background);
+    if(this.isValidProperty(styles, 'horizontalAlignment' )) range.setHorizontalAlignment(styles.horizontalAlignment);
+    if(this.isValidProperty(styles, 'verticalAlignment'   )) range.setVerticalAlignment(styles.verticalAlignment);
+    if(this.isValidProperty(styles, 'border'              )) this.setBorders             ([styles.border], range);
+    if(this.isValidProperty(styles, 'borders'             )) this.setBorders             (styles.borders, range);
+    if(this.isValidProperty(styles, 'rowHeight'           )) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), styles.rowHeight);
+    if(this.isValidProperty(styles, 'columnWidth'         )) this.sheet.sheetRef.setColumnWidths(range.getColumn(), range.getNumColumns(), styles.columnWidth);
   }
 
   setRangeStyles(ranges, styles) {
