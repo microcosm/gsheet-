@@ -6,7 +6,7 @@ class AlertSheetOnEdit extends Feature {
 
   execute() {
     super.execute();
-    if(this.isValidTriggerColumn() && this.isValidTriggerValue()) {
+    if(this.isValidTriggerValue()) {
       this.setRowValues();
       this.message = this.config.getMessage(this.rowValues);
       if(this.message) {
@@ -30,10 +30,6 @@ class AlertSheetOnEdit extends Feature {
     for(let i = 0; i < rowValuesArray.length; i++) {
       this.rowValues[zeroBasedIndexToColumn(i)] = rowValuesArray[i];
     }
-  }
-
-  isValidTriggerColumn() {
-    return this.eventData.range.getColumn() === this.config.triggerColumn.cardinalIndex;
   }
 
   isValidTriggerValue() {
