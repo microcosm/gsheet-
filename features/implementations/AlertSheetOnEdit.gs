@@ -6,10 +6,22 @@ class AlertSheetOnEdit extends Feature {
 
   execute() {
     super.execute();
-    const ui = SpreadsheetApp.getUi();
     if(this.isValidTriggerColumn() && this.isValidTriggerValue()) {
-      const message = this.config.getMessage(this.getDecisionColumns());
-      if(message) ui.alert(message.title, message.text, ui.ButtonSet.OK);
+      this.message = this.config.getMessage(this.getDecisionColumns());
+      if(this.message) {
+        this.showDialog();
+      }
+    }
+  }
+
+  showDialog() {
+    const ui = SpreadsheetApp.getUi();
+    const buttonSet = SpreadsheetApp.getUi().ButtonSet[this.config.buttonSet] || ui.ButtonSet.OK;
+    const response = ui.alert(this.message.title, this.message.text, buttonSet);
+    if (response == ui.Button.YES) {
+      Logger.log('The user clicked "Yes."');
+    } else {
+      Logger.log('The user clicked "No" or the dialog\'s close button.');
     }
   }
 
