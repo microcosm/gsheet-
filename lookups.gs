@@ -17,6 +17,7 @@ const Event = {
 
 const FeatureClass = {
   alertSheetOnEdit: AlertSheetOnEdit,
+  cacheSheetRowsBySection: CacheSheetRowsBySection,
   copyCalendarEventsToSheet: CopyCalendarEventsToSheet,
   copySheetEventsToCalendar: CopySheetEventsToCalendar,
   copySheetToExternalSpreadsheet: CopySheetToExternalSpreadsheet,

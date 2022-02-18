@@ -108,6 +108,13 @@ class StateBuilder {
     return this;
   }
 
+  buildScriptPropertiesState() {
+    if(!isProperty(state.scriptProperties)) {
+      this.appendState({ scriptProperties: PropertiesService.getScriptProperties() });
+    }
+    return this;
+  }
+
   getActiveSheet() {
     const activeSheetName = state.spreadsheet.ref.getActiveSheet().getName();
     return state.sheets.find(sheet => sheet.name === activeSheetName) || new Sheet({ name: activeSheetName });

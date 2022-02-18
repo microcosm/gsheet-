@@ -170,6 +170,21 @@ class Sheet {
     return rows;
   }
 
+  getSectionRowPairs(marker) {
+    const firstRows = this.getFirstRows(marker);
+    const lastRows = this.getLastRows(marker);
+    if(firstRows.length != lastRows.length) throw `Can't find valid section marker pairs`;
+    let pairs = [];
+    for(let i = 0; i < firstRows.length; i++) {
+      const firstRow = firstRows[i];
+      const lastRow = lastRows[i];
+      if(firstRow <= lastRow) {
+        pairs.push({ first: firstRow, last: lastRow });
+      }
+    }
+    return pairs;
+  }
+
   getLastColumn() {
     return this.getNumColumns();
   }
@@ -199,7 +214,7 @@ class Sheet {
 /* getContentSectionsSubRanges (and its accessors)                      */
 /* -------------------------------------------------------------------- */
 /* If there are n sections marked up with sectionMarker, then there are */
-/* n elements in the return array -- one for each sectionMarker in the  */
+/* n elements in the returnArray -- one for each sectionMarker in the   */
 /* sheet.                                                               */
 /*                                                                      */
 /* If there are n config objects in rangeConfigs[i], then there are n   */ 
@@ -243,6 +258,22 @@ class Sheet {
       multipleSubRanges.push(subRanges);
     }
     return multipleSubRanges;
+  }
+
+  getContentSectionsValues(sectionMarker) {
+    let lookups = [];
+    const values = this.getValues();
+    const pairs = this.getSectionRowPairs(sectionMarker);
+    for(const pair of pairs) {
+      const start = pair.first - 1;
+      const end = pair.last;
+      for(let i = start; i < end; i++) {
+        let lookup = {};
+        lookup[i + 1] = values[i];
+        lookups.push(lookup);
+      }
+    }
+    return lookups;
   }
 
   getTitlesAboveSectionsSubRanges(rangeConfigs=[{}]) {
