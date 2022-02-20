@@ -7,6 +7,7 @@ class CopyCalendarEventsToSheet extends Feature {
 
   execute() {
     super.execute();
+    this.customValidator = this.config.isValidEvent || ((e) => { return true; });
     this.buildCalendarEvents(this.config.fromDate, this.config.eventsToNumYearsFromNow);
     this.updateSheet(this.sheet);
   }
@@ -23,14 +24,20 @@ class CopyCalendarEventsToSheet extends Feature {
     const events = this.getCalendar().getEvents(fromDate, toDate);
     this.calendarEvents = [];
     events.forEach((event) => {
-      this.calendarEvents.push({
-        title: event.getTitle(),
-        startDateTime: event.getStartTime(),
-        endDateTime: event.getEndTime(),
-        isAllDay: event.isAllDayEvent()
-      });
+      if(this.customValidator(event)) {
+        this.calendarEvents.push(this.getCalendarEvent(event));
+      }
     });
     logStringVerbose('Got ' + this.calendarEvents.length + ' events from calendar between [' + fromDate + '] and [' + toDate + ']');
+  }
+
+  getCalendarEvent(event) {
+    return {
+      title: event.getTitle(),
+      startDateTime: event.getStartTime(),
+      endDateTime: event.getEndTime(),
+      isAllDay: event.isAllDayEvent()
+    };
   }
 
   updateSheet(sheet) {
