@@ -16,7 +16,8 @@ class Sidebar {
 class SidebarHtmlBuilder {
   constructor(uiRef) {
     this.sheetControlItemHtmlBuilders = {
-      text: 'buildTextItemHtml',
+      heading: 'buildHeadingItemHtml',
+      text:    'buildTextItemHtml',
       buttons: 'buildButtonsItemHtml' 
     };
     this.bodyMarker = '<x>';
@@ -90,9 +91,14 @@ class SidebarHtmlBuilder {
     return html;
   }
 
-  buildTitleItemHtml(item)  {
+  buildTitleItemHtml(item, large=false)  {
     this.currentTitleID = this.getElementID(this.currentSheetControlItemId, item.title);
-    return `<h1>` + item.title + `<span class='hidden spinner-parent' id='` + this.currentTitleID + `'>&nbsp;<i class='fas fa-spinner fa-spin'></i></span></h1>`;
+    const size = large ? ' style="font-size: 24px"' : '';
+    return `<h1` + size + `>` + item.title + `<span class='hidden spinner-parent' id='` + this.currentTitleID + `'>&nbsp;<i class='fas fa-spinner fa-spin'></i></span></h1>`;
+  }
+
+  buildHeadingItemHtml(item) {
+    return this.buildTitleItemHtml(item, true);
   }
 
   buildTextItemHtml(item) {
