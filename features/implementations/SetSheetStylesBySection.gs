@@ -68,7 +68,7 @@ class SetSheetStylesBySection extends Feature {
       rowTopOutside:    { styles:this.styles.rowTopOutside,    rangeGetter:'getTopOutsideRowRanges'           },
       rowBottomOutside: { styles:this.styles.rowBottomOutside, rangeGetter:'getBottomOutsideRowRanges'        },
       columnsOutside:   { styles:this.styles.columnsOutside,   rangeGetter:'getOutsideColumnsRanges'          },
-      matchers:         { styles:this.styles.matchers,         rangeGetter:'getMatchingGenericSectionRanges'  }
+      rowMatchers:      { styles:this.styles.rowMatchers,      rangeGetter:'getMatchingGenericSectionRanges'  }
     };
   }
 }
