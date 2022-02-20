@@ -18,6 +18,7 @@ class SidebarHtmlBuilder {
     this.sheetControlItemHtmlBuilders = {
       heading: 'buildHeadingItemHtml',
       text:    'buildTextItemHtml',
+      ul:      'buildUnorderedListItemHtml',
       buttons: 'buildButtonsItemHtml' 
     };
     this.bodyMarker = '<x>';
@@ -105,6 +106,14 @@ class SidebarHtmlBuilder {
     return this.buildTitleItemHtml(item) + `<p>` + item.text + `</p>`;
   }
 
+  buildUnorderedListItemHtml(item) {
+    let str = this.buildTitleItemHtml(item) + `<ul>`;
+    for(const text of item.texts) {
+      str += `<li>` + text + `</li>`;
+    }
+    return str + `</ul>`;
+  }
+
   buildButtonsItemHtml(item) {
     var html = '';
     html += this.buildTitleItemHtml(item);
@@ -163,6 +172,13 @@ class SidebarHtmlBuilder {
       }
       pre {
         margin: 0;
+      }
+      ul {
+        padding-left: 1em;
+        padding-right: 0.6em;
+      }
+      ul li {
+        margin-bottom: 0.7em;
       }
     </style>
     <script>
