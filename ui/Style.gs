@@ -51,6 +51,7 @@ class Style {
           fontColor: this.color.darkestGrey,
           background: this.color.lightGrey,
           verticalAlignment: this.alignment.vertical.bottom,
+          horizontalAlignment: this.alignment.horizontal.left,
           rowHeight: 55,
           border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }
         },
@@ -188,6 +189,8 @@ class Style {
           fontSize: 24,
           fontColor: this.color.darkestGrey,
           background: this.color.lightGrey,
+          verticalAlignment: this.alignment.vertical.bottom,
+          horizontalAlignment: this.alignment.horizontal.left,
           rowHeight: 55,
           border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }
         },
@@ -198,6 +201,8 @@ class Style {
           fontSize: 7,
           fontColor: this.color.darkGrey,
           background: this.color.lightGrey,
+          verticalAlignment: this.alignment.vertical.top,
+          horizontalAlignment: this.alignment.horizontal.left,
           border: { top: true, left: true, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
         },
         displayHeadings: {
@@ -206,10 +211,13 @@ class Style {
           fontSize: 10,
           fontColor: null,
           background: null,
+          verticalAlignment: this.alignment.vertical.bottom,
+          horizontalAlignment: this.alignment.horizontal.center,
           border: { top: true, left: true, bottom: true, right: true, vertical: true, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
         }
       },
       headers: {
+        left: this.getBlank({ beginColumnOffset: 0, numColumns: 2, rowHeight: 36, border: { top: true, left: false, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }}),
         year: {
           beginColumnOffset: 2,
           numColumns: 1,
@@ -217,6 +225,9 @@ class Style {
           fontSize: 10,
           fontColor: '#666666',
           background: this.color.lightGrey,
+          verticalAlignment: this.alignment.vertical.middle,
+          horizontalAlignment: this.alignment.horizontal.center,
+          rowHeight: 36,
           border: { top: true, left: false, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
         },
         realHeadings: {
@@ -225,9 +236,10 @@ class Style {
           fontSize: 8,
           fontColor: null,
           background: null,
+          verticalAlignment: this.alignment.vertical.middle,
+          horizontalAlignment: this.alignment.horizontal.center,
           border: { top: true, left: true, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
-        },
-        left: this.getBlank({ beginColumnOffset: 0, numColumns: 2, rowHeight: 36, border: { top: true, left: false, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }}),
+        }
       },
       contents:{
         months: {
@@ -237,6 +249,9 @@ class Style {
           fontSize: 14,
           fontColor: null,
           background: null,
+          verticalAlignment: this.alignment.vertical.middle,
+          horizontalAlignment: this.alignment.horizontal.center,
+          columnWidth: 95,
           border: { top: null, left: null, bottom: null, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
         },
         weeks: {
@@ -246,6 +261,9 @@ class Style {
           fontSize: 9,
           fontColor: null,
           background: null,
+          verticalAlignment: this.alignment.vertical.middle,
+          horizontalAlignment: this.alignment.horizontal.right,
+          columnWidth: 70,
           border: { top: null, left: null, bottom: null, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
         },
         calendarSync: {
@@ -255,6 +273,9 @@ class Style {
           fontSize: 8,
           fontColor: null,
           background: null,
+          verticalAlignment: this.alignment.vertical.middle,
+          horizontalAlignment: this.alignment.horizontal.left,
+          columnWidth: 240,
           borders: [
             { top: null, left: null, bottom: null, right: null, vertical: false, horizontal: true, color: '#ffffff', style: 'SOLID' },
             { top: null, left: null, bottom: null, right: true, vertical: false, horizontal: null, color: '#b7b7b7', style: 'SOLID_MEDIUM' }
@@ -266,7 +287,10 @@ class Style {
           fontSize: 7,
           fontColor: null,
           background: null,
+          verticalAlignment: this.alignment.vertical.middle,
+          horizontalAlignment: this.alignment.horizontal.center,
           rowHeight: 41,
+          columnWidth: 105,
           borders: [
             { top: null, left: null, bottom: null, right: null, vertical: false, horizontal: true, color: '#ffffff', style: 'SOLID' },
             { top: true, left: null, bottom: true, right: true, vertical: null, horizontal: null, color: '#666666', style: 'SOLID_MEDIUM' }
@@ -284,8 +308,8 @@ class Style {
       columnsOutside: {
         all: this.getBlank({ columnWidth: 12 })
       },
-      matchers: {
-        currentWeek: {
+      rowMatchers: {
+        currentWeekForRedBorder: {
           match: {
             value: getMondayThisWeek(),
             column: 'C'
