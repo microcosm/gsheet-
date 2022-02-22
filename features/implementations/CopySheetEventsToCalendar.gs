@@ -180,11 +180,11 @@ class EventsFromSheetStateBuilder {
       startDateTime = new Date(state.today);
       endDateTime = null;
     } else {
-      const startTime = row[this.columns.startTime];
-      const startTimeHours = this.getStartTimeHours(startTime);
-      const startTimeMinutes = this.getStartTimeMinutes(startTime);
-      const durationHours = row[this.columns.durationHours];
-      isAllDay = this.getIsAllDay(startTimeHours, startTimeMinutes, durationHours);
+      const startTimeVal = row[this.columns.startTime];
+      const startTimeHours = this.getStartTimeHours(startTimeVal);
+      const startTimeMinutes = this.getStartTimeMinutes(startTimeVal);
+      const durationHoursVal = row[this.columns.durationHours].toString();
+      isAllDay = this.getIsAllDay(startTimeHours, startTimeMinutes, durationHoursVal);
       startDateTime = new Date(row[this.columns.workDate]);
       startDateTime = this.getPulledForward(startDateTime);
 
@@ -195,11 +195,7 @@ class EventsFromSheetStateBuilder {
         startDateTime.setMinutes(startTimeMinutes);
         startDateTime.setSeconds(0);
         startDateTime.setMilliseconds(0);
-        endDateTime = new Date(startDateTime);
-        endDateTime.setHours(endDateTime.getHours() + durationHours);
-        endDateTime.setMinutes((durationHours - Math.floor(durationHours)) * 60);
-        endDateTime.setSeconds(0);
-        endDateTime.setMilliseconds(0);
+        endDateTime = this.getEndDateTime(startDateTime, durationHoursVal);
       }
     }
 
@@ -231,6 +227,12 @@ class EventsFromSheetStateBuilder {
 
   getStartTimeMinutes(startTime) {
     return isValidTimeString(startTime) ? startTime.split(':')[1] : false;
+  }
+
+  getEndDateTime(startTime, duration) {
+    let d = new Date(startTime);
+    d.setTime(startTime.getTime() + duration * 60 * 60 * 1000);
+    return d;
   }
 
   getPulledForward(dateTime) {
