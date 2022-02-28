@@ -29,7 +29,7 @@ class SetSheetStylesBySection extends Feature {
     if(this.isValidProperty(styles, 'fontColor'           )) range.setFontColor          (styles.fontColor);
     if(this.isValidProperty(styles, 'background'          )) range.setBackground         (styles.background);
     if(this.isValidProperty(styles, 'horizontalAlignment' )) range.setHorizontalAlignment(styles.horizontalAlignment);
-    if(this.isValidProperty(styles, 'verticalAlignment'   )) range.setVerticalAlignment(styles.verticalAlignment);
+    if(this.isValidProperty(styles, 'verticalAlignment'   )) range.setVerticalAlignment  (styles.verticalAlignment);
     if(this.isValidProperty(styles, 'border'              )) this.setBorders             ([styles.border], range);
     if(this.isValidProperty(styles, 'borders'             )) this.setBorders             (styles.borders, range);
     if(this.isValidProperty(styles, 'rowHeight'           )) this.sheet.sheetRef.setRowHeightsForced(range.getRow(), range.getNumRows(), styles.rowHeight);
