@@ -44,20 +44,23 @@ class Style {
       titles: {
         all: {
           fontFamily: this.font.family,
-          rowHeight: 39
+          rowHeight: 39,
+          verticalAlignment: this.alignment.vertical.middle
         }
       },
       headers: {
         all: {
           fontFamily: this.font.family,
-          rowHeight: 39
+          rowHeight: 39,
+          verticalAlignment: this.alignment.vertical.middle
         }
       },
       contents: {
         all: {
           fontFamily: this.font.family,
           fontSize: 9,
-          rowHeight: 23
+          rowHeight: 23,
+          verticalAlignment: this.alignment.vertical.middle
         }
       },
       rowsOutside: {
