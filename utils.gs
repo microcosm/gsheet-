@@ -49,6 +49,11 @@ function getMondayThisWeek() {
   return new Date(date.setDate(difference));
 }
 
+function getMondayLastWeek() {
+  let date = getMondayThisWeek();
+  return new Date(date.setDate(7));
+}
+
 function getTodaysDate() {
   var date = new Date();
   return setToMidnight(date);
