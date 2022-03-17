@@ -33,10 +33,29 @@ class Style {
       fontSize: 1,
       fontColor: this.color.lightGrey,
       background: this.color.lightGrey,
-      verticalAlignment: this.alignment.vertical.middle,
-      horizontalAlignment: this.alignment.horizontal.left
+      verticalAlignment: this.alignment.vertical.middle
     }
     return Object.assign(style, append);
+  }
+
+  getBare(sections) {
+    let styles = {
+      sections: sections,
+      contents: {
+        all: {
+          fontFamily: this.font.family,
+          fontSize: 9,
+          rowHeight: 23
+        }
+      },
+      rowsOutside: {
+        all: this.getBlank({ rowHeight: 9, border: { top: null, left: false, bottom: false, right: false, vertical: false, horizontal: false }})
+      },
+      columnsOutside: {
+        all: this.getBlank({ columnWidth: 12, border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }})
+      }
+    };
+    return styles;
   }
 
   getDefault(sections) {
