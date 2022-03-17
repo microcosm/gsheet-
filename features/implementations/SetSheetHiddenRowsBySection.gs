@@ -14,7 +14,7 @@ class SetSheetHiddenRowsBySection extends Feature {
   }
 
   initialize() {
-    this.hasVisibilityConfig = !!(this.config.visibleIfMatch);
+    this.hasVisibilityMatcher = !!(this.config.visibilityMatcher);
     this.startRowOffset = this.config.startRowOffset || 0;
     this.values = this.sheet.getValues();
   }
@@ -27,7 +27,7 @@ class SetSheetHiddenRowsBySection extends Feature {
 
       if(this.getIsVisible(row)) {
         this.sheet.sheetRef.showRows(row, numRows);
-        this.sheet.sheetRef.setActiveSelection(this.config.visibleIfMatch.column.asConfig + row);
+        this.sheet.sheetRef.setActiveSelection(this.config.visibilityMatcher.column.asConfig + row);
       } else {
         this.sheet.sheetRef.hideRows(row, numRows);
       }
@@ -35,16 +35,16 @@ class SetSheetHiddenRowsBySection extends Feature {
   }
 
   getIsVisible(cardinalIndexRow) {
-    if(!this.hasVisibilityConfig) return false;
-    const visibilityMatcher = this.getVisibilityMatcher();
-    const cellValue = this.values[cardinalIndexRow - 1][visibilityMatcher.column.zeroBasedIndex].toString();
-    return cellValue.includes(visibilityMatcher.text);
+    if(this.hasVisibilityMatcher) {
+      this.prepareVisibilityMatcher();
+      const cellValue = this.values[cardinalIndexRow - 1][this.config.visibilityMatcher.column.zeroBasedIndex].toString();
+      return isProperty(this.config.visibilityMatcher.method) ? this.config.visibilityMatcher.method(cellValue, this.eventData.value) : isMatch(cellValue, this.config.visibilityMatcher.text);
+    }
+    return false;
   }
 
-  getVisibilityMatcher() {
-    return {
-      column: this.config.visibleIfMatch.column,
-      text: this.config.visibleIfMatch.text === PropertyCommand.EVENT_DATA ? this.eventData.value : this.config.visibleIfMatch.text
-    };
+  prepareVisibilityMatcher() {
+    if(this.config.visibilityMatcher.text === PropertyCommand.EVENT_DATA) this.config.visibilityMatcher.text = this.eventData.value;
+    return this.config.visibilityMatcher;
   }
 }

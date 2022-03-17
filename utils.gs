@@ -28,7 +28,8 @@ function isValidTimeString(candidate) {
 
 function isMatch(candidate, matcher) {
   if(isDate(matcher)) {
-    return isDate(candidate) && candidate.getTime() === matcher.getTime();
+    const candidateDate = isDate(candidate) ? candidate : new Date(candidate);
+    return candidateDate.getTime() === matcher.getTime();
   }
   if(isString(matcher)) {
     return candidate.includes(matcher);
