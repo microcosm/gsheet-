@@ -5,6 +5,7 @@ class SetSheetHiddenRowsBySection extends Feature {
     this.addResponseCapability(Event.onOvernightTimer);
     this.addResponseCapability(Event.onHourTimer);
     this.addResponseCapability(Event.onSidebarSubmit);
+    this.isActiveSelectionSet = false;
   }
 
   execute() {
@@ -27,7 +28,7 @@ class SetSheetHiddenRowsBySection extends Feature {
 
       if(this.getIsVisible(row)) {
         this.sheet.sheetRef.showRows(row, numRows);
-        this.sheet.sheetRef.setActiveSelection(this.config.visibilityMatcher.column.asConfig + row);
+        this.setActiveSelection(row);
       } else {
         this.sheet.sheetRef.hideRows(row, numRows);
       }
@@ -46,5 +47,12 @@ class SetSheetHiddenRowsBySection extends Feature {
   prepareVisibilityMatcher() {
     if(this.config.visibilityMatcher.text === PropertyCommand.EVENT_DATA) this.config.visibilityMatcher.text = this.eventData.value;
     return this.config.visibilityMatcher;
+  }
+
+  setActiveSelection(row) {
+    if(!this.isActiveSelectionSet) {
+      this.sheet.sheetRef.setActiveSelection(this.config.visibilityMatcher.column.asConfig + row);
+      this.isActiveSelectionSet = true;
+    }
   }
 }
