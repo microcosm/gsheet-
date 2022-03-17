@@ -41,6 +41,18 @@ class Style {
   getBare(sections) {
     let styles = {
       sections: sections,
+      titles: {
+        all: {
+          fontFamily: this.font.family,
+          rowHeight: 39
+        }
+      },
+      headers: {
+        all: {
+          fontFamily: this.font.family,
+          rowHeight: 39
+        }
+      },
       contents: {
         all: {
           fontFamily: this.font.family,
