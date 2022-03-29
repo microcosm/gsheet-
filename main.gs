@@ -5,7 +5,6 @@ function onSpreadsheetOpen() {
   stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.onSpreadsheetOpen();
   executeFeaturesForEvent(Event.onSpreadsheetOpen);
-  endEventResponse();
 }
 
 function onSheetEdit(eventData) {
@@ -13,7 +12,6 @@ function onSheetEdit(eventData) {
   const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onSheetEdit, eventData);
-  endEventResponse();
 }
 
 function onCalendarEdit() {
@@ -21,7 +19,6 @@ function onCalendarEdit() {
   const stateBuilder = new StateBuilder(SpreadsheetSource.openById);
   stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onCalendarEdit);
-  endEventResponse();
 }
 
 function onOvernightTimer() {
@@ -29,7 +26,6 @@ function onOvernightTimer() {
   const stateBuilder = new StateBuilder(SpreadsheetSource.openById);
   stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onOvernightTimer);
-  endEventResponse();
 }
 
 function onHourTimer() {
@@ -37,7 +33,6 @@ function onHourTimer() {
   const stateBuilder = new StateBuilder(SpreadsheetSource.openById);
   stateBuilder.buildSheetState().buildUsersState();
   executeFeaturesForEvent(Event.onHourTimer);
-  endEventResponse();
 }
 
 /* Simple Triggers */
@@ -47,7 +42,6 @@ function onSelectionChange() {
   stateBuilder.buildSheetState().buildUserInterfaceState();
   state.ui.onSelectionChange();
   executeFeaturesForEvent(Event.onSelectionChange);
-  endEventResponse();
 }
 
 /* Callbacks */
@@ -64,7 +58,6 @@ function onSidebarSubmit(eventData) {
   const stateBuilder = new StateBuilder(SpreadsheetSource.getActive);
   stateBuilder.buildSheetState().buildUserInterfaceState();
   executeFeaturesForEvent(Event.onSidebarSubmit, eventData);
-  endEventResponse();
 }
 
 function onGetActiveSheetControlID() {
@@ -100,6 +93,7 @@ function executeFeatures() {
     } catch(exception) {
       alertError(exception);
     } finally {
+      endEventResponse();
       releaseLock();
     }
   }
