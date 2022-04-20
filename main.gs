@@ -91,7 +91,11 @@ function executeFeatures() {
       state.builder.prepareForExecution();
       state.features.executions.forEach((feature) => { feature.execute() });
     } catch(exception) {
+      logString('Current user:', Session.getActiveUser().getEmail());
       alertError(exception);
+      endEventResponse();
+      releaseLock();
+      throw exception;
     } finally {
       endEventResponse();
       releaseLock();
