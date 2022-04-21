@@ -35,7 +35,7 @@ class CreateSheetItem extends Feature {
   updateNewRowWith(values) {
     const newRowContentRange = this.getNewRowContentRange();
     const oldValues = newRowContentRange.getValues();
-    if(values.length != oldValues[0].length) logString('Not setting values on new row because ' + this.config.values.length + ' values provided in config, whereas ' + oldValues[0].length + ' values required by range');
+    if(values.length != oldValues[0].length) logString('Not setting values on new row because ' + values.length + ' values provided in config, whereas ' + oldValues[0].length + ' values required by range');
     else newRowContentRange.setValues([values]);
   }
 
