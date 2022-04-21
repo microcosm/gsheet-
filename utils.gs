@@ -34,7 +34,7 @@ function isMatch(candidate, matcher) {
   if(isString(matcher)) {
     return candidate.includes(matcher);
   }
-  return candidate === matcher;
+  return candidate == matcher;
 }
 
 function getHtmlSafeID(unsafe) {

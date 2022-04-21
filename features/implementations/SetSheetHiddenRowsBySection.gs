@@ -45,8 +45,9 @@ class SetSheetHiddenRowsBySection extends Feature {
   }
 
   prepareVisibilityMatcher() {
-    if(this.config.visibilityMatcher.text === PropertyCommand.EVENT_DATA) this.config.visibilityMatcher.text = this.eventData.value;
-    return this.config.visibilityMatcher;
+    if(this.config.visibilityMatcher.text === PropertyCommand.EVENT_DATA) {
+      this.config.visibilityMatcher.text = this.eventData.value;
+    }
   }
 
   setActiveSelection(row) {
