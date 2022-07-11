@@ -82,7 +82,9 @@ function executeFeaturesForEvent(event, eventData=false) {
 function executeFeatures() {
   const numExecutableFeatures = state.features.executions.length;
   logString((numExecutableFeatures === 0 ? 'No' : numExecutableFeatures) + ' executable features found');
-  if(numExecutableFeatures > 0) {
+  if(numExecutableFeatures === 0) {
+    endEventResponse();
+  } else {
     if(!waitForLocks()){
       alertError('Could not lock script');
       return;
