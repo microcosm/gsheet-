@@ -153,6 +153,8 @@ class Style {
       beginColumnOffset: numLeftColumns,
       border: this.border.thickPanelDivider
     };
+    styles.headers.left = Object.assign({}, styles.contents.left);
+    styles.headers.right = Object.assign({}, styles.contents.right);
     return styles;
   }
 
@@ -172,6 +174,9 @@ class Style {
       beginColumnOffset: numLeftColumns + numMidColumns,
       border: this.border.thickPanelDivider
     };
+    styles.headers.left = Object.assign({}, styles.contents.left);
+    styles.headers.middle = Object.assign({}, styles.contents.middle);
+    styles.headers.right = Object.assign({}, styles.contents.right);
     return styles;
   }
 

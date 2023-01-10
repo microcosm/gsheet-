@@ -24,7 +24,7 @@ const FeatureClass = {
   copySheetValuesBySection: CopySheetValuesBySection,
   createSheetItem: CreateSheetItem,
   moveSheetRowsToDone: MoveSheetRowsToDone,
-  orderSheetMainSections: OrderSheetMainSections,
+  orderSheetSections: OrderSheetSections,
   setSheetGroupsBySection: SetSheetGroupsBySection,
   setSheetHiddenRowsBySection: SetSheetHiddenRowsBySection,
   setSheetStylesBySection: SetSheetStylesBySection,
@@ -43,6 +43,11 @@ const Priority = {
   HIGH_PRIORITY: 'HIGH_PRIORITY',
   LOW_PRIORITY:  'LOW_PRIORITY'
 };
+
+const SectionsCategory = {
+  MAIN: 'SECTIONS_CATEGORY_MAIN',
+  DONE: 'SECTIONS_CATEGORY_DONE',
+}
 
 const BorderStyle = {
   SOLID:        SpreadsheetApp.BorderStyle.SOLID,
