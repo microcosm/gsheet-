@@ -201,6 +201,10 @@ class Style {
       beginColumnOffset: numLeftColumns + numLeftMidColumns + numRightMidColumns,
       border: this.border.thickPanelDivider
     };
+    styles.headers.left = Object.assign({}, styles.contents.left);
+    styles.headers.leftMiddle = Object.assign({}, styles.contents.leftMiddle);
+    styles.headers.rightMiddle = Object.assign({}, styles.contents.rightMiddle);
+    styles.headers.right = Object.assign({}, styles.contents.right);
     return styles;
   }
 
