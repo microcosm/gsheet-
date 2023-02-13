@@ -2,6 +2,7 @@ class OrderSheetSections extends Feature {
   constructor(sheet) {
     super(sheet, 'Order Sheet Sections');
     this.addResponseCapability(Event.onSidebarSubmit);
+    this.addResponseCapability(Event.onOvernightTimer);
     this.ascendingMarker = 'ascending';
   }
 
@@ -25,7 +26,7 @@ class OrderSheetSections extends Feature {
   }
 
   getGoogleConfigArray() {
-    const sortConfigArray = this.config.by[toCamelCase(this.eventData.value)];
+    const sortConfigArray = this.config.order || this.config.by[toCamelCase(this.eventData.value)];
     let googleConfigArray = [];
     for(const sortConfigItem of sortConfigArray) {
       googleConfigArray.push({
