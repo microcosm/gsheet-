@@ -11,7 +11,8 @@ class Style {
     this.border = {
       empty: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false },
       thinPanelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID' },
-      thickPanelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID_MEDIUM' }
+      thickPanelDivider: { top: null, left: true, bottom: null, right: null, vertical: null, horizontal: null, color: '#999999', style: 'SOLID_MEDIUM' },
+      thinVerticalDivider: { top: null, left: null, bottom: null, right: null, vertical: true, horizontal: null, color: '#f3f3f3', style: 'SOLID' }
     };
     this.alignment = {
       vertical: {
