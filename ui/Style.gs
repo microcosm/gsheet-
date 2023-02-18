@@ -88,7 +88,7 @@ class Style {
           verticalAlignment: this.alignment.vertical.bottom,
           horizontalAlignment: this.alignment.horizontal.left,
           rowHeight: 55,
-          border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }
+          borders: [{ top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }]
         },
         review: {
           numColumns: 1,
@@ -98,7 +98,7 @@ class Style {
           fontColor: null,
           background: this.color.lightGrey,
           verticalAlignment: this.alignment.vertical.bottom,
-          border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }
+          borders: [{ top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }]
         },
         between: this.getBlank({ beginColumnOffset: 1, endColumnOffset: 1, border: this.border.empty })
       },
@@ -110,7 +110,7 @@ class Style {
           background: this.color.darkGrey,
           verticalAlignment: this.alignment.vertical.bottom,
           rowHeight: 56,
-          border: { top: true, left: false, bottom: true, right: false, vertical: false, horizontal: false, color: '#333333', style: 'SOLID_THICK' }
+          borders: [{ top: true, left: false, bottom: true, right: false, vertical: false, horizontal: false, color: '#333333', style: 'SOLID_THICK' }]
         }
       },
       contents: {
@@ -121,23 +121,23 @@ class Style {
           background: null,
           verticalAlignment: this.alignment.vertical.middle,
           rowHeight: 48,
-          border: { top: null, left: false, bottom: null, right: false, vertical: false, horizontal: true, color: this.color.darkGrey, style: 'SOLID' }
+          borders: [{ top: null, left: false, bottom: null, right: false, vertical: false, horizontal: true, color: this.color.darkGrey, style: 'SOLID' }]
         }
       },
       titlesAboveBelow: {
-        all: this.getBlank({ rowHeight: 9, border: { top: null, left: false, bottom: null, right: false, vertical: false, horizontal: false } })
+        all: this.getBlank({ rowHeight: 9, borders: [{ top: null, left: false, bottom: null, right: false, vertical: false, horizontal: false }] })
       },
       hiddenValues: {
         all: this.getBlank()
       },
       underContents: {
-        all: this.getBlank({ rowHeight: 9, border: { top: true, left: false, bottom: null, right: false, vertical: false, horizontal: false, color: '#333333', style: 'SOLID_THICK' }})
+        all: this.getBlank({ rowHeight: 9, borders: [{ top: true, left: false, bottom: null, right: false, vertical: false, horizontal: false, color: '#333333', style: 'SOLID_THICK' }] })
       },
       rowsOutside: {
-        all: this.getBlank({ rowHeight: 9, border: { top: null, left: false, bottom: false, right: false, vertical: false, horizontal: false }})
+        all: this.getBlank({ rowHeight: 9, borders: [{ top: null, left: false, bottom: false, right: false, vertical: false, horizontal: false }] })
       },
       columnsOutside: {
-        all: this.getBlank({ columnWidth: 12, border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }})
+        all: this.getBlank({ columnWidth: 12, borders: [{ top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }] })
       }
     };
     return styles;
@@ -152,7 +152,7 @@ class Style {
     };
     styles.contents.right = {
       beginColumnOffset: numLeftColumns,
-      border: this.border.thickPanelDivider
+      borders: [this.border.thickPanelDivider]
     };
     styles.headers.left = Object.assign({}, styles.contents.left);
     styles.headers.right = Object.assign({}, styles.contents.right);
@@ -169,11 +169,11 @@ class Style {
     styles.contents.middle = {
       beginColumnOffset: numLeftColumns,
       numColumns: numMidColumns,
-      border: this.border.thickPanelDivider
+      borders: [this.border.thickPanelDivider]
     };
     styles.contents.right = {
       beginColumnOffset: numLeftColumns + numMidColumns,
-      border: this.border.thickPanelDivider
+      borders: [this.border.thickPanelDivider]
     };
     styles.headers.left = Object.assign({}, styles.contents.left);
     styles.headers.middle = Object.assign({}, styles.contents.middle);
@@ -191,16 +191,16 @@ class Style {
     styles.contents.leftMiddle = {
       beginColumnOffset: numLeftColumns,
       numColumns: numLeftMidColumns,
-      border: this.border.thickPanelDivider
+      borders: [this.border.thickPanelDivider]
     };
     styles.contents.rightMiddle = {
       beginColumnOffset: numLeftColumns + numLeftMidColumns,
       numColumns: numRightMidColumns,
-      border: this.border.thickPanelDivider
+      borders: [this.border.thickPanelDivider]
     };
     styles.contents.right = {
       beginColumnOffset: numLeftColumns + numLeftMidColumns + numRightMidColumns,
-      border: this.border.thickPanelDivider
+      borders: [this.border.thickPanelDivider]
     };
     styles.headers.left = Object.assign({}, styles.contents.left);
     styles.headers.leftMiddle = Object.assign({}, styles.contents.leftMiddle);
@@ -220,7 +220,7 @@ class Style {
           fontSize: 9,
           fontColor: null,
           background: this.color.lightGrey,
-          border: { top: false, left: false, bottom: null, right: false, vertical: false, horizontal: false }
+          borders: [{ top: false, left: false, bottom: null, right: false, vertical: false, horizontal: false }]
         },
         left: this.getBlank({ beginColumnOffset: 0, numColumns: 2, rowHeight: 24, border: { top: false, left: false, bottom: null, right: false, vertical: false, horizontal: false }}),
         right: this.getBlank({ beginColumnOffset: 3, rowHeight: 24, border: { top: false, left: false, bottom: null, right: false, vertical: false, horizontal: false }})
@@ -236,7 +236,7 @@ class Style {
           verticalAlignment: this.alignment.vertical.bottom,
           horizontalAlignment: this.alignment.horizontal.left,
           rowHeight: 55,
-          border: { top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }
+          borders: [{ top: false, left: false, bottom: false, right: false, vertical: false, horizontal: false }]
         },
         filter: {
           beginColumnOffset: 2,
@@ -247,7 +247,7 @@ class Style {
           background: this.color.lightGrey,
           verticalAlignment: this.alignment.vertical.top,
           horizontalAlignment: this.alignment.horizontal.left,
-          border: { top: true, left: true, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
+          borders: [{ top: true, left: true, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }]
         },
         displayHeadings: {
           beginColumnOffset: 3,
@@ -257,7 +257,7 @@ class Style {
           background: null,
           verticalAlignment: this.alignment.vertical.bottom,
           horizontalAlignment: this.alignment.horizontal.center,
-          border: { top: true, left: true, bottom: true, right: true, vertical: true, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
+          borders: [{ top: true, left: true, bottom: true, right: true, vertical: true, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }]
         }
       },
       headers: {
@@ -272,7 +272,7 @@ class Style {
           verticalAlignment: this.alignment.vertical.middle,
           horizontalAlignment: this.alignment.horizontal.center,
           rowHeight: 36,
-          border: { top: true, left: false, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
+          borders: [{ top: true, left: false, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }]
         },
         realHeadings: {
           beginColumnOffset: 3,
@@ -282,7 +282,7 @@ class Style {
           background: null,
           verticalAlignment: this.alignment.vertical.middle,
           horizontalAlignment: this.alignment.horizontal.center,
-          border: { top: true, left: true, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
+          borders: [{ top: true, left: true, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }]
         }
       },
       contents:{
@@ -296,7 +296,7 @@ class Style {
           verticalAlignment: this.alignment.vertical.middle,
           horizontalAlignment: this.alignment.horizontal.center,
           columnWidth: 95,
-          border: { top: null, left: null, bottom: null, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
+          borders: [{ top: null, left: null, bottom: null, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }]
         },
         weeks: {
           beginColumnOffset: 1,
@@ -308,7 +308,7 @@ class Style {
           verticalAlignment: this.alignment.vertical.middle,
           horizontalAlignment: this.alignment.horizontal.right,
           columnWidth: 70,
-          border: { top: null, left: null, bottom: null, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }
+          borders: [{ top: null, left: null, bottom: null, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }]
         },
         calendarSync: {
           beginColumnOffset: 2,
@@ -343,7 +343,7 @@ class Style {
         borderOverlay: {
           beginColumnOffset: 0,
           numColumns: 3,
-          border: { top: true, left: true, bottom: true, right: null, vertical: null, horizontal: null, color: '#666666', style: 'SOLID_MEDIUM' }
+          borders: [{ top: true, left: true, bottom: true, right: null, vertical: null, horizontal: null, color: '#666666', style: 'SOLID_MEDIUM' }]
         }
       },
       rowBottomOutside: {
@@ -359,7 +359,7 @@ class Style {
             column: 'C'
           },
           beginColumnOffset: 2,
-          border: { top: true, left: true, bottom: true, right: true, vertical: null, horizontal: null, color: '#ea4335', style: 'SOLID_THICK' }
+          borders: [{ top: true, left: true, bottom: true, right: true, vertical: null, horizontal: null, color: '#ea4335', style: 'SOLID_THICK' }]
         }
       }
     };
