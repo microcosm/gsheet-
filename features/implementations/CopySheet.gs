@@ -32,6 +32,11 @@ class CopySheet extends Feature {
         this.clearDataValidations(config);
       });
     }
+    if(isProperty(this.config.setCellValue)) {
+      this.config.setCellValue.forEach((config) => {
+        this.setCellValue(config);
+      });
+    }
   }
 
   replaceOldSheet() {
@@ -48,6 +53,11 @@ class CopySheet extends Feature {
   clearDataValidations(config) {
     const ranges = this.getRanges(config, false);
     ranges.destination.clearDataValidations();
+  }
+
+  setCellValue(config) {
+    const range = this.newDestinationSheet.getRange(config.row.cardinalIndex, config.column.cardinalIndex, 1, 1);
+    range.setValue(config.value);
   }
 
   getRanges(config, includeSource=true){
