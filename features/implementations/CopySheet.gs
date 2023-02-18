@@ -12,7 +12,7 @@ class CopySheet extends Feature {
 
   execute() {
     super.execute();
-    this.sourceSheet = this.sheet.sheetRef;
+    this.sourceSheet = isProperty(this.config.sourceSheetName) ? state.spreadsheet.ref.getSheetByName(this.config.sourceSheetName) : this.sheet.sheetRef;
     this.destinationSpreadsheet = SpreadsheetApp.openById(this.config.destinationSpreadsheetID);
     this.oldDestinationSheet = this.destinationSpreadsheet.getSheetByName(this.config.destinationSheetName);
     this.newDestinationSheet = this.sourceSheet.copyTo(this.destinationSpreadsheet);
