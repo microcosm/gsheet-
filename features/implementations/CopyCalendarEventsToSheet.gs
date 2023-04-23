@@ -32,11 +32,21 @@ class CopyCalendarEventsToSheet extends Feature {
   }
 
   getCalendarEvent(event) {
+    let calendarEvent = this.createNewCalendarEvent(event.getTitle());
+    calendarEvent.startDateTime = event.getStartTime();
+    calendarEvent.endDateTime = event.getEndTime();
+    calendarEvent.isAllDay = event.isAllDayEvent();
+    calendarEvent.isRecurringEvent = event.isRecurringEvent();
+    return calendarEvent;
+  }
+
+  createNewCalendarEvent(title) {
     return {
-      title: event.getTitle(),
-      startDateTime: event.getStartTime(),
-      endDateTime: event.getEndTime(),
-      isAllDay: event.isAllDayEvent()
+      title: title,
+      startDateTime: null,
+      endDateTime: null,
+      isAllDay: true,
+      isRecurringEvent: false
     };
   }
 
@@ -84,15 +94,43 @@ class CopyCalendarEventsToSheet extends Feature {
            this.eventFiltersForReference.find(filter => title.includes(filter)) === undefined;
   }
 
-  formatCalendarEventsForCell(calendarEventsForCell) {
+  formatCalendarEventsForCell(calendarEventsThisWeek) {
+    const calendarEventsForCell = this.flattenRecurringEvents(calendarEventsThisWeek);
     if(calendarEventsForCell.length === 0) {
       return '';
     }
     var resultStr = '';
     calendarEventsForCell.forEach((calendarEvent) => {
-      resultStr += this.buildCalendarEventCellLine(calendarEvent)
+      resultStr += this.buildCalendarEventCellLine(calendarEvent);
     });
     return resultStr.trim('\n');
+  }
+
+  flattenRecurringEvents(calendarEventsThisWeek) {
+    let recurringEventsThisWeek = this.findRecurringEventsThisWeek(calendarEventsThisWeek);
+    calendarEventsThisWeek = calendarEventsThisWeek.filter(calendarEvent => !calendarEvent.isRecurringEvent);
+    for(const eventTitle in recurringEventsThisWeek) {
+      calendarEventsThisWeek.push(recurringEventsThisWeek[eventTitle]);
+    }
+    calendarEventsThisWeek.sort((a, b) => { return a.startDateTime - b.startDateTime });
+    return calendarEventsThisWeek;
+  }
+
+  findRecurringEventsThisWeek(calendarEventsThisWeek) {
+    let recurringEventsThisWeek = {};
+    calendarEventsThisWeek.forEach((calendarEvent) => {
+      if(calendarEvent.isRecurringEvent) {
+        let recurringEvent = createPropertyIfDoesntExist(recurringEventsThisWeek, calendarEvent.title, this.createNewCalendarEvent);
+
+        if(recurringEvent.startDateTime === null || recurringEvent.startDateTime > calendarEvent.startDateTime) {
+          recurringEvent.startDateTime = calendarEvent.startDateTime;
+        }
+        if(recurringEvent.endDateTime === null || recurringEvent.endDateTime < calendarEvent.endDateTime) {
+          recurringEvent.endDateTime = calendarEvent.endDateTime;
+        }
+      }
+    });
+    return recurringEventsThisWeek;
   }
 
   buildCalendarEventCellLine(calendarEvent) {

@@ -123,8 +123,15 @@ function isDate(value) {
   return !!(value && value instanceof Date);
 }
 
-function isProperty(value) {
-  return typeof value !== 'undefined';
+function isProperty(property) {
+  return typeof property !== 'undefined';
+}
+
+function createPropertyIfDoesntExist(obj, key, valueMethod) {
+  if(!obj.hasOwnProperty(key)) {
+    obj[key] = valueMethod(key);
+  }
+  return obj[key];
 }
 
 function zeroBasedIndexToColumn(index) {
