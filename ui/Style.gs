@@ -285,7 +285,7 @@ class Style {
           borders: [{ top: true, left: true, bottom: true, right: true, vertical: false, horizontal: false, color: '#666666', style: 'SOLID_MEDIUM' }]
         }
       },
-      contents:{
+      contents: {
         months: {
           beginColumnOffset: 0,
           numColumns: 1,
@@ -319,11 +319,8 @@ class Style {
           background: null,
           verticalAlignment: this.alignment.vertical.middle,
           horizontalAlignment: this.alignment.horizontal.left,
-          columnWidth: 240,
-          borders: [
-            { top: null, left: null, bottom: null, right: null, vertical: false, horizontal: true, color: '#ffffff', style: 'SOLID' },
-            { top: null, left: null, bottom: null, right: true, vertical: false, horizontal: null, color: '#b7b7b7', style: 'SOLID_MEDIUM' }
-          ]
+          columnWidth: 180,
+          borders: [{ top: null, left: null, bottom: null, right: null, vertical: false, horizontal: true, color: '#ffffff', style: 'SOLID' }]
         },
         main: {
           beginColumnOffset: 3,
@@ -337,7 +334,7 @@ class Style {
           columnWidth: 105,
           borders: [
             { top: null, left: null, bottom: null, right: null, vertical: false, horizontal: true, color: '#ffffff', style: 'SOLID' },
-            { top: true, left: null, bottom: true, right: true, vertical: null, horizontal: null, color: '#666666', style: 'SOLID_MEDIUM' }
+            { top: true, left: true, bottom: true, right: true, vertical: null, horizontal: null, color: '#666666', style: 'SOLID_MEDIUM' }
           ]
         },
         borderOverlay: {
