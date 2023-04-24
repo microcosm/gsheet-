@@ -72,7 +72,7 @@ class CopyCalendarEventsToSheet extends Feature {
     this.eventRangeForUpdate = sheet.sheetRef.getRange(beginRow, eventColumn, numRows, 1);
     this.eventValuesForUpdate = this.eventRangeForUpdate.getValues();
     this.dateValuesForReference = sheet.sheetRef.getRange(beginRow, dateColumn, numRows, 1).getValues();
-    this.eventFiltersForReference = sheet.sheetRef.getRange(filterRow, eventColumn, 1, 1).getValue().split('\n').map((str) => { return str.toLowerCase(); });
+    this.eventFiltersForReference = sheet.sheetRef.getRange(filterRow, eventColumn, 1, 1).getValue().split('\n').map(str => { return str.toLowerCase(); });
   }
 
   findCalendarEventsThisWeek(weekCommenceDate) {

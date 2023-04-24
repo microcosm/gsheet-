@@ -67,7 +67,7 @@ class StateBuilder {
     const sheet = new FeatureSheet(sheetConfig);
     state.sheets.push(sheet);
     this.appendFeatures(
-      sheetConfig.featureClasses.map((featureClass) => {
+      sheetConfig.featureClasses.map(featureClass => {
         return new featureClass(sheet)
       })
     );

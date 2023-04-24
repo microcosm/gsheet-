@@ -43,7 +43,7 @@ class SidebarHtmlBuilder {
   buildHtml() {
     var html = '';
     html += this.buildFormOpen();
-    state.sheets.forEach((sheet) => {
+    state.sheets.forEach(sheet => {
       if(sheet.config.hasOwnProperty('sidebar')) {
         this.currentSheetControlName = sheet.name;
         this.currentSheetControlId = this.getElementID(sheet.name);

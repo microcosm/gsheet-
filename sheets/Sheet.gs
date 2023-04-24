@@ -481,7 +481,7 @@ class ValuesSheet extends Sheet {
   }
 
   getValuesOf(columnID) {
-    return this.getValues().map((value) => { return value[columnID]; });
+    return this.getValues().map(value => { return value[columnID]; });
   }
 
   getValueOf(rowId, columnID) {

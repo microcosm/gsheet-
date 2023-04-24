@@ -23,17 +23,17 @@ class CopySheet extends Feature {
 
   performTransformations() {
     if(isProperty(this.config.overwriteWithNonRichTextValues)) {
-      this.config.overwriteWithNonRichTextValues.forEach((config) => {
+      this.config.overwriteWithNonRichTextValues.forEach(config => {
         this.overwriteWithNonRichTextValues(config);
       });
     }
     if(isProperty(this.config.clearDataValidations)) {
-      this.config.clearDataValidations.forEach((config) => {
+      this.config.clearDataValidations.forEach(config => {
         this.clearDataValidations(config);
       });
     }
     if(isProperty(this.config.setCellValue)) {
-      this.config.setCellValue.forEach((config) => {
+      this.config.setCellValue.forEach(config => {
         this.setCellValue(config);
       });
     }

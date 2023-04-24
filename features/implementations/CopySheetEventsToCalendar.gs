@@ -12,7 +12,7 @@ class CopySheetEventsToCalendar extends Feature {
     super.execute();
     this.eventsFromUserCalendarsStateBuilder = new EventsFromUserCalendarsStateBuilder(this);
     this.eventsFromSheetStateBuilder = new EventsFromSheetStateBuilder(this);
-    state.users.forEach((user) => {
+    state.users.forEach(user => {
       if(this.isValidUser(user)) {
         user.calendarEvents = this.eventsFromUserCalendarsStateBuilder.build(user);
         user.sheetEvents = this.eventsFromSheetStateBuilder.build(user);
@@ -38,7 +38,7 @@ class CopySheetEventsToCalendar extends Feature {
   }
 
   discoverMatchingEvents(user) {
-    user.sheetEvents.forEach((sheetEvent) => {
+    user.sheetEvents.forEach(sheetEvent => {
       var matchingCalendarEvent = this.findInCalendarEvents(sheetEvent, user.calendarEvents);
       if(matchingCalendarEvent) {
         matchingCalendarEvent.existsInSheet = true;
@@ -49,7 +49,7 @@ class CopySheetEventsToCalendar extends Feature {
   }
 
   deleteUnmatchedCalendarEvents(user) {
-    user.calendarEvents.forEach((calendarEvent) => {
+    user.calendarEvents.forEach(calendarEvent => {
       if(!calendarEvent.existsInSheet){
         this.deleteCalendarEvent(calendarEvent);
       }
@@ -57,7 +57,7 @@ class CopySheetEventsToCalendar extends Feature {
   }
 
   createUnmatchedSheetEvents(user) {
-    user.sheetEvents.forEach((sheetEvent) => {
+    user.sheetEvents.forEach(sheetEvent => {
       if(!sheetEvent.existsInCalendar) {
         this.createCalendarEvent(sheetEvent, user.calendar);
       }
@@ -66,7 +66,7 @@ class CopySheetEventsToCalendar extends Feature {
 
   findInCalendarEvents(sheetEvent, calendarEvents) {
     var match = false;
-    calendarEvents.forEach((calendarEvent) => {
+    calendarEvents.forEach(calendarEvent => {
       var isEqual =
         calendarEvent.title === sheetEvent.title &&
         calendarEvent.startDateTime.getTime() === sheetEvent.startDateTime.getTime() &&
@@ -248,7 +248,7 @@ class EventsFromSheetStateBuilder {
 
   getOtherUsersNames(user) {
     var otherNames = [];
-    state.users.forEach((possibleOther) => {
+    state.users.forEach(possibleOther => {
       if(possibleOther.name != user.name) {
         otherNames.push(possibleOther.name);
       }
