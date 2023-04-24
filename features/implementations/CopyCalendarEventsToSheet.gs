@@ -55,9 +55,9 @@ class CopyCalendarEventsToSheet extends Feature {
     for(var i = 0; i < this.dateValuesForReference.length; i++) {
       var weekCommenceDate = this.dateValuesForReference[i][0];
       if(isDate(weekCommenceDate)) {
-        weekCommenceDate = setToMidnight(weekCommenceDate);
-        const calendarEventsThisWeek = this.findCalendarEventsThisWeek(weekCommenceDate);
-        this.eventValuesForUpdate[i][0] = this.formatCalendarEventsForCell(calendarEventsThisWeek);
+        this.calendarEventsThisWeek = this.findCalendarEventsThisWeek(setToMidnight(weekCommenceDate));
+        this.calendarEventsThisWeekFiltered = this.filterCalendarEvents(this.calendarEventsThisWeek);
+        this.eventValuesForUpdate[i][0] = this.formatCalendarEventsForCell(this.calendarEventsThisWeekFiltered);
       }
     }
     this.eventRangeForUpdate.setValues(this.eventValuesForUpdate);
@@ -72,8 +72,7 @@ class CopyCalendarEventsToSheet extends Feature {
     this.eventRangeForUpdate = sheet.sheetRef.getRange(beginRow, eventColumn, numRows, 1);
     this.eventValuesForUpdate = this.eventRangeForUpdate.getValues();
     this.dateValuesForReference = sheet.sheetRef.getRange(beginRow, dateColumn, numRows, 1).getValues();
-    this.eventFiltersForReference = sheet.sheetRef.getRange(filterRow, eventColumn, 1, 1).getValue().split('\n');
-    this.eventFiltersForReference = this.eventFiltersForReference.map((str) => { return str.toLowerCase(); });
+    this.eventFiltersForReference = sheet.sheetRef.getRange(filterRow, eventColumn, 1, 1).getValue().split('\n').map((str) => { return str.toLowerCase(); });
   }
 
   findCalendarEventsThisWeek(weekCommenceDate) {
@@ -86,12 +85,19 @@ class CopyCalendarEventsToSheet extends Feature {
     return result;
   }
 
+  filterCalendarEvents(calendarEvents) {
+    return calendarEvents.filter(
+      calendarEvent => this.eventFiltersForReference.find(
+        filter => calendarEvent.title.toLowerCase().includes(filter)
+      ) === undefined
+    );
+  }
+
   isValidCalendarEventForWeek(calendarEvent, weekCommenceDate) {
     const weekConcludeDate = weekCommenceDate.addDays(7);
     const title = calendarEvent.title.toLowerCase();
     return calendarEvent.startDateTime >= weekCommenceDate &&
-           calendarEvent.startDateTime < weekConcludeDate &&
-           this.eventFiltersForReference.find(filter => title.includes(filter)) === undefined;
+           calendarEvent.startDateTime < weekConcludeDate;
   }
 
   formatCalendarEventsForCell(calendarEventsThisWeek) {
