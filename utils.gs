@@ -127,6 +127,10 @@ function isProperty(property) {
   return typeof property !== 'undefined';
 }
 
+function isFunction(func) {
+  return typeof func === 'function';
+}
+
 function createPropertyIfDoesntExist(obj, key, valueMethod) {
   if(!obj.hasOwnProperty(key)) {
     obj[key] = valueMethod(key);

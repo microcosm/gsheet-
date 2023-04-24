@@ -23,7 +23,7 @@ class CopyCalendarEventsToSheet extends Feature {
     const toDate = getNYearsFromTodaysDate(numYearsAhead);
     const events = this.getCalendar().getEvents(fromDate, toDate);
     this.calendarEvents = [];
-    events.forEach((event) => {
+    events.forEach(event => {
       if(this.customValidator(event)) {
         this.calendarEvents.push(this.getCalendarEvent(event));
       }
@@ -52,32 +52,37 @@ class CopyCalendarEventsToSheet extends Feature {
 
   updateSheet(sheet) {
     this.setupSheetState(sheet);
+    if(isFunction(this.config.customSetupSheetState)) this.config.customSetupSheetState(sheet, this);
+
     for(var i = 0; i < this.dateValuesForReference.length; i++) {
       var weekCommenceDate = this.dateValuesForReference[i][0];
       if(isDate(weekCommenceDate)) {
         this.calendarEventsThisWeek = this.findCalendarEventsThisWeek(setToMidnight(weekCommenceDate));
         this.calendarEventsThisWeekFiltered = this.filterCalendarEvents(this.calendarEventsThisWeek);
         this.eventValuesForUpdate[i][0] = this.formatCalendarEventsForCell(this.calendarEventsThisWeekFiltered);
+        if(isFunction(this.config.customProcessWeek)) this.config.customProcessWeek(i, this);
       }
     }
+
     this.eventRangeForUpdate.setValues(this.eventValuesForUpdate);
+    if(isFunction(this.config.customUpdateSheet)) this.config.customUpdateSheet();
   }
 
   setupSheetState(sheet) {
-    const beginRow = this.config.beginRow.cardinalIndex;
+    this.beginRow = this.config.beginRow.cardinalIndex;
+    this.numRows = sheet.sheetRef.getMaxRows() - this.beginRow;
     const filterRow = this.config.filterRow.cardinalIndex;
     const dateColumn = this.config.dateColumn.cardinalIndex;
     const eventColumn = this.config.eventColumn.cardinalIndex;
-    const numRows = sheet.sheetRef.getMaxRows() - beginRow;
-    this.eventRangeForUpdate = sheet.sheetRef.getRange(beginRow, eventColumn, numRows, 1);
+    this.eventRangeForUpdate = sheet.sheetRef.getRange(this.beginRow, eventColumn, this.numRows, 1);
     this.eventValuesForUpdate = this.eventRangeForUpdate.getValues();
-    this.dateValuesForReference = sheet.sheetRef.getRange(beginRow, dateColumn, numRows, 1).getValues();
+    this.dateValuesForReference = sheet.sheetRef.getRange(this.beginRow, dateColumn, this.numRows, 1).getValues();
     this.eventFiltersForReference = sheet.sheetRef.getRange(filterRow, eventColumn, 1, 1).getValue().split('\n').map(str => { return str.toLowerCase(); });
   }
 
   findCalendarEventsThisWeek(weekCommenceDate) {
     var result = [];
-    this.calendarEvents.forEach((calendarEvent) => {
+    this.calendarEvents.forEach(calendarEvent => {
       if(this.isValidCalendarEventForWeek(calendarEvent, weekCommenceDate)) {
         result.push(calendarEvent);
       }
@@ -106,7 +111,7 @@ class CopyCalendarEventsToSheet extends Feature {
       return '';
     }
     var resultStr = '';
-    calendarEventsForCell.forEach((calendarEvent) => {
+    calendarEventsForCell.forEach(calendarEvent => {
       resultStr += this.buildCalendarEventCellLine(calendarEvent);
     });
     return resultStr.trim('\n');
@@ -124,7 +129,7 @@ class CopyCalendarEventsToSheet extends Feature {
 
   findRecurringEventsThisWeek(calendarEventsThisWeek) {
     let recurringEventsThisWeek = {};
-    calendarEventsThisWeek.forEach((calendarEvent) => {
+    calendarEventsThisWeek.forEach(calendarEvent => {
       if(calendarEvent.isRecurringEvent) {
         let recurringEvent = createPropertyIfDoesntExist(recurringEventsThisWeek, calendarEvent.title, this.createNewCalendarEvent);
 
